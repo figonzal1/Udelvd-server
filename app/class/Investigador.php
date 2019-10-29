@@ -13,12 +13,13 @@ class Investigador
     private $email;
     private $passwordHashed;
     private $idRol;
+    private $activado;
 
     function agregar($conn)
     {
         try {
             $stmt = $conn->prepare(
-                "INSERT INTO investigador (nombre,apellido,email,password,id_rol) VALUES (?,?,?,?,?)"
+                "INSERT INTO investigador (nombre,apellido,email,password,id_rol,activado) VALUES (?,?,?,?,?,?)"
             );
 
             $stmt->execute(
@@ -27,7 +28,8 @@ class Investigador
                     $this->apellido,
                     $this->email,
                     $this->passwordHashed,
-                    $this->idRol
+                    $this->idRol,
+                    $this->activado
                 )
             );
 
@@ -119,6 +121,31 @@ class Investigador
         }
     }
 
+    function activar($conn)
+    {
+
+        try {
+
+            $stmt = $conn->prepare(
+                "UPDATE investigador SET activado=? WHERE id=?"
+            );
+
+            $stmt->execute(array(
+                $this->activado,
+                $this->id
+            ));
+
+            if ($stmt->rowCount() == 0) {
+                return false;
+            } else if ($stmt->rowCount() == 1) {
+                return true;
+            }
+        } catch (PDOException $e) {
+            echo "Fail to activate investigador: " . $e->getMessage() . "\n";
+            return false;
+        }
+    }
+
     /**
      * GETTERS & SETTERS
      */
@@ -148,6 +175,10 @@ class Investigador
     {
         return $this->idRol;
     }
+    function getActivado()
+    {
+        return $this->activado;
+    }
     function setId($id)
     {
         $this->id = $id;
@@ -171,5 +202,9 @@ class Investigador
     function setIdRol($idRol)
     {
         $this->idRol = $idRol;
+    }
+    function setActivado($activado)
+    {
+        $this->activado = $activado;
     }
 }
