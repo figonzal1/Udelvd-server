@@ -14,22 +14,25 @@ class Investigador
     private $passwordHashed;
     private $idRol;
 
-    function crear($conn)
+    function agregar($conn)
     {
         try {
             $stmt = $conn->prepare(
                 "INSERT INTO investigador (nombre,apellido,email,password,id_rol) VALUES (?,?,?,?,?)"
             );
 
-            $stmt->execute(array(
-                $this->nombre,
-                $this->apellido,
-                $this->email,
-                $this->passwordHashed,
-                $this->id_rol
-            ));
+            $stmt->execute(
+                array(
+                    $this->nombre,
+                    $this->apellido,
+                    $this->email,
+                    $this->passwordHashed,
+                    $this->idRol
+                )
+            );
 
-            return true;
+            $lastId = $conn->lastInsertId();
+            return $lastId;
         } catch (PDOException $e) {
             echo "Fail insert: " . $e->getMessage() . "\n";
             return false;
@@ -40,18 +43,23 @@ class Investigador
     {
         try {
             $stmt = $conn->prepare(
-                "UPDATE investigador SET nombre=?,apellido=?,password=?,id_rol=? WHERE id=?"
+                "UPDATE investigador SET nombre=?,apellido=?,email=?,password=?,id_rol=? WHERE id=?"
             );
 
             $stmt->execute(array(
                 $this->nombre,
                 $this->apellido,
-                $this->passwordHash,
-                $this->id_rol,
+                $this->email,
+                $this->passwordHashed,
+                $this->idRol,
                 $this->id
             ));
 
-            return true;
+            if ($stmt->rowCount() == 0) {
+                return false;
+            } else if ($stmt->rowCount() == 1) {
+                return true;
+            }
         } catch (PDOException $e) {
             echo "Fail update: " . $e->getMessage() . "\n";
             return false;
@@ -100,13 +108,20 @@ class Investigador
             );
 
             $stmt->execute(array($this->id));
-            return true;
+            if ($stmt->rowCount() == 0) {
+                return false;
+            } else if ($stmt->rowCount() == 1) {
+                return true;
+            }
         } catch (PDOException $e) {
             echo "Fail delete investigador: " . $e->getMessage() . "\n";
             return false;
         }
     }
 
+    /**
+     * GETTERS & SETTERS
+     */
     function getId()
     {
         return $this->id;

@@ -7,14 +7,11 @@ use Slim\Routing\RouteContext;
 
 require_once("app/config/MysqlAdapter.php");
 require_once("app/class/Investigador.php");
-require_once("app/validators/IntegerValidator.php");
-
-
-
+require_once("app/utils/ErrorJsonHandler.php");
 /**
  * GET /investigadores: Listado de investigadores del sistema
  */
-$app->get('/investigadores', function ($request, $response, $args) {
+$app->get('/investigadores[/]', function ($request, $response, $args) {
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -46,7 +43,7 @@ $app->get('/investigadores', function ($request, $response, $args) {
                 array(
                     'type' => 'investigadores',
                     'id' => $value['id'],
-                    'attirbutes' => array(
+                    'attributes' => array(
                         'nombre' => $value['nombre'],
                         'apellido' => $value['apellido'],
                         'email' => $value['email'],
@@ -77,7 +74,7 @@ $app->get('/investigadores', function ($request, $response, $args) {
 /**
  * GET /investigadores/{id}: Obtener investigador segun id
  */
-$app->get('/investigadores/{id:[0-9]+}', function ($request, $response, $args) {
+$app->get('/investigadores/{id}', function ($request, $response, $args) {
 
     $id_investigador = $args['id'];
 
@@ -91,7 +88,10 @@ $app->get('/investigadores/{id:[0-9]+}', function ($request, $response, $args) {
         )
     );
 
-    if ($conn != null) {
+    if (!filter_var($id_investigador, FILTER_VALIDATE_INT)) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
+        $response = $response->withStatus(400);
+    } else if ($conn != null) {
 
         //Buscar investigadores
         $object = new Investigador();
@@ -101,8 +101,8 @@ $app->get('/investigadores/{id:[0-9]+}', function ($request, $response, $args) {
         //Si investigador no existe
         if (empty($investigador)) {
             $payload['data'] = array();
-        } 
-        
+        }
+
         //Si el investigador existe
         else {
             //Formatear respuesta
@@ -141,28 +141,234 @@ $app->get('/investigadores/{id:[0-9]+}', function ($request, $response, $args) {
 $app->post('/investigadores', function ($request, $response, $args) {
 
 
+    //Seccion link self
     $payload = array(
         'links' => array(
             'self' => '/investigadores'
         )
     );
 
+    //Obtener parametros post
     $data = $request->getParsedBody();
-
-    if (filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-        echo "Direccion email no valida";
-    }
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
     $conn = $mysql_adapter->connect();
 
-    //Buscar investigadores
-    $object = new Investigador();
-    $object->setNombre(htmlentities($data['nombre']));
-    $object->setApellido(htmlentities($data['apellido']));
-    $object->setEmail(htmlentities($data['email']));
+    /**
+     * VALIDACION PARAMETROS
+     */
+    if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Email is malformed');
+        $response = $response->withStatus(400);
+    } else if (empty($data['nombre'])) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre is empty');
+        $response = $response->withStatus(400);
+    } else if (empty($data['apellido'])) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Apellido is empty');
+        $response = $response->withStatus(400);
+    } else if (empty($data['id_rol'])) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_rol is empty');
+        $response = $response->withStatus(400);
+    } else if (empty($data['password'])) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Password is empty');
+        $response = $response->withStatus(400);
+    } else if (!filter_var($data['id_rol'], FILTER_VALIDATE_INT)) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_rol must be integer');
+        $response = $response->withStatus(400);
+    } else if ($conn != null) {
 
+        //Agregar investigador
+        $object = new Investigador();
+        $object->setNombre(htmlentities($data['nombre']));
+        $object->setApellido(htmlentities($data['apellido']));
+        $object->setEmail(htmlentities($data['email']));
+        $object->setIdRol(htmlentities($data['id_rol']));
+        $object->setPassword(htmlentities($data['password']));
+
+        //insertar investigador
+        $lastid = $object->agregar($conn);
+
+        //Insert error
+        if (!$lastid) {
+            $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Create problem', 'Create a new object has fail');
+            $response = $response->withStatus(500);
+        } else {
+
+            $object->setId($lastid);
+            $investigador = $object->buscarInvestigador($conn);
+
+            //Formatear respuesta
+            $payload['data'] = array(
+                'type' => 'investigadores',
+                'id' => $investigador['id'],
+                'attributes' => array(
+                    'nombre' => $investigador['nombre'],
+                    'apellido' => $investigador['apellido'],
+                    'email' => $investigador['email'],
+                    'id_rol' => $investigador['id_rol']
+                )
+            );
+
+            $response = $response->withStatus(201);
+        }
+    }
+
+    //Connection error
+    else {
+        $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server problem', 'A connection problem ocurred with database');
+        $response = $response->withStatus(500);
+    }
+
+    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $response->getBody()->write($payload);
+
+    //Desconectar mysql
+    $mysql_adapter->disconnect();
+
+    return $response;
+});
+
+/**
+ * PUT /investigadores/{id}: Editar un investigador
+ */
+$app->put('/investigadores/{id}', function ($request, $response, $args) {
+
+    $id_investigador = $args['id'];
+
+    //Seccion link self
+    $payload = array(
+        'links' => array(
+            'self' => '/investigadores'
+        )
+    );
+
+    //Obtener parametros put
+    $data = $request->getBody()->getContents();
+    $putdata = array();
+    parse_str($data, $putdata);
+
+    //Conectar BD
+    $mysql_adapter = new MysqlAdapter();
+    $conn = $mysql_adapter->connect();
+
+    /**
+     * VALIDACION PARAMETROS
+     */
+    if (!filter_var($putdata['email'], FILTER_VALIDATE_EMAIL)) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Email is malformed');
+        $response = $response->withStatus(400);
+    } else if (!filter_var($id_investigador, FILTER_VALIDATE_INT)) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
+        $response = $response->withStatus(400);
+    } else if (empty($putdata['nombre'])) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre is empty');
+        $response = $response->withStatus(400);
+    } else if (empty($putdata['apellido'])) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Apellido is empty');
+        $response = $response->withStatus(400);
+    } else if (empty($putdata['id_rol'])) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_rol is empty');
+        $response = $response->withStatus(400);
+    } else if (empty($putdata['password'])) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Password is empty');
+        $response = $response->withStatus(400);
+    } else if (!filter_var($putdata['id_rol'], FILTER_VALIDATE_INT)) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_rol must be integer');
+        $response = $response->withStatus(400);
+    } else if ($conn != null) {
+
+        //Agregar investigador
+        $object = new Investigador();
+        $object->setId(htmlentities($id_investigador));
+        $object->setNombre(htmlentities($putdata['nombre']));
+        $object->setApellido(htmlentities($putdata['apellido']));
+        $object->setEmail(htmlentities($putdata['email']));
+        $object->setIdRol(htmlentities($putdata['id_rol']));
+        $object->setPassword(htmlentities($putdata['password']));
+
+        //Actualizar investigador
+        $actualizar = $object->actualizar($conn);
+
+        //Insert error
+        if (!$actualizar) {
+            $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Update problem', 'Update a object has fail');
+            $response = $response->withStatus(500);
+        } else {
+
+            $investigador = $object->buscarInvestigador($conn);
+
+            //Formatear respuesta
+            $payload['data'] = array(
+                'type' => 'investigadores',
+                'id' => $investigador['id'],
+                'attributes' => array(
+                    'nombre' => $investigador['nombre'],
+                    'apellido' => $investigador['apellido'],
+                    'email' => $investigador['email'],
+                    'id_rol' => $investigador['id_rol']
+                )
+            );
+
+            $response = $response->withStatus(201);
+        }
+    }
+
+    //Connection error
+    else {
+        $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server problem', 'A connection problem ocurred with database');
+        $response = $response->withStatus(500);
+    }
+
+    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $response->getBody()->write($payload);
+
+    //Desconectar mysql
+    $mysql_adapter->disconnect();
+
+    return $response;
+});
+
+/**
+ * DELETE /investigadores: Eliminar un investigador
+ */
+$app->delete('/investigadores/{id}', function ($request, $response, $args) {
+
+    $id_investigador = $args['id'];
+
+    //Conectar BD
+    $mysql_adapter = new MysqlAdapter();
+    $conn = $mysql_adapter->connect();
+
+    $payload = array(
+        'links' => array(
+            'self' => "/investigadores/" . $id_investigador
+        )
+    );
+
+    if (!filter_var($id_investigador, FILTER_VALIDATE_INT)) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
+        $response = $response->withStatus(400);
+    } else if ($conn != null) {
+
+        $object = new Investigador();
+        $object->setId($id_investigador);
+        $eliminar = $object->eliminar($conn);
+
+        if ($eliminar) {
+            $response = $response->withStatus(200);
+            $payload['data'] = array();
+        } else {
+            $payload = ErrorJsonHandler::lanzarError($payload, 404, 'Delete problem', 'Delete object has fail');
+            $response = $response->withStatus(404);
+        }
+    }
+
+    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $response->getBody()->write($payload);
+
+    //Desconectar mysql
+    $mysql_adapter->disconnect();
 
     return $response;
 });
