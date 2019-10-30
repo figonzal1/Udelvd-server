@@ -1,10 +1,5 @@
 <?php
 
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
-use Slim\Routing\RouteContext;
-
 require_once("app/config/MysqlAdapter.php");
 require_once("app/class/Investigador.php");
 require_once("app/utils/ErrorJsonHandler.php");
@@ -20,8 +15,7 @@ $app->get('/investigadores[/]', function ($request, $response, $args) {
     $payload = array(
         'links' => array(
             'self' => "/investigadores"
-        ),
-        'data' => array()
+        )
     );
 
     if ($conn != null) {
@@ -29,9 +23,11 @@ $app->get('/investigadores[/]', function ($request, $response, $args) {
         $object = new Investigador();
         $listado = $object->buscarTodos($conn);
 
-        if (!$listado) {
-            $response->withStatus(500);
+        //Si investigador no existe
+        if (empty($listado)) {
+            $payload['data'] = array();
         }
+
         //Preparar respuesta
         foreach ($listado as $key => $value) {
 
@@ -51,11 +47,7 @@ $app->get('/investigadores[/]', function ($request, $response, $args) {
             );
         }
     } else {
-        $payload['error'] = array(
-            'status' => 500,
-            'title' => 'Server connection problem',
-            'detail' => 'A connection problem ocurred with database'
-        );
+        $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server connection problem', 'A connection problem ocurred with database');
         $response = $response->withStatus(500);
     }
     //Encodear resultado
@@ -116,11 +108,7 @@ $app->get('/investigadores/{id}', function ($request, $response, $args) {
             );
         }
     } else {
-        $payload['error'] = array(
-            'status' => 500,
-            'title' => 'Server connection problem',
-            'detail' => 'A connection problem ocurred with database'
-        );
+        $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server connection problem', 'A connection problem ocurred with database');
         $response = $response->withStatus(500);
     }
 
@@ -290,7 +278,7 @@ $app->put('/investigadores/{id}', function ($request, $response, $args) {
         //Actualizar investigador
         $actualizar = $object->actualizar($conn);
 
-        //Insert error
+        //UPDATE error
         if (!$actualizar) {
             $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Update problem', 'Update a object has fail');
             $response = $response->withStatus(500);
@@ -359,7 +347,9 @@ $app->delete('/investigadores/{id}', function ($request, $response, $args) {
         if ($eliminar) {
             $response = $response->withStatus(200);
             $payload['data'] = array();
-        } else {
+        }
+        //Error de eliminacion
+        else {
             $payload = ErrorJsonHandler::lanzarError($payload, 404, 'Delete problem', 'Delete object has fail');
             $response = $response->withStatus(404);
         }

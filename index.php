@@ -35,7 +35,7 @@ $app->addRoutingMiddleware();
  */
 $errorMiddleware = $app->addErrorMiddleware(true, false, false);
 
-require 'app/routes/Investigadores.php';
+require("app/routes/Investigadores.php");
+require("app/routes/Acciones.php");
 
 $app ->run();
-?>
