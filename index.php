@@ -37,5 +37,6 @@ $errorMiddleware = $app->addErrorMiddleware(true, false, false);
 
 require("app/routes/Investigadores.php");
 require("app/routes/Acciones.php");
+require("app/routes/Emoticones.php");
 
-$app ->run();
+$app->run();

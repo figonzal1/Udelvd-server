@@ -77,7 +77,7 @@ $app->get('/investigadores/{id}', function ($request, $response, $args) {
         )
     );
 
-    if (!filter_var($id_investigador, FILTER_VALIDATE_INT)) {
+    if (!is_numeric($id_investigador) || !isset($id_investigador) || empty($id_investigador)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
@@ -126,7 +126,6 @@ $app->get('/investigadores/{id}', function ($request, $response, $args) {
  */
 $app->post('/investigadores', function ($request, $response, $args) {
 
-
     //Seccion link self
     $payload = array(
         'links' => array(
@@ -147,19 +146,19 @@ $app->post('/investigadores', function ($request, $response, $args) {
     if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Email is malformed');
         $response = $response->withStatus(400);
-    } else if (empty($data['nombre'])) {
+    } else if (empty($data['nombre']) || !isset($data['nombre'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre is empty');
         $response = $response->withStatus(400);
-    } else if (empty($data['apellido'])) {
+    } else if (empty($data['apellido']) || !isset($data['apellido'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Apellido is empty');
         $response = $response->withStatus(400);
-    } else if (empty($data['id_rol'])) {
+    } else if (empty($data['id_rol']) || !isset($data['id_rol'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_rol is empty');
         $response = $response->withStatus(400);
-    } else if (empty($data['password'])) {
+    } else if (empty($data['password']) || !isset($data['id_rol'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Password is empty');
         $response = $response->withStatus(400);
-    } else if (!filter_var($data['id_rol'], FILTER_VALIDATE_INT)) {
+    } else if (!is_numeric($data['id_rol'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_rol must be integer');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
@@ -246,22 +245,22 @@ $app->put('/investigadores/{id}', function ($request, $response, $args) {
     if (!filter_var($putdata['email'], FILTER_VALIDATE_EMAIL)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Email is malformed');
         $response = $response->withStatus(400);
-    } else if (!filter_var($id_investigador, FILTER_VALIDATE_INT)) {
+    } else if (!is_numeric($id_investigador)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
-    } else if (empty($putdata['nombre'])) {
+    } else if (empty($putdata['nombre']) || !isset($putdata['nombre'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre is empty');
         $response = $response->withStatus(400);
-    } else if (empty($putdata['apellido'])) {
+    } else if (empty($putdata['apellido'] || !isset($putdata['apellido']))) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Apellido is empty');
         $response = $response->withStatus(400);
-    } else if (empty($putdata['id_rol'])) {
+    } else if (empty($putdata['id_rol']) || !isset($putdata['id_rol'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_rol is empty');
         $response = $response->withStatus(400);
-    } else if (empty($putdata['password'])) {
+    } else if (empty($putdata['password']) || !isset($putdata['password'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Password is empty');
         $response = $response->withStatus(400);
-    } else if (!filter_var($putdata['id_rol'], FILTER_VALIDATE_INT)) {
+    } else if (!is_numeric($putdata['id_rol'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_rol must be integer');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
@@ -335,7 +334,7 @@ $app->delete('/investigadores/{id}', function ($request, $response, $args) {
         )
     );
 
-    if (!filter_var($id_investigador, FILTER_VALIDATE_INT)) {
+    if (!is_numeric($id_investigador) || !isset($id_investigador) || empty($id_investigador)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
