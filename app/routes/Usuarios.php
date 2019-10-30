@@ -260,6 +260,12 @@ $app->put('/usuarios/{id}', function ($request, $response, $args) {
     } else if (!isset($putdata['sexo']) || empty($putdata['sexo'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Sexo is empty');
         $response = $response->withStatus(400);
+    } else if (strcmp($putdata['sexo'], "m") != 0 && strcmp($putdata['sexo'], "f") != 0) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', "Sexo must be 'm' or 'f'");
+        $response = $response->withStatus(400);
+    } else if (!isset($putdata['edad']) || empty($putdata['edad'])) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Edad is empty');
+        $response = $response->withStatus(400);
     } else if (!isset($putdata['ciudad']) || empty($putdata['ciudad'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Ciudad is empty');
         $response = $response->withStatus(400);
@@ -271,14 +277,15 @@ $app->put('/usuarios/{id}', function ($request, $response, $args) {
         $response = $response->withStatus(400);
     } else if ($conn != null) {
 
-        //Agregar Usuario
+        //UPDATE Usuario
         $object = new Usuario();
-        $object->setNombre(htmlspecialchars($data['nombre']));
-        $object->setApellido(htmlspecialchars($data['apellido']));
-        $object->setSexo(htmlspecialchars($data['sexo']));
-        $object->setEdad(htmlspecialchars($data['edad']));
-        $object->setCiudad(htmlspecialchars($data['ciudad']));
-        $object->setIdInvestigador(htmlspecialchars($data['id_investigador']));
+        $object->setId(htmlspecialchars($id_usuario));
+        $object->setNombre(htmlspecialchars($putdata['nombre']));
+        $object->setApellido(htmlspecialchars($putdata['apellido']));
+        $object->setSexo(htmlspecialchars($putdata['sexo']));
+        $object->setEdad(htmlspecialchars($putdata['edad']));
+        $object->setCiudad(htmlspecialchars($putdata['ciudad']));
+        $object->setIdInvestigador(htmlspecialchars($putdata['id_investigador']));
 
         //insertar usuario
         $actualizar = $object->actualizar($conn);
