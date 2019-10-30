@@ -16,7 +16,8 @@ $app->get('/acciones[/]', function ($request, $response, $args) {
     $payload = array(
         'links' => array(
             'self' => "/acciones"
-        )
+        ),
+        'data' => array()
     );
 
     if ($conn != null) {
@@ -24,11 +25,6 @@ $app->get('/acciones[/]', function ($request, $response, $args) {
         //Buscar acciones
         $object = new Acciones();
         $listado = $object->buscarTodos($conn);
-
-        //Si investigador no existe
-        if (empty($investigador)) {
-            $payload['data'] = array();
-        }
 
         //Preparar respuesta
         foreach ($listado as $key => $value) {

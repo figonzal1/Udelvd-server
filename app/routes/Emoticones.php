@@ -16,18 +16,14 @@ $app->get('/emoticones[/]', function ($request, $response, $args) {
     $payload = array(
         'links' => array(
             'self' => "/emoticones"
-        )
+        ),
+        'data' => array()
     );
 
     if ($conn != null) {
         //Buscar emoticones
         $object = new Emoticones();
         $listado = $object->buscarTodos($conn);
-
-        //Si emoticon no existe
-        if (empty($listado)) {
-            $payload['data'] = array();
-        }
 
         //Preparar respuesta
         foreach ($listado as $key => $value) {
@@ -81,7 +77,7 @@ $app->get('/emoticones/{id}', function ($request, $response, $args) {
     } else if ($conn != null) {
 
         //Buscar emoticones
-        $object = new emoticon();
+        $object = new Emoticones();
         $object->setId($id_emoticon);
         $emoticon = $object->buscaremoticon($conn);
 
@@ -139,10 +135,10 @@ $app->post('/emoticones', function ($request, $response, $args) {
      * VALIDACION PARAMETROS
      */
     if (empty($data['url']) || !isset($data['url'])) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre is empty');
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Url is empty');
         $response = $response->withStatus(400);
     } else if (empty($data['descripcion']) || !isset($data['descripcion'])) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Apellido is empty');
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Descripcion is empty');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
 
@@ -195,7 +191,7 @@ $app->post('/emoticones', function ($request, $response, $args) {
 /**
  * PUT /emoticones/{id}: Editar un emoticon
  */
-$app->put('/emoticones', function ($request, $response, $args) {
+$app->put('/emoticones/{id}', function ($request, $response, $args) {
 
     $id_emoticon = $args['id'];
 
@@ -222,10 +218,10 @@ $app->put('/emoticones', function ($request, $response, $args) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
     } else if (empty($putdata['url']) || !isset($putdata['url'])) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre is empty');
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Url is empty');
         $response = $response->withStatus(400);
     } else if (empty($putdata['descripcion']) || !isset($putdata['descripcion'])) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Apellido is empty');
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Descripcion is empty');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
 

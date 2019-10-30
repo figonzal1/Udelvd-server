@@ -15,19 +15,15 @@ $app->get('/investigadores[/]', function ($request, $response, $args) {
     $payload = array(
         'links' => array(
             'self' => "/investigadores"
-        )
+        ),
+        'data' => array()
     );
 
     if ($conn != null) {
         //Buscar investigadores
         $object = new Investigador();
         $listado = $object->buscarTodos($conn);
-
-        //Si investigador no existe
-        if (empty($listado)) {
-            $payload['data'] = array();
-        }
-
+        
         //Preparar respuesta
         foreach ($listado as $key => $value) {
 
