@@ -23,7 +23,7 @@ $app->get('/investigadores[/]', function ($request, $response, $args) {
         //Buscar investigadores
         $object = new Investigador();
         $listado = $object->buscarTodos($conn);
-        
+
         //Preparar respuesta
         foreach ($listado as $key => $value) {
 
@@ -73,7 +73,7 @@ $app->get('/investigadores/{id}', function ($request, $response, $args) {
         )
     );
 
-    if (!is_numeric($id_investigador) || !isset($id_investigador) || empty($id_investigador)) {
+    if (!isset($id_investigador) || empty($id_investigador) || !is_numeric($id_investigador)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
@@ -142,16 +142,16 @@ $app->post('/investigadores', function ($request, $response, $args) {
     if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Email is malformed');
         $response = $response->withStatus(400);
-    } else if (empty($data['nombre']) || !isset($data['nombre'])) {
+    } else if (!isset($data['nombre']) || empty($data['nombre'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre is empty');
         $response = $response->withStatus(400);
-    } else if (empty($data['apellido']) || !isset($data['apellido'])) {
+    } else if (!isset($data['apellido']) || empty($data['apellido'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Apellido is empty');
         $response = $response->withStatus(400);
-    } else if (empty($data['id_rol']) || !isset($data['id_rol'])) {
+    } else if (!isset($data['id_rol']) || empty($data['id_rol'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_rol is empty');
         $response = $response->withStatus(400);
-    } else if (empty($data['password']) || !isset($data['id_rol'])) {
+    } else if (!isset($data['id_rol']) || empty($data['password'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Password is empty');
         $response = $response->withStatus(400);
     } else if (!is_numeric($data['id_rol'])) {
@@ -161,11 +161,11 @@ $app->post('/investigadores', function ($request, $response, $args) {
 
         //Agregar investigador
         $object = new Investigador();
-        $object->setNombre(htmlentities($data['nombre']));
-        $object->setApellido(htmlentities($data['apellido']));
-        $object->setEmail(htmlentities($data['email']));
-        $object->setIdRol(htmlentities($data['id_rol']));
-        $object->setPassword(htmlentities($data['password']));
+        $object->setNombre(htmlspecialchars($data['nombre']));
+        $object->setApellido(htmlspecialchars($data['apellido']));
+        $object->setEmail(htmlspecialchars($data['email']));
+        $object->setIdRol(htmlspecialchars($data['id_rol']));
+        $object->setPassword(htmlspecialchars($data['password']));
         $object->setActivado(0);
 
         //insertar investigador
@@ -238,22 +238,22 @@ $app->put('/investigadores/{id}', function ($request, $response, $args) {
     /**
      * VALIDACION PARAMETROS
      */
-    if (!filter_var($putdata['email'], FILTER_VALIDATE_EMAIL)) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Email is malformed');
-        $response = $response->withStatus(400);
-    } else if (!is_numeric($id_investigador)) {
+    if (!is_numeric($id_investigador)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
-    } else if (empty($putdata['nombre']) || !isset($putdata['nombre'])) {
+    } else if (!filter_var($putdata['email'], FILTER_VALIDATE_EMAIL)) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Email is malformed');
+        $response = $response->withStatus(400);
+    } else if (!isset($putdata['nombre']) || empty($putdata['nombre'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre is empty');
         $response = $response->withStatus(400);
-    } else if (empty($putdata['apellido'] || !isset($putdata['apellido']))) {
+    } else if (!isset($putdata['apellido']) || empty($putdata['apellido'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Apellido is empty');
         $response = $response->withStatus(400);
-    } else if (empty($putdata['id_rol']) || !isset($putdata['id_rol'])) {
+    } else if (!isset($putdata['id_rol']) || empty($putdata['id_rol'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_rol is empty');
         $response = $response->withStatus(400);
-    } else if (empty($putdata['password']) || !isset($putdata['password'])) {
+    } else if (!isset($putdata['password']) || empty($putdata['password'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Password is empty');
         $response = $response->withStatus(400);
     } else if (!is_numeric($putdata['id_rol'])) {
@@ -263,12 +263,12 @@ $app->put('/investigadores/{id}', function ($request, $response, $args) {
 
         //Agregar investigador
         $object = new Investigador();
-        $object->setId(htmlentities($id_investigador));
-        $object->setNombre(htmlentities($putdata['nombre']));
-        $object->setApellido(htmlentities($putdata['apellido']));
-        $object->setEmail(htmlentities($putdata['email']));
-        $object->setIdRol(htmlentities($putdata['id_rol']));
-        $object->setPassword(htmlentities($putdata['password']));
+        $object->setId(htmlspecialchars($id_investigador));
+        $object->setNombre(htmlspecialchars($putdata['nombre']));
+        $object->setApellido(htmlspecialchars($putdata['apellido']));
+        $object->setEmail(htmlspecialchars($putdata['email']));
+        $object->setIdRol(htmlspecialchars($putdata['id_rol']));
+        $object->setPassword(htmlspecialchars($putdata['password']));
 
         //Actualizar investigador
         $actualizar = $object->actualizar($conn);
@@ -330,7 +330,7 @@ $app->delete('/investigadores/{id}', function ($request, $response, $args) {
         )
     );
 
-    if (!is_numeric($id_investigador) || !isset($id_investigador) || empty($id_investigador)) {
+    if (!isset($id_investigador) || empty($id_investigador) || !is_numeric($id_investigador)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
@@ -383,13 +383,13 @@ $app->patch('/investigadores/{id}/activar', function ($request, $response, $args
     $mysql_adapter = new MysqlAdapter();
     $conn = $mysql_adapter->connect();
 
-    if (!isset($patchdata['activado']) || !is_numeric($patchdata['activado']) || empty($patchdata['activado'])) {
+    if (!isset($patchdata['activado']) || empty($patchdata['activado']) || !is_numeric($patchdata['activado'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Activado must be integer');
         $response = $response->withStatus(400);
     } else if ($patchdata['activado'] != 0 && $patchdata['activado'] != 1) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Activado must be 1 or 0');
         $response = $response->withStatus(400);
-    } else if (!filter_var($id_investigador, FILTER_VALIDATE_INT)) {
+    } else if (!is_numeric($id_investigador)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
@@ -397,7 +397,7 @@ $app->patch('/investigadores/{id}/activar', function ($request, $response, $args
         //Agregar investigador
         $object = new Investigador();
         $object->setId($id_investigador);
-        $object->setActivado(htmlentities($patchdata['activado']));
+        $object->setActivado(htmlspecialchars($patchdata['activado']));
 
         //insertar investigador
         $activado = $object->activar($conn);

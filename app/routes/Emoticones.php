@@ -1,7 +1,7 @@
 <?php
 
 require_once("app/config/MysqlAdapter.php");
-require_once("app/class/Emoticones.php");
+require_once("app/class/Emoticon.php");
 require_once("app/utils/ErrorJsonHandler.php");
 
 /**
@@ -71,7 +71,7 @@ $app->get('/emoticones/{id}', function ($request, $response, $args) {
         )
     );
 
-    if (empty($id_emoticon) || !isset($id_emoticon) || !is_numeric($id_emoticon)) {
+    if (!isset($id_emoticon) || empty($id_emoticon) || !is_numeric($id_emoticon)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
@@ -134,17 +134,17 @@ $app->post('/emoticones', function ($request, $response, $args) {
     /**
      * VALIDACION PARAMETROS
      */
-    if (empty($data['url']) || !isset($data['url'])) {
+    if (!isset($data['url']) || empty($data['url'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Url is empty');
         $response = $response->withStatus(400);
-    } else if (empty($data['descripcion']) || !isset($data['descripcion'])) {
+    } else if (!isset($data['descripcion']) || empty($data['descripcion'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Descripcion is empty');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
 
         //Agregar emoticon
         $object = new Emoticones();
-        $object->setUrl(htmlentities($data['url']));
+        $object->setUrl(htmlspecialchars($data['url']));
         $object->setDescripcion(htmlentities($data['descripcion']));
 
         //insertar emoticon
@@ -214,13 +214,13 @@ $app->put('/emoticones/{id}', function ($request, $response, $args) {
     /**
      * VALIDACION PARAMETROS
      */
-    if (!is_numeric($id_emoticon) || empty($id_emoticon) || !isset($id_emoticon)) {
+    if (!isset($id_emoticon) || empty($id_emoticon) || !is_numeric($id_emoticon)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
-    } else if (empty($putdata['url']) || !isset($putdata['url'])) {
+    } else if (!isset($putdata['url']) || empty($putdata['url'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Url is empty');
         $response = $response->withStatus(400);
-    } else if (empty($putdata['descripcion']) || !isset($putdata['descripcion'])) {
+    } else if (!isset($putdata['descripcion']) || empty($putdata['descripcion'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Descripcion is empty');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
@@ -288,7 +288,7 @@ $app->delete('/emoticones/{id}', function ($request, $response, $args) {
         )
     );
 
-    if (!is_numeric($id_emoticon) || !isset($id_emoticon) || empty($id_emoticon)) {
+    if (!isset($id_emoticon) || empty($id_emoticon) || !is_numeric($id_emoticon)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
     } else if ($conn != null) {

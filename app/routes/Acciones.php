@@ -1,7 +1,7 @@
 <?php
 
 require_once("app/config/MysqlAdapter.php");
-require_once("app/class/Acciones.php");
+require_once("app/class/Accion.php");
 require_once("app/utils/ErrorJsonHandler.php");
 
 /**
@@ -76,7 +76,7 @@ $app->get('/acciones/{id}', function ($request, $response, $args) {
         )
     );
 
-    if (!filter_var($id_accion, FILTER_VALIDATE_INT)) {
+    if (!is_numeric($id_accion)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
@@ -138,7 +138,7 @@ $app->post('/acciones', function ($request, $response, $args) {
     /**
      * VALIDACION PARAMETROS
      */
-    if (empty($data['nombre'])) {
+    if (!isset($data['nombre']) || empty($data['nombre'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre is empty');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
@@ -146,7 +146,7 @@ $app->post('/acciones', function ($request, $response, $args) {
         //Agregar accion
 
         $object = new Acciones();
-        $object->setNombre(htmlentities($data['nombre']));
+        $object->setNombre(htmlspecialchars($data['nombre']));
 
         $lastid = $object->agregar($conn);
 
@@ -210,15 +210,15 @@ $app->put('/acciones/{id}', function ($request, $response, $args) {
     $mysql_adapter = new MysqlAdapter();
     $conn = $mysql_adapter->connect();
 
-    if (empty($putdata['nombre'])) {
+    if (!isset($putdata['nombre']) || empty($putdata['nombre'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre is empty');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
 
         //Agregar accion
         $object = new Acciones();
-        $object->setId(htmlentities($id_accion));
-        $object->setNombre(htmlentities($putdata['nombre']));
+        $object->setId(htmlspecialchars($id_accion));
+        $object->setNombre(htmlspecialchars($putdata['nombre']));
 
         //Actualizar investigador
         $actualizar = $object->actualizar($conn);
@@ -278,7 +278,7 @@ $app->delete('/acciones/{id}', function ($request, $response, $args) {
         )
     );
 
-    if (!filter_var($id_accion, FILTER_VALIDATE_INT)) {
+    if (!is_numeric($id_accion)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
