@@ -24,8 +24,10 @@ class Acciones
                 )
             );
 
-            $lastId = $conn->lastInsertId();
-            return $lastId;
+            //Consultar ultimo id
+            $stmt = $conn->query("SELECT MAX(id) as id from accion");
+            $lastId = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $lastId['id'];
         } catch (PDOException $e) {
             echo "Fail insert: " . $e->getMessage() . "\n";
             return false;

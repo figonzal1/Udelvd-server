@@ -33,8 +33,10 @@ class Usuario
                 )
             );
 
-            $lastId = $conn->lastInsertId();
-            return $lastId;
+            //Consultar ultimo id
+            $stmt = $conn->query("SELECT MAX(id) as id from usuario");
+            $lastId = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $lastId['id'];
         } catch (PDOException $e) {
             echo "Fail insert: " . $e->getMessage() . "\n";
             return false;

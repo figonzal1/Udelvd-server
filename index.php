@@ -40,5 +40,6 @@ require("app/routes/Acciones.php");
 require("app/routes/Emoticones.php");
 require("app/routes/Usuarios.php");
 require("app/routes/Entrevistas.php");
+require("app/routes/Evento.php");
 
 $app->run();
