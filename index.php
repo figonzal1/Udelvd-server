@@ -39,5 +39,6 @@ require("app/routes/Investigadores.php");
 require("app/routes/Acciones.php");
 require("app/routes/Emoticones.php");
 require("app/routes/Usuarios.php");
+require("app/routes/Entrevistas.php");
 
 $app->run();
