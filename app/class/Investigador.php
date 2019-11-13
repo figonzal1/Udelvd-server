@@ -12,6 +12,7 @@ class Investigador
     private $apellido;
     private $email;
     private $passwordHashed;
+    private $passwordRaw;
     private $idRol;
     private $activado;
 
@@ -70,13 +71,29 @@ class Investigador
         }
     }
 
-    function buscarInvestigador($conn)
+    function buscarInvestigadorPorId($conn)
     {
         try {
             $stmt = $conn->prepare(
                 "SELECT * FROM investigador WHERE id=?"
             );
             $stmt->execute(array($this->id));
+
+            $investigador = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            return $investigador;
+        } catch (PDOException $e) {
+            echo "Fail search investigador: " . $e->getMessage() . "\n";
+            return false;
+        }
+    }
+
+    function buscarInvestigadorPorEmail($conn){
+        try {
+            $stmt = $conn->prepare(
+                "SELECT * FROM investigador WHERE email=?"
+            );
+            $stmt->execute(array($this->email));
 
             $investigador = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -148,6 +165,30 @@ class Investigador
         }
     }
 
+    function login($conn)
+    {
+
+        try {
+
+            $stmt = $conn->prepare(
+                "SELECT password from investigador WHERE email=?"
+            );
+
+            $stmt->execute(array($this->email));
+
+            $passwordHash = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (password_verify($this->passwordRaw, $passwordHash['password'])) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (PDOException $e) {
+            echo "Fail to find hash: " . $e->getMessage() . "\n";
+            return false;
+        }
+    }
+
     /**
      * GETTERS & SETTERS
      */
@@ -208,5 +249,9 @@ class Investigador
     function setActivado($activado)
     {
         $this->activado = $activado;
+    }
+    function setPasswordRaw($passwordRaw)
+    {
+        $this->passwordRaw = $passwordRaw;
     }
 }

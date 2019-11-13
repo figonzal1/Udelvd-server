@@ -2,6 +2,8 @@
 
 require_once("app/config/MysqlAdapter.php");
 require_once("app/class/Investigador.php");
+require_once("app/class/Jwt.php");
+require_once("app/middleware/JwtMiddleware.php");
 require_once("app/utils/ErrorJsonHandler.php");
 /**
  * GET /investigadores: Listado de investigadores del sistema
@@ -54,7 +56,7 @@ $app->get('/investigadores[/]', function ($request, $response, $args) {
     //Desconectar mysql
     $mysql_adapter->disconnect();
     return $response;
-});
+})->add(new JwtMiddleware());
 
 /**
  * GET /investigadores/{id}: Obtener investigador segun id
@@ -194,6 +196,82 @@ $app->post('/investigadores', function ($request, $response, $args) {
             );
 
             $response = $response->withStatus(201);
+        }
+    }
+
+    //Connection error
+    else {
+        $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server problem', 'A connection problem ocurred with database');
+        $response = $response->withStatus(500);
+    }
+
+    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $response->getBody()->write($payload);
+
+    //Desconectar mysql
+    $mysql_adapter->disconnect();
+
+    return $response;
+});
+
+/**
+ * POST /investigadores/login: Logear en el sistema
+ */
+$app->post('/investigadores/login', function ($request, $response, $args) {
+
+    var_dump($request->getHeader("Authorization"));
+
+    $payload = array(
+        'links' => array(
+            'self' => '/investigadores/login'
+        )
+    );
+
+    //Obtener parametros post
+    $data = $request->getParsedBody();
+
+    //Conectar mysql
+    $mysql_adapter = new MysqlAdapter();
+    $conn = $mysql_adapter->connect();
+
+    /**
+     * Validaciond parametros
+     */
+    if (!isset($data['email']) || empty($data['email'])) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Email is empty');
+        $response = $response->withStatus(400);
+    } else if (!isset($data['password']) || empty($data['password'])) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Password is empty');
+        $response = $response->withStatus(400);
+    } else if ($conn != null) {
+
+        //Realizar login
+        $object = new Investigador();
+        $object->setEmail(htmlentities($data['email']));
+        $object->setPasswordRaw(htmlentities($data['password']));
+
+        $status = $object->login($conn);
+
+        if (!$status) {
+            $payload = ErrorJsonHandler::lanzarError($payload, 403, 'Login problem', 'Please check your credentials');
+            $response = $response->withStatus(403);
+        } else {
+
+            $investigador = $object->buscarInvestigadorPorEmail($conn);
+
+            //TODO: Generar JWT
+            $jwt = new Jwt();
+            $token = $jwt->generarToken($investigador['id']);
+
+            //Formatar respuesta
+            $payload['data'] = array(
+                'type' => 'login',
+                'status' => 'Correct',
+                'token' => $token
+            );
+
+
+            $response = $response->withStatus(200);
         }
     }
 
