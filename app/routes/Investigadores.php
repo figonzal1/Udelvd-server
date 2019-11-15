@@ -44,6 +44,8 @@ $app->get('/investigadores[/]', function ($request, $response, $args) {
                 )
             );
         }
+
+        $response = $response->withStatus(200);
     } else {
         $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server connection problem', 'A connection problem ocurred with database');
         $response = $response->withStatus(500);
@@ -104,6 +106,8 @@ $app->get('/investigadores/{id}', function ($request, $response, $args) {
                     'activado' => $investigador['activado']
                 )
             );
+
+            $response = $response->withStatus(200);
         }
     } else {
         $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server connection problem', 'A connection problem ocurred with database');
@@ -117,7 +121,7 @@ $app->get('/investigadores/{id}', function ($request, $response, $args) {
     $mysql_adapter->disconnect();
 
     return $response;
-});
+})->add(new JwtMiddleware());
 
 /**
  * POST /investigadores: Crear un investigador
@@ -389,7 +393,7 @@ $app->put('/investigadores/{id}', function ($request, $response, $args) {
     $mysql_adapter->disconnect();
 
     return $response;
-});
+})->add(new JwtMiddleware());
 
 /**
  * DELETE /investigadores: Eliminar un investigador
@@ -435,7 +439,7 @@ $app->delete('/investigadores/{id}', function ($request, $response, $args) {
     $mysql_adapter->disconnect();
 
     return $response;
-});
+})->add(new JwtMiddleware());
 
 
 /**
@@ -511,6 +515,77 @@ $app->patch('/investigadores/{id}/activar', function ($request, $response, $args
         $response = $response->withStatus(500);
     }
 
+    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $response->getBody()->write($payload);
+
+    //Desconectar mysql
+    $mysql_adapter->disconnect();
+
+    return $response;
+})->add(new JwtMiddleware());
+
+/**
+ * POST /investigadores/recuperar/{email}: Recuperar cuenta de un investigador
+ */
+$app->post('/investigadores/recuperar/{email}', function ($request, $response, $args) {
+
+    $email = $args['email'];
+
+    //Conectar mysql
+    $mysql_adapter = new MysqlAdapter();
+    $conn = $mysql_adapter->connect();
+
+    $payload = array(
+        'links' => array(
+            'self' => "/investigadores/" . $email
+        )
+    );
+
+    if (!isset($email) || empty($email)) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Email is empty');
+        $response = $response->withStatus(400);
+    } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Enter valid Email');
+        $response = $response->withStatus(400);
+    } else if ($conn != null) {
+        //Buscar investigador por email
+
+        $object = new Investigador();
+        $object->setEmail(htmlentities($email));
+        $investigador = $object->buscarInvestigadorPorEmail($conn);
+
+        //Si investigador no existe
+        if (empty($investigador)) {
+            $payload['data'] = array();
+            $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Email problem', 'Email does not exist');
+            $response = $response->withStatus(400);
+        } else {
+            //Formatear respuesta
+            $payload['data'] = array(
+                'type' => 'investigadores',
+                'id' => $investigador['id'],
+                'attributes' => array(
+                    'email' => $investigador['email'],
+                )
+            );
+            $response = $response->withStatus(200);
+
+            //Generar pin y enviar por email
+            //Pin de 6 digitos
+            $pin = "";
+            $i = 0;
+            while ($i < 4) {
+                $pin .= random_int(0, 9);
+                $i++;
+            }
+            echo "Pin generado " . $pin;
+
+            //TODO: Enviar por email
+        }
+    } else {
+        $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server connection problem', 'A connection problem ocurred with database');
+        $response = $response->withStatus(500);
+    }
     $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
