@@ -41,10 +41,11 @@ class MysqlAdapter
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
                 )
             );
-            echo "Connectado" . "\n";
+            //echo "Connectado" . "\n";
             return $this->conn;
         } catch (PDOException $e) {
-            echo "Connection failed: " . $e->getMessage() . "\n";
+            //echo "Connection failed: " . $e->getMessage() . "\n";
+            return null;
         }
     }
 

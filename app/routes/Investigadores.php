@@ -145,23 +145,26 @@ $app->post('/investigadores', function ($request, $response, $args) {
     /**
      * VALIDACION PARAMETROS
      */
-    if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Email is malformed');
-        $response = $response->withStatus(400);
-    } else if (!isset($data['nombre']) || empty($data['nombre'])) {
+    if (!isset($data['nombre']) || empty($data['nombre'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre is empty');
         $response = $response->withStatus(400);
     } else if (!isset($data['apellido']) || empty($data['apellido'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Apellido is empty');
         $response = $response->withStatus(400);
+    } else if (!isset($data['email']) || empty($data['email'])) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Email is empty');
+        $response = $response->withStatus(400);
     } else if (!isset($data['id_rol']) || empty($data['id_rol'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_rol is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($data['id_rol']) || empty($data['password'])) {
+    } else if (!isset($data['password']) || empty($data['password'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Password is empty');
         $response = $response->withStatus(400);
     } else if (!is_numeric($data['id_rol'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_rol must be integer');
+        $response = $response->withStatus(400);
+    } else if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Email is malformed');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
 
@@ -184,7 +187,7 @@ $app->post('/investigadores', function ($request, $response, $args) {
         } else {
 
             $object->setId($lastid);
-            $investigador = $object->buscarInvestigador($conn);
+            $investigador = $object->buscarInvestigadorPorId($conn);
 
             //Formatear respuesta
             $payload['data'] = array(

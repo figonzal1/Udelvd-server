@@ -32,10 +32,10 @@ class JwtMiddleware
 
             $response = new Response();
             $response->getBody()->write($payload);
-            $response->withStatus(403);
+            $response = $response->withStatus(403);
             return $response;
-        } 
-        
+        }
+
         /**
          * Procesar token invalido
          */
@@ -46,10 +46,10 @@ class JwtMiddleware
 
             $response = new Response();
             $response->getBody()->write($payload);
-            $response->withStatus(403);
+            $response = $response->withStatus(403);
             return $response;
-        } 
-        
+        }
+
         /**
          * Procesar token valido
          */
