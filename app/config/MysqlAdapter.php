@@ -45,6 +45,7 @@ class MysqlAdapter
             return $this->conn;
         } catch (PDOException $e) {
             //echo "Connection failed: " . $e->getMessage() . "\n";
+            error_log("Connection failed: " . $e->getMessage());
             return null;
         }
     }

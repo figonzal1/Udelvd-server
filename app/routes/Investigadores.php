@@ -177,32 +177,41 @@ $app->post('/investigadores', function ($request, $response, $args) {
         $object->setPassword(htmlspecialchars($data['password']));
         $object->setActivado(0);
 
-        //insertar investigador
-        $lastid = $object->agregar($conn);
+        $existente = $object->buscarInvestigadorPorEmail($conn);
 
-        //Insert error
-        if (!$lastid) {
-            $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Create problem', 'Create a new object has fail');
+        //Si el correo existe
+        if ($existente!=null || $existente) {
+            //Lanzar error de email
+            $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Email problem', 'Email already exists');
             $response = $response->withStatus(500);
         } else {
+            //insertar investigador
+            $lastid = $object->agregar($conn);
 
-            $object->setId($lastid);
-            $investigador = $object->buscarInvestigadorPorId($conn);
+            //Insert error
+            if (!$lastid) {
+                $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Create problem', 'Create a new object has fail');
+                $response = $response->withStatus(500);
+            } else {
 
-            //Formatear respuesta
-            $payload['data'] = array(
-                'type' => 'investigadores',
-                'id' => $investigador['id'],
-                'attributes' => array(
-                    'nombre' => $investigador['nombre'],
-                    'apellido' => $investigador['apellido'],
-                    'email' => $investigador['email'],
-                    'id_rol' => $investigador['id_rol'],
-                    'activado' => $investigador['activado']
-                )
-            );
+                $object->setId($lastid);
+                $investigador = $object->buscarInvestigadorPorId($conn);
 
-            $response = $response->withStatus(201);
+                //Formatear respuesta
+                $payload['data'] = array(
+                    'type' => 'investigadores',
+                    'id' => $investigador['id'],
+                    'attributes' => array(
+                        'nombre' => $investigador['nombre'],
+                        'apellido' => $investigador['apellido'],
+                        'email' => $investigador['email'],
+                        'id_rol' => $investigador['id_rol'],
+                        'activado' => $investigador['activado']
+                    )
+                );
+
+                $response = $response->withStatus(201);
+            }
         }
     }
 

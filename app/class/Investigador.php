@@ -39,7 +39,8 @@ class Investigador
             $lastId = $stmt->fetch(PDO::FETCH_ASSOC);
             return $lastId['id'];
         } catch (PDOException $e) {
-            echo "Fail insert: " . $e->getMessage() . "\n";
+            //echo "Fail insert: " . $e->getMessage() . "\n";
+            error_log("Fail insert" . $e->getMessage(), 0);
             return false;
         }
     }
@@ -66,7 +67,8 @@ class Investigador
                 return true;
             }
         } catch (PDOException $e) {
-            echo "Fail update: " . $e->getMessage() . "\n";
+            //echo "Fail update: " . $e->getMessage() . "\n";
+            error_log("Fail update: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -83,12 +85,14 @@ class Investigador
 
             return $investigador;
         } catch (PDOException $e) {
-            echo "Fail search investigador: " . $e->getMessage() . "\n";
+            //echo "Fail search investigador: " . $e->getMessage() . "\n";
+            error_log("Fail search investigador: " . $e->getMessage());
             return false;
         }
     }
 
-    function buscarInvestigadorPorEmail($conn){
+    function buscarInvestigadorPorEmail($conn)
+    {
         try {
             $stmt = $conn->prepare(
                 "SELECT * FROM investigador WHERE email=?"
@@ -99,7 +103,8 @@ class Investigador
 
             return $investigador;
         } catch (PDOException $e) {
-            echo "Fail search investigador: " . $e->getMessage() . "\n";
+            //echo "Fail search investigador: " . $e->getMessage() . "\n";
+            error_log("Fail search investigador: " . $e->getMessage());
             return false;
         }
     }
@@ -115,7 +120,8 @@ class Investigador
 
             return $listado;
         } catch (PDOException $e) {
-            echo "Fail search lista investigadores: " . $e->getMessage() . "\n";
+            //echo "Fail search lista investigadores: " . $e->getMessage() . "\n";
+            error_log("Fail search lista investigadores: " . $e->getMessage());
             return false;
         }
     }
@@ -135,7 +141,8 @@ class Investigador
                 return true;
             }
         } catch (PDOException $e) {
-            echo "Fail delete investigador: " . $e->getMessage() . "\n";
+            //echo "Fail delete investigador: " . $e->getMessage() . "\n";
+            error_log("Fail delete investigador: " . $e->getMessage());
             return false;
         }
     }
@@ -160,7 +167,8 @@ class Investigador
                 return true;
             }
         } catch (PDOException $e) {
-            echo "Fail to activate investigador: " . $e->getMessage() . "\n";
+            //echo "Fail to activate investigador: " . $e->getMessage() . "\n";
+            error_log("Fail to activate investigador: " . $e->getMessage());
             return false;
         }
     }
@@ -184,7 +192,8 @@ class Investigador
                 return false;
             }
         } catch (PDOException $e) {
-            echo "Fail to find hash: " . $e->getMessage() . "\n";
+            //echo "Fail to find hash: " . $e->getMessage() . "\n";
+            eror_log("Fail to find hash: " . $e->getMessage());
             return false;
         }
     }
