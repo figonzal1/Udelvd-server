@@ -1,8 +1,5 @@
 <?php
 
-require_once("app/config/MysqlAdapter.php");
-require_once("app/class/Entrevista.php");
-require_once("app/utils/ErrorJsonHandler.php");
 
 /**
  * GET /entrevistas

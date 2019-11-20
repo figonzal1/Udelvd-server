@@ -1,9 +1,5 @@
 <?php
 
-require_once("app/config/MysqlAdapter.php");
-require_once("app/class/Accion.php");
-require_once("app/utils/ErrorJsonHandler.php");
-
 /**
  * GET /acciones: Listado de acciones del sistema
  */

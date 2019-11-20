@@ -4,8 +4,6 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Psr7\Response;
 
-require_once("app/class/Jwt.php");
-
 /**
  * Clase Middleware encargada de manejar logica de JWT
  */

@@ -1,9 +1,5 @@
 <?php
 
-require_once("app/config/MysqlAdapter.php");
-require_once("app/class/Evento.php");
-require_once("app/utils/ErrorJsonHandler.php");
-
 /**
  * GET /entrevista/{id_entrevista}/eventos Obtener eventos de una entrevista
  * 

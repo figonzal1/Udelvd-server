@@ -1,9 +1,5 @@
 <?php
 
-require_once("app/config/MysqlAdapter.php");
-require_once("app/class/Usuario.php");
-require_once("app/utils/ErrorJsonHandler.php");
-
 /**
  * GET /usuarios: Listado de usuarios del sistema
  */

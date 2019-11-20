@@ -1,9 +1,5 @@
 <?php
 
-require_once("app/config/MysqlAdapter.php");
-require_once("app/class/Emoticon.php");
-require_once("app/utils/ErrorJsonHandler.php");
-
 /**
  * GET /emoticones: Listado de emoticones del sistema
  */

@@ -1,10 +1,5 @@
 <?php
 
-require_once("app/config/MysqlAdapter.php");
-require_once("app/class/Investigador.php");
-require_once("app/class/Jwt.php");
-require_once("app/middleware/JwtMiddleware.php");
-require_once("app/utils/ErrorJsonHandler.php");
 /**
  * GET /investigadores: Listado de investigadores del sistema
  */

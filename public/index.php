@@ -4,8 +4,35 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Factory\AppFactory;
+use Slim\Exception\NotFoundException;
 
-require 'vendor/autoload.php';
+require '../vendor/autoload.php';
+
+/**
+ * CONFIGS
+ */
+require_once("../app/config/MysqlAdapter.php");
+
+/**
+ * CLASES
+ */
+require_once("../app/class/Accion.php");
+require_once("../app/class/Emoticon.php");
+require_once("../app/class/Entrevista.php");
+require_once("../app/class/Evento.php");
+require_once("../app/class/Investigador.php");
+require_once("../app/class/Jwt.php");
+require_once("../app/class/Usuario.php");
+
+/**
+ * MIDDLEWARE
+ */
+require_once("../app/middleware/JwtMiddleware.php");
+
+/**
+ * UTILS
+ */
+require_once("../app/utils/ErrorJsonHandler.php");
 
 header('Cache-Control: no-cache');
 header('X-Content-Type-Options: nosniff');
@@ -35,11 +62,14 @@ $app->addRoutingMiddleware();
  */
 $errorMiddleware = $app->addErrorMiddleware(true, false, false);
 
-require("app/routes/Investigadores.php");
-require("app/routes/Acciones.php");
-require("app/routes/Emoticones.php");
-require("app/routes/Usuarios.php");
-require("app/routes/Entrevistas.php");
-require("app/routes/Evento.php");
+/**
+ * RUTAS
+ */
+require("../app/routes/Acciones.php");
+require("../app/routes/Emoticones.php");
+require("../app/routes/Entrevistas.php");
+require("../app/routes/Evento.php");
+require("../app/routes/Investigadores.php");
+require("../app/routes/Usuarios.php");
 
 $app->run();
