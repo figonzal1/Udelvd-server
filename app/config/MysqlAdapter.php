@@ -16,8 +16,8 @@ class MysqlAdapter
      */
     function __construct()
     {
-        $dotenv = Dotenv\Dotenv::create(__DIR__ . "../../../");
-        $dotenv->load();
+        //$dotenv = Dotenv\Dotenv::create(__DIR__ . "../../../");
+        //$dotenv->load();
 
         $this->db = getenv('DB_DATABASE');
         $this->hostname = getenv('DB_HOSTNAME');
