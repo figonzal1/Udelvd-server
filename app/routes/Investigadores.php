@@ -170,9 +170,9 @@ $app->post('/investigadores', function ($request, $response, $args) {
 
         //Agregar investigador
         $object = new Investigador();
-        $object->setNombre(htmlspecialchars($data['nombre']));
-        $object->setApellido(htmlspecialchars($data['apellido']));
-        $object->setEmail(htmlspecialchars($data['email']));
+        $object->setNombre(htmlspecialchars(ucfirst($data['nombre'])));
+        $object->setApellido(htmlspecialchars(ucfirst($data['apellido'])));
+        $object->setEmail(htmlspecialchars(strtolower($data['email'])));
         $object->setIdRol(htmlspecialchars($data['id_rol']));
         $object->setPassword(htmlspecialchars($data['password']));
         $object->setActivado(0);
@@ -180,7 +180,7 @@ $app->post('/investigadores', function ($request, $response, $args) {
         $existente = $object->buscarInvestigadorPorEmail($conn);
 
         //Si el correo existe
-        if ($existente!=null || $existente) {
+        if ($existente != null || $existente) {
             //Lanzar error de email
             $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Email problem', 'Email already exists');
             $response = $response->withStatus(500);
@@ -235,8 +235,6 @@ $app->post('/investigadores', function ($request, $response, $args) {
  */
 $app->post('/investigadores/login', function ($request, $response, $args) {
 
-    var_dump($request->getHeader("Authorization"));
-
     $payload = array(
         'links' => array(
             'self' => '/investigadores/login'
@@ -263,31 +261,44 @@ $app->post('/investigadores/login', function ($request, $response, $args) {
 
         //Realizar login
         $object = new Investigador();
-        $object->setEmail(htmlentities($data['email']));
+        $object->setEmail(htmlentities(strtolower($data['email'])));
         $object->setPasswordRaw(htmlentities($data['password']));
 
-        $status = $object->login($conn);
+        $existente = $object->buscarInvestigadorPorEmail($conn);
 
-        if (!$status) {
-            $payload = ErrorJsonHandler::lanzarError($payload, 403, 'Login problem', 'Please check your credentials');
-            $response = $response->withStatus(403);
-        } else {
+        //Si el correo NO existe
+        if (!$existente) {
+            //Lanzar error de email
+            $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Email problem', 'Email does not exist');
+            $response = $response->withStatus(500);
+        } 
+        //Si el correo existe
+        else {
 
-            $investigador = $object->buscarInvestigadorPorEmail($conn);
+            //Hacer login
+            $status = $object->login($conn);
 
-            //TODO: Generar JWT
-            $jwt = new Jwt();
-            $token = $jwt->generarToken($investigador['id']);
+            //Si la pass no es la misma
+            if (!$status) {
+                $payload = ErrorJsonHandler::lanzarError($payload, 403, 'Login problem', 'Please check your credentials');
+                $response = $response->withStatus(403);
+            } else {
 
-            //Formatar respuesta
-            $payload['data'] = array(
-                'type' => 'login',
-                'status' => 'Correct',
-                'token' => $token
-            );
+                $investigador = $object->buscarInvestigadorPorEmail($conn);
 
+                //TODO: Generar JWT
+                $jwt = new Jwt();
+                $token = $jwt->generarToken($investigador['id']);
 
-            $response = $response->withStatus(200);
+                //Formatar respuesta
+                $payload['data'] = array(
+                    'type' => 'login',
+                    'status' => 'Correct',
+                    'token' => $token
+                );
+
+                $response = $response->withStatus(200);
+            }
         }
     }
 

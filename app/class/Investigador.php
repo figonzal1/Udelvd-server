@@ -193,7 +193,7 @@ class Investigador
             }
         } catch (PDOException $e) {
             //echo "Fail to find hash: " . $e->getMessage() . "\n";
-            eror_log("Fail to find hash: " . $e->getMessage());
+            error_log("Fail to find hash: " . $e->getMessage());
             return false;
         }
     }
