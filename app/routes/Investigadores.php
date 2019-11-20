@@ -259,10 +259,10 @@ $app->post('/investigadores/login', function ($request, $response, $args) {
         $object->setEmail(htmlentities(strtolower($data['email'])));
         $object->setPasswordRaw(htmlentities($data['password']));
 
-        $existente = $object->buscarInvestigadorPorEmail($conn);
+        $investigador = $object->buscarInvestigadorPorEmail($conn);
 
         //Si el correo NO existe
-        if (!$existente) {
+        if (!$investigador) {
             //Lanzar error de email
             $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Email problem', 'Email does not exist');
             $response = $response->withStatus(500);
@@ -279,17 +279,31 @@ $app->post('/investigadores/login', function ($request, $response, $args) {
                 $response = $response->withStatus(403);
             } else {
 
-                $investigador = $object->buscarInvestigadorPorEmail($conn);
+                //TODO: Verificar si investigador esta activado
 
-                //TODO: Generar JWT
+                //Generar token
                 $jwt = new Jwt();
                 $token = $jwt->generarToken($investigador['id']);
 
                 //Formatar respuesta
-                $payload['data'] = array(
+                $payload['login'] = array(
                     'type' => 'login',
                     'status' => 'Correct',
                     'token' => $token
+                );
+
+                //Formatear respuesta
+                $payload['data'] = array(
+                    'type' => 'investigadores',
+                    'id' => $investigador['id'],
+                    'attributes' => array(
+                        'nombre' => $investigador['nombre'],
+                        'apellido' => $investigador['apellido'],
+                        'email' => $investigador['email'],
+                        'id_rol' => $investigador['id_rol'],
+                        'nombre_rol' => $investigador['nombre_rol'],
+                        'activado' => $investigador['activado']
+                    )
                 );
 
                 $response = $response->withStatus(200);
