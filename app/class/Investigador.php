@@ -95,7 +95,7 @@ class Investigador
     {
         try {
             $stmt = $conn->prepare(
-                "SELECT i.id,i.nombre,i.apellido,i.email,i.activado,r.nombre as nombre_rol FROM investigador i INNER JOIN rol r ON i.id_rol=r.id WHERE email=?"
+                "SELECT i.id,i.nombre,i.apellido,i.email,i.id_rol,i.activado,r.nombre as nombre_rol FROM investigador i INNER JOIN rol r ON i.id_rol=r.id WHERE email=?"
             );
             $stmt->execute(array($this->email));
 

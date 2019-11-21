@@ -51,15 +51,15 @@ class Jwt
         try {
             $token = (new Parser())->parse((string) $string_token);
         } catch (Exception $e) {
-            echo "Fail to parse token " . $e->getMessage();
+            error_log("Fail to parse token " . $e->getMessage(), 0);
             return false;
         }
 
         //Si el token no es verificable 
         if (!$this->verificarToken($token)) {
             return false;
-        } 
-        
+        }
+
         //Si el token es veridico
         else {
 
@@ -72,7 +72,8 @@ class Jwt
             try {
                 $status = $token->validate($data);
             } catch (Exception $e) {
-                echo "Fail to validate token" . $e->getMessage();
+                //echo "Fail to validate token" . $e->getMessage();
+                error_log("Fail to validate token" . $e->getMessage(), 0);
             }
 
             return $status;
@@ -88,7 +89,7 @@ class Jwt
             $signer = new Sha256();
             $status = $token->verify($signer, 'Felipe');
         } catch (Exception $e) {
-            echo "Fail to verify token " . $e->getMessage();
+            error_log("Fail to verify token " . $e->getMessage(), 0);
         }
         return $status;
     }

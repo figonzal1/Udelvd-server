@@ -52,7 +52,7 @@ $app->get('/usuarios[/]', function ($request, $response, $args) {
     //Desconectar mysql
     $mysql_adapter->disconnect();
     return $response;
-});
+})->add(new JwtMiddleware());
 
 /**
  * GET /usuarios/{id}: Obtener usuario segun id
