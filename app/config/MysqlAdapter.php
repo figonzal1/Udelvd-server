@@ -17,19 +17,18 @@ class MysqlAdapter
     function __construct()
     {
 
-            //$dotenv = Dotenv\Dotenv::create(__DIR__ . "../../../");
-            //$dotenv->load();
+        //$dotenv = Dotenv\Dotenv::create(__DIR__ . "../../../");
+        //$dotenv->load();
 
-            /*$this->db = getenv('DB_DATABASE_TEST');
+        /*$this->db = getenv('DB_DATABASE_TEST');
             $this->hostname = getenv('DB_HOSTNAME_TEST');
             $this->username = getenv('DB_USERNAME_TEST');
             $this->password = getenv('DB_PASSWORD_TEST');*/
 
-            $this->db = getenv('DB_DATABASE');
-            $this->hostname = getenv('DB_HOSTNAME');
-            $this->username = getenv('DB_USERNAME');
-            $this->password = getenv('DB_PASSWORD');
-        }
+        $this->db = getenv('DB_DATABASE');
+        $this->hostname = getenv('DB_HOSTNAME');
+        $this->username = getenv('DB_USERNAME');
+        $this->password = getenv('DB_PASSWORD');
     }
 
     /**
