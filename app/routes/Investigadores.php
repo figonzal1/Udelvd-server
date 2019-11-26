@@ -35,6 +35,14 @@ $app->get('/investigadores[/]', function ($request, $response, $args) {
                         'email' => $value['email'],
                         'id_rol' => $value['id_rol'],
                         'activado' => $value['activado']
+                    ),
+                    'relationships' => array(
+                        'rol' => array(
+                            'data' => array(
+                                'id' => $value['id_rol'],
+                                'nombre' => $value['nombre_rol']
+                            )
+                        )
                     )
                 )
             );
@@ -80,7 +88,7 @@ $app->get('/investigadores/{id}', function ($request, $response, $args) {
         //Buscar investigadores
         $object = new Investigador();
         $object->setId($id_investigador);
-        $investigador = $object->buscarInvestigador($conn);
+        $investigador = $object->buscarInvestigadorPorId($conn);
 
         //Si investigador no existe
         if (empty($investigador)) {
@@ -99,6 +107,14 @@ $app->get('/investigadores/{id}', function ($request, $response, $args) {
                     'email' => $investigador['email'],
                     'id_rol' => $investigador['id_rol'],
                     'activado' => $investigador['activado']
+                ),
+                'relationships' => array(
+                    'rol' => array(
+                        'data' => array(
+                            'id' => $investigador['id_rol'],
+                            'nombre' => $investigador['nombre_rol']
+                        )
+                    )
                 )
             );
 
@@ -118,6 +134,7 @@ $app->get('/investigadores/{id}', function ($request, $response, $args) {
     return $response;
 })->add(new JwtMiddleware());
 
+//TODO: PENSAR SI ES NECESARIO DEVOLVER DATOS EN RESPUESTA
 /**
  * POST /investigadores: Crear un investigador
  */
@@ -149,14 +166,11 @@ $app->post('/investigadores', function ($request, $response, $args) {
     } else if (!isset($data['email']) || empty($data['email'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Email is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($data['id_rol']) || empty($data['id_rol'])) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_rol is empty');
+    } else if (!isset($data['nombre_rol']) || empty($data['nombre_rol'])) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre_rol is empty');
         $response = $response->withStatus(400);
     } else if (!isset($data['password']) || empty($data['password'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Password is empty');
-        $response = $response->withStatus(400);
-    } else if (!is_numeric($data['id_rol'])) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_rol must be integer');
         $response = $response->withStatus(400);
     } else if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Email is malformed');
@@ -168,7 +182,7 @@ $app->post('/investigadores', function ($request, $response, $args) {
         $object->setNombre(htmlspecialchars(ucfirst($data['nombre'])));
         $object->setApellido(htmlspecialchars(ucfirst($data['apellido'])));
         $object->setEmail(htmlspecialchars(strtolower($data['email'])));
-        $object->setIdRol(htmlspecialchars($data['id_rol']));
+        $object->setNombreRol(htmlspecialchars(ucfirst($data['nombre_rol'])));
         $object->setPassword(htmlspecialchars($data['password']));
         $object->setActivado(0);
 
@@ -202,6 +216,14 @@ $app->post('/investigadores', function ($request, $response, $args) {
                         'email' => $investigador['email'],
                         'id_rol' => $investigador['id_rol'],
                         'activado' => $investigador['activado']
+                    ),
+                    'relationships' => array(
+                        'rol' => array(
+                            'data' => array(
+                                'id' => $investigador['id_rol'],
+                                'nombre' => $investigador['nombre_rol']
+                            )
+                        )
                     )
                 );
 
@@ -266,7 +288,7 @@ $app->post('/investigadores/login', function ($request, $response, $args) {
             //Lanzar error de email
             $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Email problem', 'Email does not exist');
             $response = $response->withStatus(500);
-        } 
+        }
         //Si el correo existe
         else {
 
@@ -301,8 +323,15 @@ $app->post('/investigadores/login', function ($request, $response, $args) {
                         'apellido' => $investigador['apellido'],
                         'email' => $investigador['email'],
                         'id_rol' => $investigador['id_rol'],
-                        'nombre_rol' => $investigador['nombre_rol'],
                         'activado' => $investigador['activado']
+                    ),
+                    'relationships' => array(
+                        'rol' => array(
+                            'data' => array(
+                                'id' => $investigador['id_rol'],
+                                'nombre' => $investigador['nombre_rol']
+                            )
+                        )
                     )
                 );
 
@@ -326,6 +355,7 @@ $app->post('/investigadores/login', function ($request, $response, $args) {
     return $response;
 });
 
+//TODO: PENSAR SI ES NECESARIO DEVOLVER RESPUESTA EN UPDATE
 /**
  * PUT /investigadores/{id}: Editar un investigador
  */
@@ -393,7 +423,8 @@ $app->put('/investigadores/{id}', function ($request, $response, $args) {
             $response = $response->withStatus(500);
         } else {
 
-            $investigador = $object->buscarInvestigador($conn);
+            $investigador = $object->buscarInvestigadorPorId($conn);
+
 
             //Formatear respuesta
             $payload['data'] = array(
@@ -405,6 +436,14 @@ $app->put('/investigadores/{id}', function ($request, $response, $args) {
                     'email' => $investigador['email'],
                     'id_rol' => $investigador['id_rol'],
                     'activado' => $investigador['activado']
+                ),
+                'relationships' => array(
+                    'rol' => array(
+                        'data' => array(
+                            'id' => $investigador['id_rol'],
+                            'nombre' => $investigador['nombre_rol']
+                        )
+                    )
                 )
             );
 
@@ -475,7 +514,7 @@ $app->delete('/investigadores/{id}', function ($request, $response, $args) {
 
 
 /**
- * PATCH /investigador/{id}/activar: Activar registro de inevstigador
+ * PATCH /investigador/{id}/activar: Activar registro de investigador
  */
 $app->patch('/investigadores/{id}/activar', function ($request, $response, $args) {
 
@@ -522,7 +561,7 @@ $app->patch('/investigadores/{id}/activar', function ($request, $response, $args
             $response = $response->withStatus(500);
         } else {
 
-            $investigador = $object->buscarInvestigador($conn);
+            $investigador = $object->buscarInvestigadorPorId($conn);
 
             //Formatear respuesta
             $payload['data'] = array(
@@ -626,3 +665,5 @@ $app->post('/investigadores/recuperar/{email}', function ($request, $response, $
 
     return $response;
 });
+
+//TODO: AGREGAR METODO PARA RETORNAR LISTA DE INVESTIGADORES PENDIENTES DE ACTIVACION

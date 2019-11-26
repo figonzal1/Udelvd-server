@@ -21,8 +21,12 @@ require_once("../app/class/Emoticon.php");
 require_once("../app/class/Entrevista.php");
 require_once("../app/class/Evento.php");
 require_once("../app/class/Investigador.php");
-require_once("../app/class/Jwt.php");
 require_once("../app/class/Usuario.php");
+
+/**
+ * UTILS
+ */
+require_once("../app/utils/Jwt.php");
 
 /**
  * MIDDLEWARE

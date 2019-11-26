@@ -1,5 +1,6 @@
 <?php
 
+require_once("Rol.php");
 /**
  * Objeto investigador
  */
@@ -13,12 +14,22 @@ class Investigador
     private $email;
     private $passwordHashed;
     private $passwordRaw;
+
+    private $nombreRol; //Usado para crear investigadores
+
     private $idRol;
     private $activado;
 
     function agregar($conn)
     {
         try {
+            //Buscar id rol por nombre
+            $rol = new Rol();
+            $rol->setNombre($this->nombreRol);
+            $rol = $rol->buscarRolPorNombre($conn);
+            $this->idRol = $rol['id'];
+
+            //Insertar investigador con id Rol correcto
             $stmt = $conn->prepare(
                 "INSERT INTO investigador (nombre,apellido,email,password,id_rol,activado) VALUES (?,?,?,?,?,?)"
             );
@@ -73,11 +84,12 @@ class Investigador
         }
     }
 
+    
     function buscarInvestigadorPorId($conn)
     {
         try {
             $stmt = $conn->prepare(
-                "SELECT * FROM investigador WHERE id=?"
+                "SELECT i.id,i.nombre,i.apellido,i.email,i.id_rol,i.activado,r.id as id_rol,r.nombre as nombre_rol FROM investigador i INNER JOIN rol r ON i.id_rol=r.id WHERE i.id=?"
             );
             $stmt->execute(array($this->id));
 
@@ -95,7 +107,7 @@ class Investigador
     {
         try {
             $stmt = $conn->prepare(
-                "SELECT i.id,i.nombre,i.apellido,i.email,i.id_rol,i.activado,r.nombre as nombre_rol FROM investigador i INNER JOIN rol r ON i.id_rol=r.id WHERE email=?"
+                "SELECT i.id,i.nombre,i.apellido,i.email,i.id_rol,i.activado,r.nombre as nombre_rol FROM investigador i INNER JOIN rol r ON i.id_rol=r.id WHERE i.email=?"
             );
             $stmt->execute(array($this->email));
 
@@ -114,7 +126,7 @@ class Investigador
         try {
 
             $stmt = $conn->query(
-                "SELECT * FROM investigador"
+                "SELECT i.id,i.nombre,i.apellido,i.email,i.id_rol,i.activado,r.nombre as nombre_rol FROM investigador i INNER JOIN rol r ON i.id_rol=r.id"
             );
             $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -231,6 +243,10 @@ class Investigador
     {
         return $this->activado;
     }
+    function getNombreRol()
+    {
+        return $this->nombreRol;
+    }
     function setId($id)
     {
         $this->id = $id;
@@ -262,5 +278,9 @@ class Investigador
     function setPasswordRaw($passwordRaw)
     {
         $this->passwordRaw = $passwordRaw;
+    }
+    function setNombreRol($nombreRol)
+    {
+        $this->nombreRol = $nombreRol;
     }
 }
