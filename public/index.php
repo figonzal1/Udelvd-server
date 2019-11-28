@@ -21,7 +21,8 @@ require_once("../app/class/Emoticon.php");
 require_once("../app/class/Entrevista.php");
 require_once("../app/class/Evento.php");
 require_once("../app/class/Investigador.php");
-require_once("../app/class/Usuario.php");
+require_once("../app/class/Entrevistado.php");
+require_once("../app/class/Profesion.php");
 
 /**
  * UTILS
@@ -74,6 +75,6 @@ require("../app/routes/Emoticones.php");
 require("../app/routes/Entrevistas.php");
 require("../app/routes/Evento.php");
 require("../app/routes/Investigadores.php");
-require("../app/routes/Usuarios.php");
+require("../app/routes/Entrevistado.php");
 
 $app->run();
