@@ -89,7 +89,7 @@ class Investigador
     {
         try {
             $stmt = $conn->prepare(
-                "SELECT i.id,i.nombre,i.apellido,i.email,i.id_rol,i.activado,r.id as id_rol,r.nombre as nombre_rol FROM investigador i INNER JOIN rol r ON i.id_rol=r.id WHERE i.id=?"
+                "SELECT i.id,i.nombre,i.apellido,i.email,i.id_rol,i.activado,i.create_time,i.update_time,r.id as id_rol,r.nombre as nombre_rol FROM investigador i INNER JOIN rol r ON i.id_rol=r.id WHERE i.id=?"
             );
             $stmt->execute(array($this->id));
 
@@ -107,7 +107,7 @@ class Investigador
     {
         try {
             $stmt = $conn->prepare(
-                "SELECT i.id,i.nombre,i.apellido,i.email,i.id_rol,i.activado,r.nombre as nombre_rol FROM investigador i INNER JOIN rol r ON i.id_rol=r.id WHERE i.email=?"
+                "SELECT i.id,i.nombre,i.apellido,i.email,i.id_rol,i.activado,i.create_time,i.update_time,r.nombre as nombre_rol FROM investigador i INNER JOIN rol r ON i.id_rol=r.id WHERE i.email=?"
             );
             $stmt->execute(array($this->email));
 

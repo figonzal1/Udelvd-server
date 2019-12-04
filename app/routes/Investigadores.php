@@ -134,7 +134,7 @@ $app->get('/investigadores/{id}', function ($request, $response, $args) {
     return $response;
 })->add(new JwtMiddleware());
 
-//TODO: PENSAR SI ES NECESARIO DEVOLVER DATOS EN RESPUESTA
+
 /**
  * POST /investigadores: Crear un investigador
  */
@@ -183,7 +183,7 @@ $app->post('/investigadores', function ($request, $response, $args) {
         $object->setApellido(htmlspecialchars(ucfirst($data['apellido'])));
         $object->setEmail(htmlspecialchars(strtolower($data['email'])));
         $object->setNombreRol(htmlspecialchars(ucfirst($data['nombre_rol'])));
-        $object->setPassword(htmlspecialchars($data['password']));
+        $object->setPassword($data['password']);
         $object->setActivado(0);
 
         $existente = $object->buscarInvestigadorPorEmail($conn);
@@ -278,8 +278,8 @@ $app->post('/investigadores/login', function ($request, $response, $args) {
 
         //Realizar login
         $object = new Investigador();
-        $object->setEmail(htmlentities(strtolower($data['email'])));
-        $object->setPasswordRaw(htmlentities($data['password']));
+        $object->setEmail(htmlspecialchars(strtolower($data['email'])));
+        $object->setPasswordRaw($data['password']);
 
         $investigador = $object->buscarInvestigadorPorEmail($conn);
 
@@ -323,7 +323,8 @@ $app->post('/investigadores/login', function ($request, $response, $args) {
                         'apellido' => $investigador['apellido'],
                         'email' => $investigador['email'],
                         'id_rol' => $investigador['id_rol'],
-                        'activado' => $investigador['activado']
+                        'activado' => $investigador['activado'],
+                        'create_time' => $investigador['create_time']
                     ),
                     'relationships' => array(
                         'rol' => array(
@@ -412,7 +413,7 @@ $app->put('/investigadores/{id}', function ($request, $response, $args) {
         $object->setApellido(htmlspecialchars($putdata['apellido']));
         $object->setEmail(htmlspecialchars($putdata['email']));
         $object->setIdRol(htmlspecialchars($putdata['id_rol']));
-        $object->setPassword(htmlspecialchars($putdata['password']));
+        $object->setPassword($putdata['password']);
 
         //Actualizar investigador
         $actualizar = $object->actualizar($conn);
@@ -435,7 +436,8 @@ $app->put('/investigadores/{id}', function ($request, $response, $args) {
                     'apellido' => $investigador['apellido'],
                     'email' => $investigador['email'],
                     'id_rol' => $investigador['id_rol'],
-                    'activado' => $investigador['activado']
+                    'activado' => $investigador['activado'],
+                    'update_time' => $investigador['update_time']
                 ),
                 'relationships' => array(
                     'rol' => array(
@@ -622,7 +624,7 @@ $app->post('/investigadores/recuperar/{email}', function ($request, $response, $
         //Buscar investigador por email
 
         $object = new Investigador();
-        $object->setEmail(htmlentities($email));
+        $object->setEmail(htmlspecialchars($email));
         $investigador = $object->buscarInvestigadorPorEmail($conn);
 
         //Si investigador no existe
