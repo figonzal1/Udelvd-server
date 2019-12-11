@@ -169,6 +169,9 @@ $app->post('/entrevistados', function ($request, $response, $args) {
     if (!isset($data['id_conviviente']) || empty($data['id_conviviente'])) {
         $data['id_conviviente'] = NULL;
     }
+    if (!isset($data['nombre_profesion']) || empty($data['nombre_profesion'])) {
+        $data['nombre_profesion'] = NULL;
+    }
 
     //CAMPOS OBLIGATORIOS
     if (!isset($data['nombre']) || empty($data['nombre'])) {
@@ -194,9 +197,6 @@ $app->post('/entrevistados', function ($request, $response, $args) {
         $response = $response->withStatus(400);
     } else if (!is_numeric($data['jubilado_legal'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Jubilado_legal must be integer');
-        $response = $response->withStatus(400);
-    } else if (!isset($data['nombre_profesion'])) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre_profesion is empty');
         $response = $response->withStatus(400);
     } else if (!isset($data['caidas'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Caidas is empty');
@@ -290,7 +290,7 @@ $app->post('/entrevistados', function ($request, $response, $args) {
     $mysql_adapter->disconnect();
 
     return $response;
-})->add(new JwtMiddleware());
+});
 
 /**
  * PUT /entrevistados/{id}: Editar un entrevistados

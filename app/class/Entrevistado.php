@@ -30,20 +30,26 @@ class Entrevistado
         try {
 
             //Intentar agregar profesion
-            $profesion = new Profesion();
-            $profesion->setNombre($this->nombre_profesion);
+            if ($this->nombre_profesion != NULL) {
+                $profesion = new Profesion();
+                $profesion->setNombre($this->nombre_profesion);
 
-            $id_profesion = $profesion->agregar($conn);
+                $id_profesion = $profesion->agregar($conn);
 
-            //Si ya existe profesion
-            if (!$id_profesion || empty($id_profesion)) {
-                $profesion = $profesion->buscarProfesionPorNombre($conn);
-                $this->id_profesion = $profesion['id'];
+                //Si ya existe profesion
+                if (!$id_profesion || empty($id_profesion)) {
+                    $profesion = $profesion->buscarProfesionPorNombre($conn);
+                    $this->id_profesion = $profesion['id'];
+                }
+                //Si no existe profesion, guardar nuevo id
+                else {
+                    $this->id_profesion = $id_profesion;
+                }
+            } else {
+                $id_profesion = NULL;
             }
-            //Si no existe profesion
-            else {
-                $this->id_profesion = $id_profesion;
-            }
+
+
 
             $stmt = $conn->prepare(
                 "INSERT 
