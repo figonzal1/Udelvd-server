@@ -4,7 +4,6 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Factory\AppFactory;
-use Slim\Exception\NotFoundException;
 
 require '../vendor/autoload.php';
 
@@ -23,6 +22,7 @@ require_once("../app/class/Evento.php");
 require_once("../app/class/Investigador.php");
 require_once("../app/class/Entrevistado.php");
 require_once("../app/class/Profesion.php");
+require_once("../app/class/Ciudad.php");
 
 /**
  * UTILS
@@ -73,8 +73,9 @@ $errorMiddleware = $app->addErrorMiddleware(true, false, false);
 require("../app/routes/Acciones.php");
 require("../app/routes/Emoticones.php");
 require("../app/routes/Entrevistas.php");
-require("../app/routes/Evento.php");
+require("../app/routes/Eventos.php");
 require("../app/routes/Investigadores.php");
-require("../app/routes/Entrevistado.php");
+require("../app/routes/Entrevistados.php");
+require("../app/routes/Ciudades.php");
 
 $app->run();

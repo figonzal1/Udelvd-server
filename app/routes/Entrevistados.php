@@ -34,16 +34,24 @@ $app->get('/entrevistados[/]', function ($request, $response, $args) {
                         'apellido' => $value['apellido'],
                         'sexo' => $value['sexo'],
                         'fecha_nacimiento' => $value['fecha_nacimiento'],
-                        'ciudad' => $value['ciudad'],
                         'jubilado_legal' => $value['jubilado_legal'],
                         'caidas' => $value['caidas'],
                         'n_caidas' => $value['n_caidas'],
                         'n_convivientes_3_meses' => $value['n_convivientes_3_meses'],
                         'id_investigador' => $value['id_investigador'],
+                        'id_ciudad' => $value['id_ciudad'],
                         'id_nivel_educacional' => $value['id_nivel_educacional'],
                         'id_estado_civil' => $value['id_estado_civil'],
                         'id_conviviente' => $value['id_conviviente'],
                         'id_profesion' => $value['id_profesion']
+                    ),
+                    'relationships' => array(
+                        'ciudad' => array(
+                            'data' => array(
+                                'id' => $value['id_ciudad'],
+                                'nombre' => $value['nombre_ciudad']
+                            )
+                        )
                     )
                 )
             );
@@ -107,12 +115,12 @@ $app->get('/entrevistados/{id}', function ($request, $response, $args) {
                     'apellido' => $entrevistado['apellido'],
                     'sexo' => $entrevistado['sexo'],
                     'fecha_nacimiento' => $entrevistado['fecha_nacimiento'],
-                    'ciudad' => $entrevistado['ciudad'],
                     'jubilado_legal' => $entrevistado['jubilado_legal'],
                     'caidas' => $entrevistado['caidas'],
                     'n_caidas' => $entrevistado['n_caidas'],
                     'n_convivientes_3_meses' => $entrevistado['n_convivientes_3_meses'],
                     'id_investigador' => $entrevistado['id_investigador'],
+                    'id_ciudad' => $entrevistado['id_ciudad'],
                     'id_nivel_educacional' => $entrevistado['id_nivel_educacional'],
                     'id_estado_civil' => $entrevistado['id_estado_civil'],
                     'id_conviviente' => $entrevistado['id_conviviente'],
@@ -189,8 +197,8 @@ $app->post('/entrevistados', function ($request, $response, $args) {
     } else if (!isset($data['fecha_nacimiento']) || empty($data['fecha_nacimiento'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Fecha_nac is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($data['ciudad']) || empty($data['ciudad'])) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Ciudad is empty');
+    } else if (!isset($data['nombre_ciudad']) || empty($data['nombre_ciudad'])) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre_ciudad is empty');
         $response = $response->withStatus(400);
     } else if (!isset($data['jubilado_legal'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Jubilado legal is empty');
@@ -224,7 +232,7 @@ $app->post('/entrevistados', function ($request, $response, $args) {
         $object->setApellido(htmlspecialchars($data['apellido']));
         $object->setSexo(htmlspecialchars($data['sexo']));
         $object->setFechaNac($data['fecha_nacimiento']);
-        $object->setCiudad(htmlspecialchars($data['ciudad']));
+        $object->setNombreCiudad(htmlspecialchars(ucwords($data['nombre_ciudad'])));
         $object->setJubiladoLegal(htmlspecialchars($data['jubilado_legal']));
         $object->setCaidas(htmlspecialchars($data['caidas']));
         $object->setNConvivientes(htmlspecialchars($data['n_convivientes_3_meses']));
@@ -259,13 +267,12 @@ $app->post('/entrevistados', function ($request, $response, $args) {
                     'apellido' => $usuario['apellido'],
                     'sexo' => $usuario['sexo'],
                     'fecha_nacimiento' => $usuario['fecha_nacimiento'],
-                    'ciudad' => $usuario['ciudad'],
                     'jubilado_legal' => $usuario['jubilado_legal'],
                     'caidas' => $usuario['caidas'],
                     'n_caidas' => $usuario['n_caidas'],
                     'n_convivientes_3_meses' => $usuario['n_convivientes_3_meses'],
-
                     'id_investigador' => $usuario['id_investigador'],
+                    'id_ciudad' => $usuario['id_ciudad'],
                     'id_nivel_educacional' => $usuario['id_nivel_educacional'],
                     'id_estado_civil' => $usuario['id_estado_civil'],
                     'id_conviviente' => $usuario['id_conviviente'],
@@ -389,7 +396,7 @@ $app->put('/entrevistados/{id}', function ($request, $response, $args) {
         $object->setApellido(htmlspecialchars($putdata['apellido']));
         $object->setSexo(htmlspecialchars($putdata['sexo']));
         $object->setFechaNac($putdata['fecha_nacimiento']);
-        $object->setCiudad(htmlspecialchars($putdata['ciudad']));
+        //$object->setCiudad(htmlspecialchars($putdata['ciudad']));
         $object->setJubiladoLegal(htmlspecialchars($putdata['jubilado_legal']));
         $object->setCaidas(htmlspecialchars($putdata['caidas']));
         $object->setNConvivientes(htmlspecialchars($putdata['n_convivientes_3_meses']));

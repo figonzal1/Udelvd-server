@@ -11,7 +11,6 @@ class Entrevistado
     private $apellido;
     private $sexo;
     private $fecha_nac;
-    private $ciudad;
     private $jubilado_legal;
     private $caidas;
     private $n_caidas;  //Opcional
@@ -19,6 +18,8 @@ class Entrevistado
 
     //Foreneas
     private $id_investigador;
+    private $id_ciudad;
+    private $nombre_ciudad;
     private $id_nivel_educacional; //Opcional
     private $id_estado_civil;
     private $id_conviviente;    //Opcional
@@ -49,6 +50,26 @@ class Entrevistado
                 $id_profesion = NULL;
             }
 
+            //Intentar agregar ciudad
+            if ($this->nombre_ciudad != NULL) {
+                $ciudad = new Ciudad();
+                $ciudad->setNombre($this->nombre_ciudad);
+
+                $id_ciudad = $ciudad->agregar($conn);
+
+                //Si ciudad ya existe
+                if (!$id_ciudad || empty($id_profesion)) {
+                    $ciudad = $ciudad->buscarCiudadPorNombre($conn);
+                    $this->id_ciudad = $ciudad['id'];
+                }
+                //Si no existe ciudad, guardar nuevo id
+                else {
+                    $this->id_ciudad = $id_ciudad;
+                }
+            } else {
+                $id_ciudad = NULL;
+            }
+
 
 
             $stmt = $conn->prepare(
@@ -58,12 +79,12 @@ class Entrevistado
                 apellido,
                 sexo,
                 fecha_nacimiento,
-                ciudad,
                 jubilado_legal,
                 caidas,
                 n_caidas,
                 n_convivientes_3_meses,
                 id_investigador,
+                id_ciudad,
                 id_nivel_educacional,
                 id_estado_civil,
                 id_conviviente,
@@ -78,12 +99,12 @@ class Entrevistado
                     $this->apellido,
                     $this->sexo,
                     $this->fecha_nac,
-                    $this->ciudad,
                     $this->jubilado_legal,
                     $this->caidas,
                     $this->n_caidas,
                     $this->n_convivientes_3_meses,
                     $this->id_investigador,
+                    $this->id_ciudad,
                     $this->id_nivel_educacional,
                     $this->id_estado_civil,
                     $this->id_conviviente,
@@ -180,7 +201,24 @@ class Entrevistado
         try {
 
             $stmt = $conn->query(
-                "SELECT * FROM entrevistado"
+                "SELECT 
+                e.id,
+                e.nombre,
+                e.apellido,
+                e.fecha_nacimiento,
+                e.jubilado_legal,
+                e.caidas,
+                e.sexo,
+                e.n_caidas,
+                e.n_convivientes_3_meses,
+                e.id_investigador,
+                e.id_ciudad,
+                e.id_nivel_educacional,
+                e.id_estado_civil,
+                e.id_conviviente,
+                e.id_profesion,
+                e.create_time,
+                c.nombre as nombre_ciudad FROM entrevistado e INNER JOIN ciudad c ON e.id_ciudad=c.id"
             );
             $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -234,9 +272,9 @@ class Entrevistado
     {
         return $this->fecha_nac;
     }
-    function getCiudad()
+    function getNombreCiudad()
     {
-        return $this->ciudad;
+        return $this->nombre_ciudad;
     }
     function getJubiladoLegal()
     {
@@ -257,6 +295,10 @@ class Entrevistado
     function getIdInvestigador()
     {
         return $this->id_investigador;
+    }
+    function getIdCiudad()
+    {
+        return $this->id_ciudad;
     }
     function getIdNivelEducacional()
     {
@@ -302,9 +344,9 @@ class Entrevistado
     {
         $this->fecha_nac = $fecha_nac;
     }
-    function setCiudad($ciudad)
+    function setNombreCiudad($nombre_ciudad)
     {
-        $this->ciudad = $ciudad;
+        $this->nombre_ciudad = $nombre_ciudad;
     }
     function setJubiladoLegal($jubilado_legal)
     {
@@ -325,6 +367,10 @@ class Entrevistado
     function setIdInvestigador($id_investigador)
     {
         $this->id_investigador = $id_investigador;
+    }
+    function setIdCiudad($id_ciudad)
+    {
+        $this->id_ciudad = $id_ciudad;
     }
     function setIdNivelEducacional($id_nivel_educacional)
     {
