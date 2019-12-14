@@ -49,8 +49,6 @@ $app->get('/acciones[/]', function ($request, $response, $args) {
     //Desconectar mysql
     $mysql_adapter->disconnect();
     return $response;
-
-    return $response;
 });
 
 

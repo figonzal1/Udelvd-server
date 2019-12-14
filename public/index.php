@@ -23,6 +23,7 @@ require_once("../app/class/Investigador.php");
 require_once("../app/class/Entrevistado.php");
 require_once("../app/class/Profesion.php");
 require_once("../app/class/Ciudad.php");
+require_once("../app/class/EstadoCivil.php");
 
 /**
  * UTILS
@@ -77,5 +78,6 @@ require("../app/routes/Eventos.php");
 require("../app/routes/Investigadores.php");
 require("../app/routes/Entrevistados.php");
 require("../app/routes/Ciudades.php");
+require("../app/routes/EstadosCiviles.php");
 
 $app->run();
