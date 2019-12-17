@@ -200,6 +200,7 @@ class Entrevistado
     {
         try {
 
+            //TODO: Quizas quitar INNER JOIN CON CIUDAD
             $stmt = $conn->query(
                 "SELECT 
                 e.id,

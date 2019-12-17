@@ -53,6 +53,22 @@ class Profesion
         }
     }
 
+    function buscarTodos($conn)
+    {
+        try {
+
+            $stmt = $conn->query(
+                "SELECT * FROM profesion"
+            );
+
+            $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $listado;
+        } catch (PDOException $e) {
+            error_log("Fail search lista profesiones: " . $e->getMessage());
+            return false;
+        }
+    }
+
     /**
      * GETTERS & SETTERS
      */

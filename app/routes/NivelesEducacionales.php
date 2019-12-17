@@ -1,6 +1,8 @@
 <?php
 
-
+/**
+ * GET /nivelesEducacionales: Listado de niveles educacionales del sistema
+ */
 $app->get("/nivelesEducacionales[/]", function ($request, $response, $args) {
 
     //Conectar BD

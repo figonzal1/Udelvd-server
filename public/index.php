@@ -26,6 +26,7 @@ require_once("../app/class/Ciudad.php");
 require_once("../app/class/EstadoCivil.php");
 require_once("../app/class/NivelEducacional.php");
 require_once("../app/class/TipoConvivencia.php");
+require_once("../app/class/Profesion.php");
 
 /**
  * UTILS
@@ -83,5 +84,6 @@ require("../app/routes/Ciudades.php");
 require("../app/routes/EstadosCiviles.php");
 require("../app/routes/NivelesEducacionales.php");
 require("../app/routes/TiposConvivencias.php");
+require("../app/routes/Profesiones.php");
 
 $app->run();

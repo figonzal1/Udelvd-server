@@ -1,24 +1,25 @@
 <?php
 
 /**
- * GET /tiposConvivencias: Listado de tipos de convivencias del sistema
+ * GET /profesiones: Listado de profesiones del sistema
  */
-$app->get("/tiposConvivencias[/]", function ($request, $response, $args) {
+$app->get("/profesiones[/]", function ($request, $response, $args) {
+
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
     $conn = $mysql_adapter->connect();
 
     $payload = array(
         'links' => array(
-            'self' => "/tiposConvivencias"
+            'self' => "/profesiones"
         ),
         'data' => array()
     );
 
     if ($conn != null) {
 
-        //Buscar estados civiles
-        $object = new TipoConvivencia();
+        //Buscar acciones
+        $object = new Profesion();
         $listado = $object->buscarTodos($conn);
 
         //Preparar respuesta
@@ -27,7 +28,7 @@ $app->get("/tiposConvivencias[/]", function ($request, $response, $args) {
             array_push(
                 $payload['data'],
                 array(
-                    'type' => 'tiposConvivencias',
+                    'type' => 'profesiones',
                     'id' => $value['id'],
                     'attributes' => array(
                         'nombre' => $value['nombre']
