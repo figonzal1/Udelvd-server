@@ -24,6 +24,8 @@ require_once("../app/class/Entrevistado.php");
 require_once("../app/class/Profesion.php");
 require_once("../app/class/Ciudad.php");
 require_once("../app/class/EstadoCivil.php");
+require_once("../app/class/NivelEducacional.php");
+require_once("../app/class/TipoConvivencia.php");
 
 /**
  * UTILS
@@ -79,5 +81,7 @@ require("../app/routes/Investigadores.php");
 require("../app/routes/Entrevistados.php");
 require("../app/routes/Ciudades.php");
 require("../app/routes/EstadosCiviles.php");
+require("../app/routes/NivelesEducacionales.php");
+require("../app/routes/TiposConvivencias.php");
 
 $app->run();

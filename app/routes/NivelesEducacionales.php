@@ -1,9 +1,7 @@
 <?php
 
-/**
- * GET /estadosCiviles: Listado de estados civiles del sistema
- */
-$app->get("/estadosCiviles[/]", function ($request, $response, $args) {
+
+$app->get("/nivelesEducacionales[/]", function ($request, $response, $args) {
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -11,7 +9,7 @@ $app->get("/estadosCiviles[/]", function ($request, $response, $args) {
 
     $payload = array(
         'links' => array(
-            'self' => "/estadosCiviles"
+            'self' => "/nivelesEducacionales"
         ),
         'data' => array()
     );
@@ -19,7 +17,7 @@ $app->get("/estadosCiviles[/]", function ($request, $response, $args) {
     if ($conn != null) {
 
         //Buscar estados civiles
-        $object = new EstadoCivil();
+        $object = new NivelEducacional();
         $listado = $object->buscarTodos($conn);
 
         //Preparar respuesta
@@ -28,7 +26,7 @@ $app->get("/estadosCiviles[/]", function ($request, $response, $args) {
             array_push(
                 $payload['data'],
                 array(
-                    'type' => 'estadosCiviles',
+                    'type' => 'nivelesEducacionales',
                     'id' => $value['id'],
                     'attributes' => array(
                         'nombre' => $value['nombre']

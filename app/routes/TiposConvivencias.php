@@ -1,17 +1,14 @@
 <?php
 
-/**
- * GET /estadosCiviles: Listado de estados civiles del sistema
- */
-$app->get("/estadosCiviles[/]", function ($request, $response, $args) {
 
+$app->get("/tiposConvivencias[/]", function ($request, $response, $args) {
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
     $conn = $mysql_adapter->connect();
 
     $payload = array(
         'links' => array(
-            'self' => "/estadosCiviles"
+            'self' => "/tiposConvivencias"
         ),
         'data' => array()
     );
@@ -19,7 +16,7 @@ $app->get("/estadosCiviles[/]", function ($request, $response, $args) {
     if ($conn != null) {
 
         //Buscar estados civiles
-        $object = new EstadoCivil();
+        $object = new TipoConvivencia();
         $listado = $object->buscarTodos($conn);
 
         //Preparar respuesta
@@ -28,7 +25,7 @@ $app->get("/estadosCiviles[/]", function ($request, $response, $args) {
             array_push(
                 $payload['data'],
                 array(
-                    'type' => 'estadosCiviles',
+                    'type' => 'tiposConvivencias',
                     'id' => $value['id'],
                     'attributes' => array(
                         'nombre' => $value['nombre']

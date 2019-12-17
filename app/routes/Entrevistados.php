@@ -191,9 +191,6 @@ $app->post('/entrevistados', function ($request, $response, $args) {
     } else if (!isset($data['sexo']) || empty($data['sexo'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Sexo is empty');
         $response = $response->withStatus(400);
-    } else if (strcmp($data['sexo'], "m") != 0 && strcmp($data['sexo'], "f") != 0) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', "Sexo must be 'm' or 'f'");
-        $response = $response->withStatus(400);
     } else if (!isset($data['fecha_nacimiento']) || empty($data['fecha_nacimiento'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Fecha_nac is empty');
         $response = $response->withStatus(400);

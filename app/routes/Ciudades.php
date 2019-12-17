@@ -29,7 +29,7 @@
             array_push(
                 $payload['data'],
                 array(
-                    'type' => 'acciones',
+                    'type' => 'ciudades',
                     'id' => $value['id'],
                     'attributes' => array(
                         'nombre' => $value['nombre']

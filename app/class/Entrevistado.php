@@ -22,7 +22,7 @@ class Entrevistado
     private $nombre_ciudad;
     private $id_nivel_educacional; //Opcional
     private $id_estado_civil;
-    private $id_conviviente;    //Opcional
+    private $id_tipo_convivencia;    //Opcional
     private $id_profesion;     //Opcional
     private $nombre_profesion;
 
@@ -87,7 +87,7 @@ class Entrevistado
                 id_ciudad,
                 id_nivel_educacional,
                 id_estado_civil,
-                id_conviviente,
+                id_tipo_convivencia,
                 id_profesion
                 ) 
                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
@@ -107,7 +107,7 @@ class Entrevistado
                     $this->id_ciudad,
                     $this->id_nivel_educacional,
                     $this->id_estado_civil,
-                    $this->id_conviviente,
+                    $this->id_tipo_convivencia,
                     $this->id_profesion,
                 )
             );
@@ -143,7 +143,7 @@ class Entrevistado
                 id_investigador=?,
                 id_nivel_educacional=?,
                 id_estado_civil=?,
-                id_conviviente=?,
+                id_tipo_convivencia=?,
                 id_profesion=? 
                 WHERE id=?"
             );
@@ -162,7 +162,7 @@ class Entrevistado
                     $this->id_investigador,
                     $this->id_nivel_educacional,
                     $this->id_estado_civil,
-                    $this->id_conviviente,
+                    $this->id_tipo_convivencia,
                     $this->id_profesion,
                     $this->id
                 )
@@ -215,7 +215,7 @@ class Entrevistado
                 e.id_ciudad,
                 e.id_nivel_educacional,
                 e.id_estado_civil,
-                e.id_conviviente,
+                e.id_tipo_convivencia,
                 e.id_profesion,
                 e.create_time,
                 c.nombre as nombre_ciudad FROM entrevistado e INNER JOIN ciudad c ON e.id_ciudad=c.id"
@@ -314,7 +314,7 @@ class Entrevistado
     }
     function getIdConviviente()
     {
-        return $this->id_conviviente;
+        return $this->id_tipo_convivencia;
     }
     function getIdProfesion()
     {
@@ -384,9 +384,9 @@ class Entrevistado
     {
         $this->id_enfermedad = $id_enfermedad;
     }
-    function setIdConviviente($id_conviviente)
+    function setIdConviviente($id_tipo_convivencia)
     {
-        $this->id_conviviente = $id_conviviente;
+        $this->id_tipo_convivencia = $id_tipo_convivencia;
     }
     function setIdProfesion($id_profesion)
     {
