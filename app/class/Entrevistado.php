@@ -312,7 +312,7 @@ class Entrevistado
     {
         return $this->id_enfermedad;
     }
-    function getIdConviviente()
+    function getIdTipoConvivencia()
     {
         return $this->id_tipo_convivencia;
     }
@@ -384,7 +384,7 @@ class Entrevistado
     {
         $this->id_enfermedad = $id_enfermedad;
     }
-    function setIdConviviente($id_tipo_convivencia)
+    function setIdTipoConvivencia($id_tipo_convivencia)
     {
         $this->id_tipo_convivencia = $id_tipo_convivencia;
     }

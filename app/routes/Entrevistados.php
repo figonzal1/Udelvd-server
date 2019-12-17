@@ -42,7 +42,7 @@ $app->get('/entrevistados[/]', function ($request, $response, $args) {
                         'id_ciudad' => $value['id_ciudad'],
                         'id_nivel_educacional' => $value['id_nivel_educacional'],
                         'id_estado_civil' => $value['id_estado_civil'],
-                        'id_conviviente' => $value['id_conviviente'],
+                        'id_tipo_convivencia' => $value['id_tipo_convivencia'],
                         'id_profesion' => $value['id_profesion']
                     ),
                     'relationships' => array(
@@ -123,7 +123,7 @@ $app->get('/entrevistados/{id}', function ($request, $response, $args) {
                     'id_ciudad' => $entrevistado['id_ciudad'],
                     'id_nivel_educacional' => $entrevistado['id_nivel_educacional'],
                     'id_estado_civil' => $entrevistado['id_estado_civil'],
-                    'id_conviviente' => $entrevistado['id_conviviente'],
+                    'id_tipo_convivencia' => $entrevistado['id_tipo_convivencia'],
                     'id_profesion' => $entrevistado['id_profesion']
                 )
             );
@@ -174,8 +174,8 @@ $app->post('/entrevistados', function ($request, $response, $args) {
     if (!isset($data['id_nivel_educacional']) || empty($data['id_nivel_educacional'])) {
         $data['id_nivel_educacional'] = NULL;
     }
-    if (!isset($data['id_conviviente']) || empty($data['id_conviviente'])) {
-        $data['id_conviviente'] = NULL;
+    if (!isset($data['id_tipo_convivencia']) || empty($data['id_tipo_convivencia'])) {
+        $data['id_tipo_convivencia'] = NULL;
     }
     if (!isset($data['nombre_profesion']) || empty($data['nombre_profesion'])) {
         $data['nombre_profesion'] = NULL;
@@ -239,7 +239,7 @@ $app->post('/entrevistados', function ($request, $response, $args) {
         //Opcionales
         $object->setNCaidas($data['n_caidas']);
         $object->setIdNivelEducacional($data['id_nivel_educacional']);
-        $object->setidConviviente($data['id_conviviente']);
+        $object->setIdTipoConvivencia($data['id_tipo_convivencia']);
         //$object->setIdProfesion($data['id_profesion']);
         $object->setNombreProfesion(htmlspecialchars(ucfirst($data['nombre_profesion'])));
 
@@ -272,7 +272,7 @@ $app->post('/entrevistados', function ($request, $response, $args) {
                     'id_ciudad' => $usuario['id_ciudad'],
                     'id_nivel_educacional' => $usuario['id_nivel_educacional'],
                     'id_estado_civil' => $usuario['id_estado_civil'],
-                    'id_conviviente' => $usuario['id_conviviente'],
+                    'id_tipo_convivencia' => $usuario['id_tipo_convivencia'],
                     'id_profesion' => $usuario['id_profesion']
                 )
             );
@@ -334,8 +334,8 @@ $app->put('/entrevistados/{id}', function ($request, $response, $args) {
     if (!isset($putdata['id_nivel_educacional']) || empty($putdata['id_nivel_educacional'])) {
         $putdata['id_nivel_educacional'] = NULL;
     }
-    if (!isset($putdata['id_conviviente']) || empty($putdata['id_conviviente'])) {
-        $putdata['id_conviviente'] = NULL;
+    if (!isset($putdata['id_tipo_convivencia']) || empty($putdata['id_tipo_convivencia'])) {
+        $putdata['id_tipo_convivencia'] = NULL;
     }
     if (!isset($putdata['id_profesion']) || empty($putdata['id_profesion'])) {
         $putdata['id_profesion'] = NULL;
@@ -404,7 +404,7 @@ $app->put('/entrevistados/{id}', function ($request, $response, $args) {
         //Opcionales
         $object->setNCaidas($putdata['n_caidas']);
         $object->setIdNivelEducacional($putdata['id_nivel_educacional']);
-        $object->setIdConviviente($putdata['id_conviviente']);
+        $object->setIdTipoConvivencia($putdata['id_tipo_convivencia']);
         $object->setIdProfesion($putdata['id_profesion']);
 
         //actualizar entrevistado
@@ -436,7 +436,7 @@ $app->put('/entrevistados/{id}', function ($request, $response, $args) {
                     'id_investigador' => $entrevistado['id_investigador'],
                     'id_nivel_educacional' => $entrevistado['id_nivel_educacional'],
                     'id_estado_civil' => $entrevistado['id_estado_civil'],
-                    'id_conviviente' => $entrevistado['id_conviviente'],
+                    'id_tipo_convivencia' => $entrevistado['id_tipo_convivencia'],
                     'id_profesion' => $entrevistado['id_profesion']
                 )
             );
