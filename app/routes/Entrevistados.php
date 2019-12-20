@@ -149,7 +149,7 @@ $app->get('/entrevistados/{id}', function ($request, $response, $args) {
  */
 $app->post('/entrevistados', function ($request, $response, $args) {
 
-    //Seccion link self
+
     $payload = array(
         'links' => array(
             'self' => '/entrevistados'
@@ -257,7 +257,7 @@ $app->post('/entrevistados', function ($request, $response, $args) {
 
             //Formatear respuesta
             $payload['data'] = array(
-                'type' => 'usuarios',
+                'type' => 'entrevistados',
                 'id' => $usuario['id'],
                 'attributes' => array(
                     'nombre' => $usuario['nombre'],

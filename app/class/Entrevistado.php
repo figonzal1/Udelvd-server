@@ -33,44 +33,40 @@ class Entrevistado
             //Intentar agregar profesion
             if ($this->nombre_profesion != NULL) {
                 $profesion = new Profesion();
-                $profesion->setNombre($this->nombre_profesion);
+                $profesion->setNombre($this->nombre_ciudad);
+                $existente = $profesion->buscarProfesionPorNombre($conn);
 
-                $id_profesion = $profesion->agregar($conn);
-
-                //Si ya existe profesion
-                if (!$id_profesion || empty($id_profesion)) {
-                    $profesion = $profesion->buscarProfesionPorNombre($conn);
-                    $this->id_profesion = $profesion['id'];
+                //Si no existe, agrega nuevo
+                if (!$existente) {
+                    $this->id_profesion = $profesion->agregar($conn);
                 }
-                //Si no existe profesion, guardar nuevo id
+                //Si existe asignar id
                 else {
-                    $this->id_profesion = $id_profesion;
+                    $this->id_profesion = $existente['id'];
                 }
             } else {
-                $id_profesion = NULL;
+                $this->id_profesion = NULL;
             }
 
             //Intentar agregar ciudad
             if ($this->nombre_ciudad != NULL) {
+
                 $ciudad = new Ciudad();
                 $ciudad->setNombre($this->nombre_ciudad);
+                $existente = $ciudad->buscarCiudadPorNombre($conn);
 
-                $id_ciudad = $ciudad->agregar($conn);
-
-                //Si ciudad ya existe
-                if (!$id_ciudad || empty($id_profesion)) {
-                    $ciudad = $ciudad->buscarCiudadPorNombre($conn);
-                    $this->id_ciudad = $ciudad['id'];
+                //Si no existe, agrega nuevo
+                if (!$existente) {
+                    $this->id_ciudad = $ciudad->agregar($conn);
                 }
-                //Si no existe ciudad, guardar nuevo id
+
+                //Si existe asignar id
                 else {
-                    $this->id_ciudad = $id_ciudad;
+                    $this->id_ciudad = $existente['id'];
                 }
             } else {
-                $id_ciudad = NULL;
+                $this->id_ciudad = NULL;
             }
-
-
 
             $stmt = $conn->prepare(
                 "INSERT 
