@@ -33,7 +33,7 @@ class Entrevistado
             //Intentar agregar profesion
             if ($this->nombre_profesion != NULL) {
                 $profesion = new Profesion();
-                $profesion->setNombre($this->nombre_ciudad);
+                $profesion->setNombre($this->nombre_profesion);
                 $existente = $profesion->buscarProfesionPorNombre($conn);
 
                 //Si no existe, agrega nuevo
@@ -123,6 +123,44 @@ class Entrevistado
 
         try {
 
+            //Intentar agregar profesion
+            if ($this->nombre_profesion != NULL) {
+                $profesion = new Profesion();
+                $profesion->setNombre($this->nombre_profesion);
+                $existente = $profesion->buscarProfesionPorNombre($conn);
+
+                //Si no existe, agrega nuevo
+                if (!$existente) {
+                    $this->id_profesion = $profesion->agregar($conn);
+                }
+                //Si existe asignar id
+                else {
+                    $this->id_profesion = $existente['id'];
+                }
+            } else {
+                $this->id_profesion = NULL;
+            }
+
+            //Intentar agregar ciudad
+            if ($this->nombre_ciudad != NULL) {
+
+                $ciudad = new Ciudad();
+                $ciudad->setNombre($this->nombre_ciudad);
+                $existente = $ciudad->buscarCiudadPorNombre($conn);
+
+                //Si no existe, agrega nuevo
+                if (!$existente) {
+                    $this->id_ciudad = $ciudad->agregar($conn);
+                }
+
+                //Si existe asignar id
+                else {
+                    $this->id_ciudad = $existente['id'];
+                }
+            } else {
+                $this->id_ciudad = NULL;
+            }
+
             $stmt = $conn->prepare(
                 "UPDATE 
                 entrevistado 
@@ -131,12 +169,12 @@ class Entrevistado
                 apellido=?,
                 sexo=?,
                 fecha_nacimiento=?,
-                ciudad=?,
                 jubilado_legal=?,
                 caidas=?,
                 n_caidas=?,
                 n_convivientes_3_meses=?,
                 id_investigador=?,
+                id_ciudad=?,
                 id_nivel_educacional=?,
                 id_estado_civil=?,
                 id_tipo_convivencia=?,
@@ -150,12 +188,12 @@ class Entrevistado
                     $this->apellido,
                     $this->sexo,
                     $this->fecha_nac,
-                    $this->ciudad,
                     $this->jubilado_legal,
                     $this->caidas,
                     $this->n_caidas,
                     $this->n_convivientes_3_meses,
                     $this->id_investigador,
+                    $this->id_ciudad,
                     $this->id_nivel_educacional,
                     $this->id_estado_civil,
                     $this->id_tipo_convivencia,
@@ -196,26 +234,26 @@ class Entrevistado
     {
         try {
 
-            //TODO: Quizas quitar INNER JOIN CON CIUDAD
             $stmt = $conn->query(
                 "SELECT 
-                e.id,
-                e.nombre,
-                e.apellido,
-                e.fecha_nacimiento,
-                e.jubilado_legal,
-                e.caidas,
-                e.sexo,
-                e.n_caidas,
-                e.n_convivientes_3_meses,
-                e.id_investigador,
-                e.id_ciudad,
-                e.id_nivel_educacional,
-                e.id_estado_civil,
-                e.id_tipo_convivencia,
-                e.id_profesion,
-                e.create_time,
-                c.nombre as nombre_ciudad FROM entrevistado e INNER JOIN ciudad c ON e.id_ciudad=c.id"
+                id,
+                nombre,
+                apellido,
+                fecha_nacimiento,
+                jubilado_legal,
+                caidas,
+                sexo,
+                n_caidas,
+                n_convivientes_3_meses,
+                id_investigador,
+                id_ciudad,
+                id_nivel_educacional,
+                id_estado_civil,
+                id_tipo_convivencia,
+                id_profesion,
+                create_time,
+                update_time
+                FROM entrevistado"
             );
             $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

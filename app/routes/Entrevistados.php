@@ -44,14 +44,6 @@ $app->get('/entrevistados[/]', function ($request, $response, $args) {
                         'id_estado_civil' => $value['id_estado_civil'],
                         'id_tipo_convivencia' => $value['id_tipo_convivencia'],
                         'id_profesion' => $value['id_profesion']
-                    ),
-                    'relationships' => array(
-                        'ciudad' => array(
-                            'data' => array(
-                                'id' => $value['id_ciudad'],
-                                'nombre' => $value['nombre_ciudad']
-                            )
-                        )
                     )
                 )
             );
@@ -70,7 +62,7 @@ $app->get('/entrevistados[/]', function ($request, $response, $args) {
     //Desconectar mysql
     $mysql_adapter->disconnect();
     return $response;
-}); //->add(new JwtMiddleware());
+})->add(new JwtMiddleware());
 
 /**
  * GET /entrevistados/{id}: Obtener usuario segun id
@@ -142,7 +134,7 @@ $app->get('/entrevistados/{id}', function ($request, $response, $args) {
     $mysql_adapter->disconnect();
 
     return $response;
-});
+})->add(new JwtMiddleware());
 
 /**
  * POST /entrevistados: Crear un entrevistos
@@ -273,7 +265,8 @@ $app->post('/entrevistados', function ($request, $response, $args) {
                     'id_nivel_educacional' => $usuario['id_nivel_educacional'],
                     'id_estado_civil' => $usuario['id_estado_civil'],
                     'id_tipo_convivencia' => $usuario['id_tipo_convivencia'],
-                    'id_profesion' => $usuario['id_profesion']
+                    'id_profesion' => $usuario['id_profesion'],
+                    'create_time' => $usuario['create_time']
                 )
             );
 
@@ -294,7 +287,7 @@ $app->post('/entrevistados', function ($request, $response, $args) {
     $mysql_adapter->disconnect();
 
     return $response;
-});
+})->add(new JwtMiddleware());
 
 /**
  * PUT /entrevistados/{id}: Editar un entrevistados
@@ -337,8 +330,8 @@ $app->put('/entrevistados/{id}', function ($request, $response, $args) {
     if (!isset($putdata['id_tipo_convivencia']) || empty($putdata['id_tipo_convivencia'])) {
         $putdata['id_tipo_convivencia'] = NULL;
     }
-    if (!isset($putdata['id_profesion']) || empty($putdata['id_profesion'])) {
-        $putdata['id_profesion'] = NULL;
+    if (!isset($putdata['nombre_profesion']) || empty($putdata['nombre_profesion'])) {
+        $putdata['nombre_profesion'] = NULL;
     }
 
     //Campos obligatorios
@@ -351,14 +344,11 @@ $app->put('/entrevistados/{id}', function ($request, $response, $args) {
     } else if (!isset($putdata['sexo']) || empty($putdata['sexo'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Sexo is empty');
         $response = $response->withStatus(400);
-    } else if (strcmp($putdata['sexo'], "m") != 0 && strcmp($putdata['sexo'], "f") != 0) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', "Sexo must be 'm' or 'f'");
-        $response = $response->withStatus(400);
     } else if (!isset($putdata['fecha_nacimiento']) || empty($putdata['fecha_nacimiento'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Fecha_nac is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($putdata['ciudad']) || empty($putdata['ciudad'])) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Ciudad is empty');
+    } else if (!isset($putdata['nombre_ciudad']) || empty($putdata['nombre_ciudad'])) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre ciudad is empty');
         $response = $response->withStatus(400);
     } else if (!isset($putdata['jubilado_legal'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Jubilado legal is empty');
@@ -393,7 +383,7 @@ $app->put('/entrevistados/{id}', function ($request, $response, $args) {
         $object->setApellido(htmlspecialchars($putdata['apellido']));
         $object->setSexo(htmlspecialchars($putdata['sexo']));
         $object->setFechaNac($putdata['fecha_nacimiento']);
-        //$object->setCiudad(htmlspecialchars($putdata['ciudad']));
+        $object->setNombreCiudad(htmlspecialchars(ucwords($putdata['nombre_ciudad'])));
         $object->setJubiladoLegal(htmlspecialchars($putdata['jubilado_legal']));
         $object->setCaidas(htmlspecialchars($putdata['caidas']));
         $object->setNConvivientes(htmlspecialchars($putdata['n_convivientes_3_meses']));
@@ -405,7 +395,7 @@ $app->put('/entrevistados/{id}', function ($request, $response, $args) {
         $object->setNCaidas($putdata['n_caidas']);
         $object->setIdNivelEducacional($putdata['id_nivel_educacional']);
         $object->setIdTipoConvivencia($putdata['id_tipo_convivencia']);
-        $object->setIdProfesion($putdata['id_profesion']);
+        $object->setNombreProfesion(htmlspecialchars(ucfirst($putdata['nombre_profesion'])));
 
         //actualizar entrevistado
         $actualizar = $object->actualizar($conn);
@@ -427,17 +417,17 @@ $app->put('/entrevistados/{id}', function ($request, $response, $args) {
                     'apellido' => $entrevistado['apellido'],
                     'sexo' => $entrevistado['sexo'],
                     'fecha_nacimiento' => $entrevistado['fecha_nacimiento'],
-                    'ciudad' => $entrevistado['ciudad'],
                     'jubilado_legal' => $entrevistado['jubilado_legal'],
                     'caidas' => $entrevistado['caidas'],
                     'n_caidas' => $entrevistado['n_caidas'],
                     'n_convivientes_3_meses' => $entrevistado['n_convivientes_3_meses'],
-
                     'id_investigador' => $entrevistado['id_investigador'],
+                    'id_ciudad' => $entrevistado['id_ciudad'],
                     'id_nivel_educacional' => $entrevistado['id_nivel_educacional'],
                     'id_estado_civil' => $entrevistado['id_estado_civil'],
                     'id_tipo_convivencia' => $entrevistado['id_tipo_convivencia'],
-                    'id_profesion' => $entrevistado['id_profesion']
+                    'id_profesion' => $entrevistado['id_profesion'],
+                    'update_time' => $entrevistado['update_time']
                 )
             );
 
