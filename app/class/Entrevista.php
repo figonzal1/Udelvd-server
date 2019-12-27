@@ -9,7 +9,7 @@ class Entrevista
 
 
     private $id;
-    private $id_usuario;
+    private $id_entrevistado;
     private $id_tipo_entrevista;
     private $fecha_entrevista;
 
@@ -17,12 +17,12 @@ class Entrevista
     {
         try {
             $stmt = $conn->prepare(
-                "INSERT INTO entrevista (id_usuario,id_tipo_entrevista,fecha_entrevista) VALUES (?,?,?)"
+                "INSERT INTO entrevista (id_entrevistado,id_tipo_entrevista,fecha_entrevista) VALUES (?,?,?)"
             );
 
             $stmt->execute(
                 array(
-                    $this->id_usuario,
+                    $this->id_entrevistado,
                     $this->id_tipo_entrevista,
                     $this->fecha_entrevista
                 )
@@ -42,11 +42,11 @@ class Entrevista
     {
         try {
             $stmt = $conn->prepare(
-                "UPDATE entrevista SET id_usuario=?,id_tipo_entrevista=?,fecha_entrevista=? WHERE id=?"
+                "UPDATE entrevista SET id_entrevistado=?,id_tipo_entrevista=?,fecha_entrevista=? WHERE id=?"
             );
 
             $stmt->execute(array(
-                $this->id_usuario,
+                $this->id_entrevistado,
                 $this->id_tipo_entrevista,
                 $this->fecha_entrevista,
                 $this->id
@@ -84,14 +84,15 @@ class Entrevista
     }
 
     /**
-     * Buscar entrevistas por ID usuario
+     * Buscar entrevistas personales
      */
-    function buscarEntrevistasUsuario($conn){
+    function buscarEntrevistasPersonales($conn)
+    {
         try {
             $stmt = $conn->prepare(
-                "SELECT * FROM entrevista WHERE id_usuario=?"
+                "SELECT * FROM entrevista WHERE id_entrevistado=?"
             );
-            $stmt->execute(array($this->id_usuario));
+            $stmt->execute(array($this->id_entrevistado));
 
             $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -123,13 +124,13 @@ class Entrevista
 
         try {
             $stmt = $conn->prepare(
-                "DELETE FROM entrevista WHERE id=? AND id_usuario=?"
+                "DELETE FROM entrevista WHERE id=? AND id_entrevistado=?"
             );
 
             $stmt->execute(
                 array(
                     $this->id,
-                    $this->id_usuario
+                    $this->id_entrevistado
                 )
             );
             if ($stmt->rowCount() == 0) {
@@ -150,9 +151,9 @@ class Entrevista
     {
         return $this->id;
     }
-    function getIdUsuario()
+    function getIdEntrevistado()
     {
-        return $this->id_usuario;
+        return $this->id_entrevistado;
     }
     function getIdTipoEntrevista()
     {
@@ -166,9 +167,9 @@ class Entrevista
     {
         $this->id = $id;
     }
-    function setIdUsuario($id_usuario)
+    function setIdEntrevistado($id_entrevistado)
     {
-        $this->id_usuario = $id_usuario;
+        $this->id_entrevistado = $id_entrevistado;
     }
     function setIdTipoEntrevista($id_tipo_entrevista)
     {

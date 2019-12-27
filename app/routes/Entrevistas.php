@@ -1,13 +1,11 @@
 <?php
 
-
 /**
- * GET /entrevistas
+ * GET /entrevistados/{id_entrevistado}/entrevistas
  */
+$app->get('/entrevistados/{id_entrevistado}/entrevistas', function ($request, $response, $args) {
 
-$app->get('/usuarios/{id_usuario}/entrevistas', function ($request, $response, $args) {
-
-    $id_usuario = $args['id_usuario'];
+    $id_entrevistado = $args['id_entrevistado'];
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -15,21 +13,21 @@ $app->get('/usuarios/{id_usuario}/entrevistas', function ($request, $response, $
 
     $payload = array(
         'links' => array(
-            'self' => "/usuarios/" . $id_usuario . "/entrevistas"
+            'self' => "/entrevistados/" . $id_entrevistado . "/entrevistas"
         ),
         'data' => array()
     );
 
 
-    if (!isset($id_usuario) || empty($id_usuario) || !is_numeric($id_usuario)) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_usuario must be integer');
+    if (!isset($id_entrevistado) || empty($id_entrevistado) || !is_numeric($id_entrevistado)) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevistado must be integer');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
 
         //Buscar entrevistas de usuarios
         $object = new Entrevista();
-        $object->setIdUsuario($id_usuario);
-        $listado = $object->buscarEntrevistasUsuario($conn);
+        $object->setIdEntrevistado($id_entrevistado);
+        $listado = $object->buscarEntrevistasPersonales($conn);
 
         //Preparar respuesta
         foreach ($listado as $key => $value) {
@@ -40,7 +38,7 @@ $app->get('/usuarios/{id_usuario}/entrevistas', function ($request, $response, $
                     'type' => 'entrevistas',
                     'id' => $value['id'],
                     'attributes' => array(
-                        'id_usuario' => $value['id_usuario'],
+                        'id_entrevistado' => $value['id_entrevistado'],
                         'id_tipo_entrevista' => $value['id_tipo_entrevista'],
                         'fecha_entrevista' =>  $value['fecha_entrevista']
                     )
@@ -97,7 +95,7 @@ $app->post('/usuarios/{id_usuario}/entrevistas', function ($request, $response, 
 
         //Agregar entrevista
         $object = new Entrevista();
-        $object->setIdUsuario($id_usuario);
+        $object->setIdEntrevistado($id_usuario);
         $object->setFechaEntrevista($data['fecha_entrevista']);
         $object->setIdTipoEntrevista($data['id_tipo_entrevista']);
 
@@ -186,7 +184,7 @@ $app->put('/usuarios/{id_usuario}/entrevistas/{id_entrevista}', function ($reque
 
         //Actualzar entrevista
         $object = new Entrevista();
-        $object->setIdUsuario($id_usuario);
+        $object->setIdEntrevistado($id_usuario);
         $object->setId($id_entrevista);
         $object->setFechaEntrevista($putdata['fecha_entrevista']);
         $object->setIdTipoEntrevista($putdata['id_tipo_entrevista']);
@@ -259,7 +257,7 @@ $app->delete('/usuarios/{id_usuario}/entrevistas/{id_entrevista}', function ($re
         //Eliminar entrevistas
         $object  = new Entrevista();
         $object->setId($id_entrevista);
-        $object->setIdUsuario($id_usuario);
+        $object->setIdEntrevistado($id_usuario);
         $eliminar = $object->eliminar($conn);
 
         if ($eliminar) {
