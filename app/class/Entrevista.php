@@ -90,7 +90,22 @@ class Entrevista
     {
         try {
             $stmt = $conn->prepare(
-                "SELECT * FROM entrevista WHERE id_entrevistado=? ORDER BY fecha_entrevista DESC"
+                "SELECT
+                    e.id,
+                    e.id_entrevistado,
+                    e.id_tipo_entrevista,
+                    e.fecha_entrevista,
+                    t.id as id_tipo_entrevista,
+                    t.nombre as nombre_tipo_entrevista
+                FROM
+                    entrevista e
+                INNER JOIN tipo_entrevista t ON
+                    t.id = e.id_tipo_entrevista
+                WHERE
+                    e.id_entrevistado = ?
+                ORDER BY
+                    e.fecha_entrevista
+                DESC"
             );
             $stmt->execute(array($this->id_entrevistado));
 

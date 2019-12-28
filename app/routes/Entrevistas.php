@@ -1,7 +1,7 @@
 <?php
 
 /**
- * GET /entrevistados/{id_entrevistado}/entrevistas
+ * GET /entrevistados/{id_entrevistado}/entrevistas: Listado de entrevistas de una persona especifica
  */
 $app->get('/entrevistados/{id_entrevistado}/entrevistas', function ($request, $response, $args) {
 
@@ -41,6 +41,14 @@ $app->get('/entrevistados/{id_entrevistado}/entrevistas', function ($request, $r
                         'id_entrevistado' => $value['id_entrevistado'],
                         'id_tipo_entrevista' => $value['id_tipo_entrevista'],
                         'fecha_entrevista' =>  $value['fecha_entrevista']
+                    ),
+                    'relationships' => array(
+                        'tipoEntrevista' => array(
+                            'data' => array(
+                                'id' => $value['id_tipo_entrevista'],
+                                'nombre' => $value['nombre_tipo_entrevista']
+                            )
+                        )
                     )
                 )
             );
