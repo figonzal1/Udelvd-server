@@ -90,7 +90,7 @@ class Entrevista
     {
         try {
             $stmt = $conn->prepare(
-                "SELECT * FROM entrevista WHERE id_entrevistado=?"
+                "SELECT * FROM entrevista WHERE id_entrevistado=? ORDER BY fecha_entrevista DESC"
             );
             $stmt->execute(array($this->id_entrevistado));
 
@@ -108,7 +108,7 @@ class Entrevista
         try {
 
             $stmt = $conn->query(
-                "SELECT * FROM entrevista"
+                "SELECT * FROM entrevista ORDER BY fecha_entrevista"
             );
             $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

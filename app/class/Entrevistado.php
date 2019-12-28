@@ -217,9 +217,36 @@ class Entrevistado
     {
         try {
             $stmt = $conn->prepare(
-                "SELECT * FROM entrevistado WHERE id=?"
+                "SELECT
+                id,
+                nombre,
+                apellido,
+                sexo,
+                fecha_nacimiento,
+                jubilado_legal,
+                caidas,
+                n_caidas,
+                n_convivientes_3_meses,
+                id_investigador,
+                id_ciudad,
+                id_nivel_educacional,
+                id_estado_civil,
+                id_tipo_convivencia,
+                id_profesion,
+                create_time,
+                update_time,
+                (SELECT COUNT(*) FROM entrevista WHERE id_entrevistado = ?) AS n_entrevistas
+            FROM
+                entrevistado
+            WHERE
+                id = ?"
             );
-            $stmt->execute(array($this->id));
+            $stmt->execute(
+                array(
+                    $this->id,
+                    $this->id
+                )
+            );
 
             $entrevistado = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -235,25 +262,31 @@ class Entrevistado
         try {
 
             $stmt = $conn->query(
-                "SELECT 
-                id,
-                nombre,
-                apellido,
-                fecha_nacimiento,
-                jubilado_legal,
-                caidas,
-                sexo,
-                n_caidas,
-                n_convivientes_3_meses,
-                id_investigador,
-                id_ciudad,
-                id_nivel_educacional,
-                id_estado_civil,
-                id_tipo_convivencia,
-                id_profesion,
-                create_time,
-                update_time
-                FROM entrevistado"
+                "SELECT
+                eo.id,
+                eo.nombre,
+                eo.apellido,
+                eo.fecha_nacimiento,
+                eo.jubilado_legal,
+                eo.caidas,
+                eo.sexo,
+                eo.n_caidas,
+                eo.n_convivientes_3_meses,
+                eo.id_investigador,
+                eo.id_ciudad,
+                eo.id_nivel_educacional,
+                eo.id_estado_civil,
+                eo.id_tipo_convivencia,
+                eo.id_profesion,
+                eo.create_time,
+                eo.update_time,
+                (SELECT COUNT(*) FROM entrevista WHERE id_entrevistado = eo.id) AS n_entrevistas
+            FROM
+                entrevistado eo
+            INNER JOIN entrevista ea ON
+                eo.id = ea.id_entrevistado
+            GROUP BY
+                ea.id_entrevistado"
             );
             $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

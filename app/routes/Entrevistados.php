@@ -44,6 +44,13 @@ $app->get('/entrevistados[/]', function ($request, $response, $args) {
                         'id_estado_civil' => $value['id_estado_civil'],
                         'id_tipo_convivencia' => $value['id_tipo_convivencia'],
                         'id_profesion' => $value['id_profesion']
+                    ),
+                    'relationships' => array(
+                        'entrevistas' => array(
+                            'data' => array(
+                                'n_entrevistas' => $value['n_entrevistas']
+                            )
+                        )
                     )
                 )
             );
