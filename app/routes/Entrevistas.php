@@ -68,15 +68,15 @@ $app->get('/entrevistados/{id_entrevistado}/entrevistas', function ($request, $r
 });
 
 /**
- * POST /usuarios/{id}/entrevistas: Crear una entrevista
+ * POST /entrevistados/{id}/entrevistas: Crear una entrevista
  */
-$app->post('/usuarios/{id_usuario}/entrevistas', function ($request, $response, $args) {
+$app->post('/entrevistados/{id_entrevistado}/entrevistas', function ($request, $response, $args) {
 
-    $id_usuario = $args['id_usuario'];
+    $id_entrevista = $args['id_entrevistado'];
 
     $payload = array(
         'links' => array(
-            'self' => '/usuarios/' . $id_usuario . '/entrevistas'
+            'self' => '/entrevistados/' . $id_entrevista . '/entrevistas'
         )
     );
 
@@ -90,8 +90,8 @@ $app->post('/usuarios/{id_usuario}/entrevistas', function ($request, $response, 
     /**
      * Validacion de parametros
      */
-    if (!isset($id_usuario) || empty($id_usuario)) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_Usuario is empty');
+    if (!isset($id_entrevista) || empty($id_entrevista)) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevista is empty');
         $response = $response->withStatus(400);
     } else if (!isset($data['id_tipo_entrevista']) || empty($data['id_tipo_entrevista'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_tipo_entrevista is empty');
@@ -103,7 +103,7 @@ $app->post('/usuarios/{id_usuario}/entrevistas', function ($request, $response, 
 
         //Agregar entrevista
         $object = new Entrevista();
-        $object->setIdEntrevistado($id_usuario);
+        $object->setIdEntrevistado($id_entrevista);
         $object->setFechaEntrevista($data['fecha_entrevista']);
         $object->setIdTipoEntrevista($data['id_tipo_entrevista']);
 
@@ -126,9 +126,10 @@ $app->post('/usuarios/{id_usuario}/entrevistas', function ($request, $response, 
                 'type' => 'entrevistas',
                 'id' => $entrevista['id'],
                 'attributes' => array(
-                    'id_usuario' => $entrevista['id_usuario'],
+                    'id_entrevistado' => $entrevista['id_entrevistado'],
                     'id_tipo_entrevista' => $entrevista['id_tipo_entrevista'],
-                    'fecha_entrevista' => $entrevista['fecha_entrevista']
+                    'fecha_entrevista' => $entrevista['fecha_entrevista'],
+                    'create_time' => $entrevista['create_time']
                 )
             );
 
@@ -150,6 +151,7 @@ $app->post('/usuarios/{id_usuario}/entrevistas', function ($request, $response, 
     return $response;
 });
 
+//TODO: Pendiente por corregir
 /**
  * PUT /usuarios/{id_usuario}/entrevistas/{id_entrevista}: Editar una entrevista
  */
@@ -236,6 +238,8 @@ $app->put('/usuarios/{id_usuario}/entrevistas/{id_entrevista}', function ($reque
 
     return $response;
 });
+
+//TODO: PEndiente por corregir
 /**
  * DELETE /usuarios/{id_usuario}/entrevistas/{id_entrevista}: Eliminar una entrevista
  */

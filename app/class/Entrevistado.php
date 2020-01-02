@@ -283,7 +283,7 @@ class Entrevistado
                 (SELECT COUNT(*) FROM entrevista WHERE id_entrevistado = eo.id) AS n_entrevistas
             FROM
                 entrevistado eo
-            INNER JOIN entrevista ea ON
+            LEFT JOIN entrevista ea ON
                 eo.id = ea.id_entrevistado
             GROUP BY
                 ea.id_entrevistado"
