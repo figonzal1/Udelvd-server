@@ -72,7 +72,11 @@ class Entrevista
             $stmt = $conn->prepare(
                 "SELECT * FROM entrevista WHERE id=?"
             );
-            $stmt->execute(array($this->id));
+            $stmt->execute(
+                array(
+                    $this->id
+                )
+            );
 
             $entrevista = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -114,6 +118,31 @@ class Entrevista
             return $listado;
         } catch (PDOException $e) {
             echo "Fail search entrevistas usuario: " . $e->getMessage() . "\n";
+            return false;
+        }
+    }
+
+    /**
+     * Buscar entrevista por ID e ID_entrevistado
+     */
+    function buscarEntrevistaPersonal($conn)
+    {
+        try {
+            $stmt = $conn->prepare(
+                "SELECT * FROM entrevista WHERE id=? AND id_entrevistado=?"
+            );
+            $stmt->execute(
+                array(
+                    $this->id,
+                    $this->id_entrevistado
+                )
+            );
+
+            $entrevista = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            return $entrevista;
+        } catch (PDOException $e) {
+            echo "Fail search entrevista: " . $e->getMessage() . "\n";
             return false;
         }
     }
