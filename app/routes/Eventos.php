@@ -42,6 +42,21 @@ $app->get('/entrevistas/{id_entrevista}/eventos', function ($request, $response,
                         'id_emoticon' => $value['id_emoticon'],
                         'justificacion' => $value['justificacion'],
                         'hora_evento' => $value['hora_evento']
+                    ),
+                    'relatinships' => array(
+                        'accion' => array(
+                            'data' => array(
+                                'id' => $value['id_accion_a'],
+                                'nombre' => $value['nombre_accion']
+                            )
+                        ),
+                        'emoticon' => array(
+                            'data' => array(
+                                'id' => $value['id_emoticon_e'],
+                                'nombre' => $value['url_emoticon'],
+                                'descripcion' => $value['descripcion_emoticon']
+                            )
+                        )
                     )
                 )
             );
@@ -58,9 +73,10 @@ $app->get('/entrevistas/{id_entrevista}/eventos', function ($request, $response,
     $mysql_adapter->disconnect();
 
     return $response;
-});
+})->add(new JwtMiddleware());
 
 
+//TODO: Pendiente por revisar
 /**
  * POST /entrevistas/{id_entrevista}/eventos: Agregar evento
  */
@@ -149,7 +165,7 @@ $app->post('/entrevistas/{id_entrevista}/eventos', function ($request, $response
     return $response;
 });
 
-
+//TODO: Pendiente por revisar
 /**
  * PUT /entrevista/{id_entrevista}/eventos/{id_evento}: Editar un evento
  */
@@ -247,6 +263,7 @@ $app->put('/entrevistas/{id_entrevista}/eventos/{id_evento}', function ($request
     return $response;
 });
 
+//TODO: Pendiente por revisar
 /**
  * DELETE /entrevista/{id_entrevista}/eventos/{id_evento}: Eliminar un evento de entrevista
  */

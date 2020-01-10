@@ -36,9 +36,8 @@ class Evento
             $stmt = $conn->query("SELECT MAX(id) as id from evento");
             $lastId = $stmt->fetch(PDO::FETCH_ASSOC);
             return $lastId['id'];
-
         } catch (PDOException $e) {
-            echo "Fail insert: " . $e->getMessage() . "\n";
+            error_log("Fail insert: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -65,7 +64,7 @@ class Evento
                 return true;
             }
         } catch (PDOException $e) {
-            echo "Fail update: " . $e->getMessage() . "\n";
+            error_log("Fail update: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -85,7 +84,7 @@ class Evento
 
             return $investigador;
         } catch (PDOException $e) {
-            echo "Fail search evento: " . $e->getMessage() . "\n";
+            error_log("Fail search evento: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -93,18 +92,38 @@ class Evento
     /**
      * Buscar evento de entrevista
      */
-    function buscarEventosEntrevista($conn){
-        try{
+    function buscarEventosEntrevista($conn)
+    {
+        try {
 
             $stmt = $conn->prepare(
-                "SELECT * FROM evento WHERE id_entrevista=?"
+                "SELECT
+                e.id,
+                e.id_entrevista,
+                e.id_accion,
+                e.id_emoticon,
+                e.justificacion,
+                e.hora_evento,
+                a.id AS id_accion_a,
+                a.nombre AS nombre_accion,
+                em.id AS id_emoticon_e,
+                em.url AS url_emoticon,
+                em.descripcion AS descripcion_emoticon
+            FROM
+                evento e
+            INNER JOIN accion a ON
+                e.id_accion = a.id
+            INNER JOIN emoticon em ON
+                e.id_emoticon = em.id
+            WHERE
+                id_entrevista = ?"
             );
             $stmt->execute(array($this->id_entrevista));
 
-            $listado = $stmt -> fetchAll(PDO::FETCH_ASSOC);
+            $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
             return $listado;
-        }catch (PDOException $e) {
-            echo "Fail search lista eventos: " . $e->getMessage() . "\n";
+        } catch (PDOException $e) {
+            error_log("Fail search lista eventos: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -124,7 +143,7 @@ class Evento
                 return true;
             }
         } catch (PDOException $e) {
-            echo "Fail delete evento: " . $e->getMessage() . "\n";
+            error_log("Fail delete evento: " . $e->getMessage(), 0);
             return false;
         }
     }

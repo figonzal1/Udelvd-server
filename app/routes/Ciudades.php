@@ -50,4 +50,4 @@
     //Desconectar mysql
     $mysql_adapter->disconnect();
     return $response;
- });//->add(new JwtMiddleware());
+ })->add(new JwtMiddleware());

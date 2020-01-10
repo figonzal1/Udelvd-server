@@ -212,7 +212,6 @@ $app->post('/entrevistados/{id_entrevistado}/entrevistas', function ($request, $
 });
 
 
-//TODO: PEndiente por corregir
 /**
  * PUT /entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}: Editar una entrevista
  */
