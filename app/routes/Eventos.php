@@ -43,7 +43,7 @@ $app->get('/entrevistas/{id_entrevista}/eventos', function ($request, $response,
                         'justificacion' => $value['justificacion'],
                         'hora_evento' => $value['hora_evento']
                     ),
-                    'relatinships' => array(
+                    'relationships' => array(
                         'accion' => array(
                             'data' => array(
                                 'id' => $value['id_accion_a'],
@@ -53,7 +53,7 @@ $app->get('/entrevistas/{id_entrevista}/eventos', function ($request, $response,
                         'emoticon' => array(
                             'data' => array(
                                 'id' => $value['id_emoticon_e'],
-                                'nombre' => $value['url_emoticon'],
+                                'url' => $value['url_emoticon'],
                                 'descripcion' => $value['descripcion_emoticon']
                             )
                         )
