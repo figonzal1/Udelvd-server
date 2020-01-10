@@ -116,7 +116,8 @@ class Evento
             INNER JOIN emoticon em ON
                 e.id_emoticon = em.id
             WHERE
-                id_entrevista = ?"
+                id_entrevista = ?
+            ORDER BY e.hora_evento ASC"
             );
             $stmt->execute(array($this->id_entrevista));
 
