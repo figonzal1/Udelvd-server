@@ -76,7 +76,6 @@ $app->get('/entrevistas/{id_entrevista}/eventos', function ($request, $response,
 })->add(new JwtMiddleware());
 
 
-//TODO: Pendiente por revisar
 /**
  * POST /entrevistas/{id_entrevista}/eventos: Agregar evento
  */
@@ -142,7 +141,8 @@ $app->post('/entrevistas/{id_entrevista}/eventos', function ($request, $response
                     'id_accion' => $evento['id_accion'],
                     'id_emoticon' => $evento['id_emoticon'],
                     'justificacion' => $evento['justificacion'],
-                    'hora_evento' => $evento['hora_evento']
+                    'hora_evento' => $evento['hora_evento'],
+                    'create_time' => $evento['create_time']
                 )
             );
 

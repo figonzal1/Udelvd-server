@@ -49,11 +49,11 @@ $app->get('/acciones[/]', function ($request, $response, $args) {
     //Desconectar mysql
     $mysql_adapter->disconnect();
     return $response;
-});
+})->add(new JwtMiddleware());
 
 
 /**
- * GET /acciones/{id}: Obtener investigador segun id
+ * GET /acciones/{id}: Obtener acciones segun id
  */
 $app->get('/acciones/{id}', function ($request, $response, $args) {
 
@@ -108,8 +108,9 @@ $app->get('/acciones/{id}', function ($request, $response, $args) {
     $mysql_adapter->disconnect();
 
     return $response;
-});
+})->add(new JwtMiddleware());
 
+//TODO: PENDIENTE POR VERIFICAR
 /**
  * POST /acciones: Crear una accion
  */
@@ -180,10 +181,10 @@ $app->post('/acciones', function ($request, $response, $args) {
     return $response;
 });
 
+//TODO: PENDIENTE POR VERIFICAR
 /**
  * PUT /acciones/{id}: Editar una accion
  */
-
 $app->put('/acciones/{id}', function ($request, $response, $args) {
 
     $id_accion = $args['id'];
@@ -253,11 +254,10 @@ $app->put('/acciones/{id}', function ($request, $response, $args) {
     return $response;
 });
 
-
+//TODO: PENDIENTE POR VERIFICAR
 /**
  * DELETE /acciones/{id}: Eliminar una accion
  */
-
 $app->delete('/acciones/{id}', function ($request, $response, $args) {
 
     $id_accion = $args['id'];

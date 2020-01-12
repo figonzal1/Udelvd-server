@@ -80,9 +80,9 @@ class Evento
             );
             $stmt->execute(array($this->id));
 
-            $investigador = $stmt->fetch(PDO::FETCH_ASSOC);
+            $evento = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            return $investigador;
+            return $evento;
         } catch (PDOException $e) {
             error_log("Fail search evento: " . $e->getMessage(), 0);
             return false;
