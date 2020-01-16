@@ -76,9 +76,12 @@ class Evento
     {
         try {
             $stmt = $conn->prepare(
-                "SELECT * FROM evento WHERE id=?"
+                "SELECT * FROM evento WHERE id=? AND id_entrevista=?"
             );
-            $stmt->execute(array($this->id));
+            $stmt->execute(array(
+                $this->id,
+                $this->id_entrevista
+            ));
 
             $evento = $stmt->fetch(PDO::FETCH_ASSOC);
 

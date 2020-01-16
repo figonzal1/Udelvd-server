@@ -3,7 +3,7 @@
 /**
  * GET /usuarios: Listado de usuarios del sistema
  */
-$app->get('/entrevistados[/]', function ($request, $response, $args) {
+$app->get('/entrevistados', function ($request, $response, $args) {
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();

@@ -75,6 +75,68 @@ $app->get('/entrevistas/{id_entrevista}/eventos', function ($request, $response,
     return $response;
 })->add(new JwtMiddleware());
 
+/**
+ * GET /entrevista/{id_entrevista}/eventos/{id_evento} Obtener evento especifico de una entrevista
+ * 
+ */
+$app->get('/entrevistas/{id_entrevista}/eventos/{id_evento}', function ($request, $response, $args) {
+
+    $id_entrevista = $args['id_entrevista'];
+    $id_evento = $args['id_evento'];
+
+    //Conectar BD
+    $mysql_adapter = new MysqlAdapter();
+    $conn = $mysql_adapter->connect();
+
+    $payload = array(
+        'links' => array(
+            'self' => "/entrevistas/" . $id_entrevista . "/eventos" . $id_evento
+        ),
+        'data' => array()
+    );
+    if (!isset($id_entrevista) || empty($id_entrevista) || !is_numeric($id_entrevista)) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevista must be integer');
+        $response = $response->withStatus(400);
+    }
+    if (!isset($id_evento) || empty($id_evento) || !is_numeric($id_evento)) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_evento must be integer');
+        $response = $response->withStatus(400);
+    } else if ($conn != null) {
+
+        //Buscar eventos de entrevista
+        $object = new Evento();
+        $object->setIdEntrevista($id_entrevista);
+        $object->setId($id_evento);
+        $evento = $object->buscarEvento($conn);
+
+        //Preparar respuesta
+        $payload['data'] =
+            array(
+                'type' => 'eventos',
+                'id' => $evento['id'],
+                'attributes' => array(
+                    'id_entrevista' => $evento['id_entrevista'],
+                    'id_accion' => $evento['id_accion'],
+                    'id_emoticon' => $evento['id_emoticon'],
+                    'justificacion' => $evento['justificacion'],
+                    'hora_evento' => $evento['hora_evento']
+
+                )
+            );
+    } else {
+        $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server connection problem', 'A connection problem ocurred with database');
+        $response = $response->withStatus(500);
+    }
+
+    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $response->getBody()->write($payload);
+
+    //Desconectar mysql
+    $mysql_adapter->disconnect();
+
+    return $response;
+})->add(new JwtMiddleware());
+
 
 /**
  * POST /entrevistas/{id_entrevista}/eventos: Agregar evento
