@@ -65,7 +65,7 @@ $app->get('/entrevistados/{id_entrevistado}/entrevistas', function ($request, $r
     $mysql_adapter->disconnect();
 
     return $response;
-});
+})->add(new JwtMiddleware());
 
 /**
  * GET /entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}: Obtener una entrevista de una persona especifica
@@ -125,7 +125,7 @@ $app->get('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', functi
     $mysql_adapter->disconnect();
 
     return $response;
-});
+})->add(new JwtMiddleware());
 
 /**
  * POST /entrevistados/{id}/entrevistas: Crear una entrevista
@@ -209,7 +209,7 @@ $app->post('/entrevistados/{id_entrevistado}/entrevistas', function ($request, $
     $mysql_adapter->disconnect();
 
     return $response;
-});
+})->add(new JwtMiddleware());
 
 
 /**
@@ -298,15 +298,14 @@ $app->put('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', functi
     $mysql_adapter->disconnect();
 
     return $response;
-});
+})->add(new JwtMiddleware());
 
-//TODO: PEndiente por corregir
 /**
- * DELETE /usuarios/{id_usuario}/entrevistas/{id_entrevista}: Eliminar una entrevista
+ * DELETE /entrevistados/{id_usuario}/entrevistas/{id_entrevista}: Eliminar una entrevista
  */
-$app->delete('/usuarios/{id_usuario}/entrevistas/{id_entrevista}', function ($request, $response, $args) {
+$app->delete('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', function ($request, $response, $args) {
 
-    $id_usuario = $args['id_usuario'];
+    $id_entrevistado = $args['id_entrevistado'];
     $id_entrevista = $args['id_entrevista'];
 
     //Conectar bd
@@ -315,12 +314,12 @@ $app->delete('/usuarios/{id_usuario}/entrevistas/{id_entrevista}', function ($re
 
     $payload = array(
         'links' => array(
-            'self' => "/usuarios/" . $id_usuario . "/entrevistas/" . $id_entrevista
+            'self' => "/entrevistados/" . $id_entrevistado . "/entrevistas/" . $id_entrevista
         )
     );
 
-    if (!isset($id_usuario) || empty($id_usuario) || !is_numeric($id_usuario)) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_usuario must be integer');
+    if (!isset($id_entrevistado) || empty($id_entrevistado) || !is_numeric($id_entrevistado)) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevistado must be integer');
         $response = $response->withStatus(400);
     } else if (!isset($id_entrevista) || empty($id_entrevista) || !is_numeric($id_entrevista)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevista must be integer');
@@ -330,7 +329,7 @@ $app->delete('/usuarios/{id_usuario}/entrevistas/{id_entrevista}', function ($re
         //Eliminar entrevistas
         $object  = new Entrevista();
         $object->setId($id_entrevista);
-        $object->setIdEntrevistado($id_usuario);
+        $object->setIdEntrevistado($id_entrevistado);
         $eliminar = $object->eliminar($conn);
 
         if ($eliminar) {
@@ -350,4 +349,4 @@ $app->delete('/usuarios/{id_usuario}/entrevistas/{id_entrevista}', function ($re
     $mysql_adapter->disconnect();
 
     return $response;
-});
+})->add(new JwtMiddleware());
