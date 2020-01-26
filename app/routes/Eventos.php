@@ -225,9 +225,9 @@ $app->post('/entrevistas/{id_entrevista}/eventos', function ($request, $response
     $mysql_adapter->disconnect();
 
     return $response;
-});
+})->add(new JwtMiddleware());
 
-//TODO: Pendiente por revisar
+
 /**
  * PUT /entrevista/{id_entrevista}/eventos/{id_evento}: Editar un evento
  */
@@ -302,7 +302,8 @@ $app->put('/entrevistas/{id_entrevista}/eventos/{id_evento}', function ($request
                     'id_accion' => $evento['id_accion'],
                     'id_emoticon' => $evento['id_emoticon'],
                     'justificacion' => $evento['justificacion'],
-                    'hora_evento' => $evento['hora_evento']
+                    'hora_evento' => $evento['hora_evento'],
+                    'update_time' => $evento['update_time']
                 )
             );
 
@@ -323,7 +324,7 @@ $app->put('/entrevistas/{id_entrevista}/eventos/{id_evento}', function ($request
     $mysql_adapter->disconnect();
 
     return $response;
-});
+})->add(new JwtMiddleware());
 
 //TODO: Pendiente por revisar
 /**
