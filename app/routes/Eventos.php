@@ -326,7 +326,7 @@ $app->put('/entrevistas/{id_entrevista}/eventos/{id_evento}', function ($request
     return $response;
 })->add(new JwtMiddleware());
 
-//TODO: Pendiente por revisar
+
 /**
  * DELETE /entrevista/{id_entrevista}/eventos/{id_evento}: Eliminar un evento de entrevista
  */
@@ -376,4 +376,4 @@ $app->delete('/entrevistas/{id_entrevista}/eventos/{id_evento}', function ($requ
     $mysql_adapter->disconnect();
 
     return $response;
-});
+})->add(new JwtMiddleware());
