@@ -47,7 +47,7 @@ class Acciones
             ));
 
             if ($stmt->rowCount() == 0) {
-                return false;
+                return "iguales";
             } else if ($stmt->rowCount() == 1) {
                 return true;
             }
