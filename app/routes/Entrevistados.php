@@ -470,7 +470,7 @@ $app->delete('/entrevistados/{id}', function ($request, $response, $args) {
 
     $payload = array(
         'links' => array(
-            'self' => "/entrevistado/" . $id_entrevistado
+            'self' => "/entrevistados/" . $id_entrevistado
         )
     );
 
