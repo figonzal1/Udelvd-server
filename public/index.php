@@ -33,6 +33,8 @@ require_once("../app/class/TipoEntrevista.php");
  * UTILS
  */
 require_once("../app/utils/Jwt.php");
+require_once("../app/utils/DynamicLink.php");
+require_once("../app/utils/Mail.php");
 
 /**
  * MIDDLEWARE
@@ -44,6 +46,7 @@ require_once("../app/middleware/JwtMiddleware.php");
  */
 require_once("../app/utils/ErrorJsonHandler.php");
 
+date_default_timezone_set('America/Santiago');
 header('Cache-Control: no-cache');
 header('X-Content-Type-Options: nosniff');
 header('Content-type: application/json; charset=UTF-8');

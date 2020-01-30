@@ -1,0 +1,9 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "cl.udelvd",
+    "sha256_cert_fingerprints":
+    ["36:1C:83:17:29:1D:07:A6:E6:A1:0A:E3:41:58:A8:6E:F5:99:C4:00:15:DC:C2:F9:94:CC:A3:1A:74:D7:FE:B8"]
+  }
+}]

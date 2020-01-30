@@ -3,7 +3,7 @@
 /**
  * GET /investigadores: Listado de investigadores del sistema
  */
-$app->get('/investigadores[/]', function ($request, $response, $args) {
+$app->get('/investigadores', function ($request, $response, $args) {
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -356,7 +356,7 @@ $app->post('/investigadores/login', function ($request, $response, $args) {
     return $response;
 });
 
-//TODO: PENSAR SI ES NECESARIO DEVOLVER RESPUESTA EN UPDATE
+
 /**
  * PUT /investigadores/{id}: Editar un investigador
  */
@@ -468,6 +468,7 @@ $app->put('/investigadores/{id}', function ($request, $response, $args) {
     return $response;
 })->add(new JwtMiddleware());
 
+//TODO: PENDIENTE POR REVISAR
 /**
  * DELETE /investigadores: Eliminar un investigador
  */
@@ -514,7 +515,7 @@ $app->delete('/investigadores/{id}', function ($request, $response, $args) {
     return $response;
 })->add(new JwtMiddleware());
 
-
+//TODO: PENDIENTE POR REVISAR
 /**
  * PATCH /investigador/{id}/activar: Activar registro de investigador
  */
@@ -633,6 +634,7 @@ $app->post('/investigadores/recuperar/{email}', function ($request, $response, $
             $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Email problem', 'Email does not exist');
             $response = $response->withStatus(400);
         } else {
+
             //Formatear respuesta
             $payload['data'] = array(
                 'type' => 'investigadores',
@@ -645,15 +647,33 @@ $app->post('/investigadores/recuperar/{email}', function ($request, $response, $
 
             //Generar pin y enviar por email
             //Pin de 6 digitos
-            $pin = "";
+            /*$pin = "";
             $i = 0;
             while ($i < 4) {
                 $pin .= random_int(0, 9);
                 $i++;
             }
-            echo "Pin generado " . $pin;
+            echo "Pin generado " . $pin;*/
 
-            //TODO: Enviar por email
+            //TODO: GENERAR IN DYNAMIC LINK Y ENVIAR POR MAIL
+            $dynamicLink = crearDynamicLink();
+
+            if ($dynamicLink != false) {
+                $status = sendEmail($investigador, $dynamicLink);
+
+                if (!$status) {
+                    $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Send mail problem', 'Email with dynamic link has not been send');
+                    $response = $response->withStatus(500);
+                } else {
+                    $payload['recovery'] = array(
+                        'type' => 'recovery',
+                        'status' => 'email sended',
+                        'dynamicLink' => $dynamicLink
+                    );
+                }
+            } else {
+                echo "Entre aqui";
+            }
         }
     } else {
         $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server connection problem', 'A connection problem ocurred with database');
