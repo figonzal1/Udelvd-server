@@ -294,6 +294,49 @@ class Entrevistado
         }
     }
 
+    function buscarPagina($conn, $pagina)
+    {
+        try {
+
+            $limite = 7;
+            $stmt = $conn->prepare(
+                "SELECT
+                eo.id,
+                eo.nombre,
+                eo.apellido,
+                eo.fecha_nacimiento,
+                eo.jubilado_legal,
+                eo.caidas,
+                eo.sexo,
+                eo.n_caidas,
+                eo.n_convivientes_3_meses,
+                eo.id_investigador,
+                eo.id_ciudad,
+                eo.id_nivel_educacional,
+                eo.id_estado_civil,
+                eo.id_tipo_convivencia,
+                eo.id_profesion,
+                eo.create_time,
+                eo.update_time,
+                (SELECT COUNT(*) FROM entrevista WHERE id_entrevistado = eo.id) AS n_entrevistas
+            FROM
+                entrevistado2 eo
+            ORDER BY eo.id DESC
+            LIMIT :limite OFFSET :offset"
+            );
+            $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', ($pagina - 1) * $limite, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return $listado;
+        } catch (PDOException $e) {
+            error_log("Fail search lista entrevistados: " . $e->getMessage(), 0);
+            return false;
+        }
+    }
+
     function eliminar($conn)
     {
 

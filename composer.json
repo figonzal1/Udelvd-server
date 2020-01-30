@@ -4,6 +4,7 @@
         "slim/psr7": "^0.6.0",
         "vlucas/phpdotenv": "^3.6",
         "phpmailer/phpmailer": "^6.1",
-        "lcobucci/jwt": "3.3.1"
+        "lcobucci/jwt": "3.3.1",
+        "kreait/firebase-php": "4.35"
     }
 }
