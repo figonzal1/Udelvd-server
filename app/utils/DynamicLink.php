@@ -6,12 +6,6 @@ use Kreait\Firebase\DynamicLink\CreateDynamicLink\FailedToCreateDynamicLink;
 use Kreait\Firebase\DynamicLink\CreateDynamicLink;
 use Kreait\Firebase\DynamicLink\AndroidInfo;
 
-function hola()
-{
-    echo "Hola";
-}
-
-
 function crearDynamicLink()
 {
     $factory = (new Firebase\Factory())
@@ -37,7 +31,7 @@ function crearDynamicLink()
 
         return $uriString;
     } catch (FailedToCreateDynamicLink $e) {
-        error_log("Failed to create dynamic link:" . $e->getMessage());
+        error_log("Failed to create dynamic link:" . $e->getMessage(),0);
         return false;
     }
 }

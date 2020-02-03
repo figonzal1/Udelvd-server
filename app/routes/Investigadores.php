@@ -643,22 +643,11 @@ $app->post('/investigadores/recuperar/{email}', function ($request, $response, $
                     'email' => $investigador['email'],
                 )
             );
-            $response = $response->withStatus(200);
 
-            //Generar pin y enviar por email
-            //Pin de 6 digitos
-            /*$pin = "";
-            $i = 0;
-            while ($i < 4) {
-                $pin .= random_int(0, 9);
-                $i++;
-            }
-            echo "Pin generado " . $pin;*/
-
-            //TODO: GENERAR IN DYNAMIC LINK Y ENVIAR POR MAIL
             $dynamicLink = crearDynamicLink();
 
             if ($dynamicLink != false) {
+                error_log("Entre aqui", 0);
                 $status = sendEmail($investigador, $dynamicLink);
 
                 if (!$status) {
@@ -668,11 +657,15 @@ $app->post('/investigadores/recuperar/{email}', function ($request, $response, $
                     $payload['recovery'] = array(
                         'type' => 'recovery',
                         'status' => 'email sended',
+                        //*SOLO DEBUG*//
                         'dynamicLink' => $dynamicLink
                     );
+
+                    $response = $response->withStatus(200);
                 }
             } else {
-                echo "Entre aqui";
+                $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Dynamic link', 'Dynamic link has not been created');
+                $response = $response->withStatus(500);
             }
         }
     } else {

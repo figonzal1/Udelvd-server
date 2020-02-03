@@ -5,41 +5,38 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-// Load Composer's autoloader
-require '../vendor/autoload.php';
-
 
 
 function sendEmail($investigador, $dynamicLink)
 {
 
-  $dotenv = Dotenv\Dotenv::create(__DIR__ . "../../../");
-  $dotenv->load();
+    $dotenv = Dotenv\Dotenv::create(__DIR__ . "../../../");
+    $dotenv->load();
 
-  // Instantiation and passing `true` enables exceptions
-  $mail = new PHPMailer(true);
+    // Instantiation and passing `true` enables exceptions
+    $mail = new PHPMailer(true);
 
-  try {
-    //Server settings
-    $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      // Enable verbose debug output
-    $mail->isSMTP();                                            // Send using SMTP
-    $mail->Host       = 'smtp.gmail.com';                       // Set the SMTP server to send through
-    $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-    $mail->Username   = 'felipe.gonzalezalarcon94@gmail.com';   // SMTP username
-    $mail->Password   = getenv('GOOGLE_PASSWORD_EMAIL');        // SMTP password
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` also accepted
-    $mail->Port       = 587;                                    // TCP port to connect to
+    try {
+        //Server settings
+        $mail->SMTPDebug = SMTP::DEBUG_OFF;                      // Enable verbose debug output
+        $mail->isSMTP();                                            // Send using SMTP
+        $mail->Host       = 'smtp.gmail.com';                       // Set the SMTP server to send through
+        $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
+        $mail->Username   = 'felipe.gonzalezalarcon94@gmail.com';   // SMTP username
+        $mail->Password   = getenv('GOOGLE_PASSWORD_EMAIL');        // SMTP password
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` also accepted
+        $mail->Port       = 587;                                    // TCP port to connect to
 
-    //Recipients
-    $mail->setFrom('felipe.gonzalezalarcon94@gmail.com', 'App - UDELVD');
-    $mail->addAddress($investigador['email']);
+        //Recipients
+        $mail->setFrom('felipe.gonzalezalarcon94@gmail.com', 'App - UDELVD');
+        $mail->addAddress($investigador['email']);
 
-    // Content
-    $mail->isHTML(true);
-    $mail->CharSet = 'UTF-8';                              // Set email format to HTML
-    $mail->Subject = 'Recuperación de contraseña';        //TODO: AGREGAR SOPORTE INGLES
-    $mail->Body    =
-      '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+        // Content
+        $mail->isHTML(true);
+        $mail->CharSet = 'UTF-8';                              // Set email format to HTML
+        $mail->Subject = 'Recuperación de cuenta';        //TODO: AGREGAR SOPORTE INGLES
+        $mail->Body    =
+            '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
       <html xmlns="http://www.w3.org/1999/xhtml">
       <head>
       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -139,7 +136,7 @@ function sendEmail($investigador, $dynamicLink)
                             Parece que has olvidado tu contraseña. Para reestablecerla, haz click en el botón de abajo.<br>
                             <br>
                             Gracias,<br>
-                            Administración
+                            Administración, App - Un Dia en la Vida de ...
                         </font>
                       </td>
                     </tr>
@@ -173,11 +170,11 @@ function sendEmail($investigador, $dynamicLink)
         </body>
       </html>';
 
-    $mail->send();
-    return true;
-  } catch (Exception $e) {
-    error_log("Failed to send email: " . $e->getMessage(), 0);
-    //echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-    return false;
-  }
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log("Failed to send email: " . $e->getMessage(), 0);
+        //echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        return false;
+    }
 }
