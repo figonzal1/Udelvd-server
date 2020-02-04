@@ -84,7 +84,7 @@ class Investigador
         }
     }
 
-    
+
     function buscarInvestigadorPorId($conn)
     {
         try {
@@ -138,6 +138,7 @@ class Investigador
         }
     }
 
+    //TODO: COMPROBAR
     function eliminar($conn)
     {
 
@@ -159,6 +160,7 @@ class Investigador
         }
     }
 
+    //TODO: COMPROBAR
     function activar($conn)
     {
 
@@ -174,7 +176,7 @@ class Investigador
             ));
 
             if ($stmt->rowCount() == 0) {
-                return false;
+                return "iguales";
             } else if ($stmt->rowCount() == 1) {
                 return true;
             }
@@ -206,6 +208,32 @@ class Investigador
         } catch (PDOException $e) {
             //echo "Fail to find hash: " . $e->getMessage() . "\n";
             error_log("Fail to find hash: " . $e->getMessage());
+            return false;
+        }
+    }
+
+
+    function resetPassword($conn)
+    {
+        try {
+
+            $stmt = $conn->prepare(
+                "UPDATE investigador SET password=? WHERE email=?"
+            );
+
+            $stmt->execute(array(
+                $this->passwordHashed,
+                $this->email
+            ));
+
+            if ($stmt->rowCount() == 0) {
+                return "iguales";
+            } else if ($stmt->rowCount() == 1) {
+                return true;
+            }
+        } catch (PDOException $e) {
+            //echo "Fail to activate investigador: " . $e->getMessage() . "\n";
+            error_log("Fail to reset pass investigador: " . $e->getMessage(), 0);
             return false;
         }
     }
