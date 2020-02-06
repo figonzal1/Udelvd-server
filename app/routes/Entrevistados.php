@@ -1,9 +1,8 @@
 <?php
 //TODO: FALTA AGREGAR ENFERMEDADES
-/**
- * GET /entrevistados: Listado de entrevistados del sistema
- */
-$app->get('/entrevistados', function ($request, $response, $args) {
+
+//Listado de entrevistados del sistema
+/*$app->get('/entrevistados', function ($request, $response, $args) {
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -68,156 +67,9 @@ $app->get('/entrevistados', function ($request, $response, $args) {
     //Desconectar mysql
     $mysql_adapter->disconnect();
     return $response;
-})->add(new JwtMiddleware());
+})->add(new JwtMiddleware());*/
 
-/**
- * GET /entrevistados: Listado de entrevistados del sistema por paginacion
- */
-$app->get('/entrevistados/pagina/{n_pag}', function ($request, $response, $args) {
-
-    $n_pag = $args['n_pag'];
-
-    //Conectar BD
-    $mysql_adapter = new MysqlAdapter();
-    $conn = $mysql_adapter->connect();
-
-    $payload = array(
-        'links' => array(
-            'self' => "/entrevistados/pagina/" . $n_pag
-        ),
-        'data' => array()
-    );
-
-    if ($conn != null) {
-
-        //Buscar entrevistados
-        $object = new Entrevistado();
-        $listado = $object->buscarPagina($conn, $n_pag);
-
-        //Preparar respuesta
-        foreach ($listado as $key => $value) {
-
-            array_push(
-                $payload['data'],
-                array(
-                    'type' => 'entrevistados',
-                    'id' => $value['id'],
-                    'attributes' => array(
-                        'nombre' => $value['nombre'],
-                        'apellido' => $value['apellido'],
-                        'sexo' => $value['sexo'],
-                        'fecha_nacimiento' => $value['fecha_nacimiento'],
-                        'jubilado_legal' => $value['jubilado_legal'],
-                        'caidas' => $value['caidas'],
-                        'n_caidas' => $value['n_caidas'],
-                        'n_convivientes_3_meses' => $value['n_convivientes_3_meses'],
-                        'id_investigador' => $value['id_investigador'],
-                        'id_ciudad' => $value['id_ciudad'],
-                        'id_nivel_educacional' => $value['id_nivel_educacional'],
-                        'id_estado_civil' => $value['id_estado_civil'],
-                        'id_tipo_convivencia' => $value['id_tipo_convivencia'],
-                        'id_profesion' => $value['id_profesion']
-                    ),
-                    'relationships' => array(
-                        'entrevistas' => array(
-                            'data' => array(
-                                'n_entrevistas' => $value['n_entrevistas']
-                            )
-                        )
-                    )
-                )
-            );
-        }
-        $response = $response->withStatus(200);
-    } else {
-        $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server connection problem', 'A connection problem ocurred with database');
-        $response = $response->withStatus(500);
-    }
-    //Encodear resultado
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-
-    $response->getBody()->write($payload);
-
-    //Desconectar mysql
-    $mysql_adapter->disconnect();
-    return $response;
-})->add(new JwtMiddleware());
-
-/**
- * GET /entrevistados/{id}: Obtener usuario segun id
- */
-$app->get('/entrevistados/{id}', function ($request, $response, $args) {
-
-    $id_entrevistado = $args['id'];
-
-    //Conectar BD
-    $mysql_adapter = new MysqlAdapter();
-    $conn = $mysql_adapter->connect();
-
-    $payload = array(
-        'links' => array(
-            'self' => "/entrevistados/" . $id_entrevistado
-        )
-    );
-
-    if (!isset($id_entrevistado) || !is_numeric($id_entrevistado) ||  empty($id_entrevistado)) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
-        $response = $response->withStatus(400);
-    } else if ($conn != null) {
-
-        //Buscar usuario
-        $object = new Entrevistado();
-        $object->setId($id_entrevistado);
-        $entrevistado = $object->buscarEntrevistado($conn);
-
-        //Si usuario no existe
-        if (empty($entrevistado)) {
-            $payload['data'] = array();
-        }
-
-        //Si el usuario existe
-        else {
-            //Formatear respuesta
-            $payload['data'] = array(
-                'type' => 'entrevistados',
-                'id' => $entrevistado['id'],
-                'attributes' => array(
-                    'nombre' => $entrevistado['nombre'],
-                    'apellido' => $entrevistado['apellido'],
-                    'sexo' => $entrevistado['sexo'],
-                    'fecha_nacimiento' => $entrevistado['fecha_nacimiento'],
-                    'jubilado_legal' => $entrevistado['jubilado_legal'],
-                    'caidas' => $entrevistado['caidas'],
-                    'n_caidas' => $entrevistado['n_caidas'],
-                    'n_convivientes_3_meses' => $entrevistado['n_convivientes_3_meses'],
-                    'id_investigador' => $entrevistado['id_investigador'],
-                    'id_ciudad' => $entrevistado['id_ciudad'],
-                    'id_nivel_educacional' => $entrevistado['id_nivel_educacional'],
-                    'id_estado_civil' => $entrevistado['id_estado_civil'],
-                    'id_tipo_convivencia' => $entrevistado['id_tipo_convivencia'],
-                    'id_profesion' => $entrevistado['id_profesion']
-                )
-            );
-
-            $response = $response->withStatus(200);
-        }
-    } else {
-        $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server connection problem', 'A connection problem ocurred with database');
-        $response = $response->withStatus(500);
-    }
-
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    $response->getBody()->write($payload);
-
-    //Desconectar mysql
-    $mysql_adapter->disconnect();
-
-    return $response;
-})->add(new JwtMiddleware());
-
-/**
- * POST /entrevistados: Crear un entrevistos
- */
+//Crear un entrevistado
 $app->post('/entrevistados', function ($request, $response, $args) {
 
 
@@ -368,9 +220,156 @@ $app->post('/entrevistados', function ($request, $response, $args) {
     return $response;
 })->add(new JwtMiddleware());
 
-/**
- * PUT /entrevistados/{id}: Editar un entrevistados
- */
+//Listado de entrevistados del sistema por paginacion
+$app->get('/entrevistados/pagina/{n_pag}', function ($request, $response, $args) {
+
+    $n_pag = $args['n_pag'];
+
+    //Conectar BD
+    $mysql_adapter = new MysqlAdapter();
+    $conn = $mysql_adapter->connect();
+
+    $payload = array(
+        'links' => array(
+            'self' => "/entrevistados/pagina/" . $n_pag
+        ),
+        'data' => array()
+    );
+
+    if ($conn != null) {
+
+        //Buscar entrevistados
+        $object = new Entrevistado();
+        $listado = $object->buscarPagina($conn, $n_pag);
+
+        $conteo = $object->contarEntrevistados($conn);
+
+        //Preparar respuesta
+        foreach ($listado as $key => $value) {
+
+            array_push(
+                $payload['data'],
+                array(
+                    'type' => 'entrevistados',
+                    'id' => $value['id'],
+                    'attributes' => array(
+                        'nombre' => $value['nombre'],
+                        'apellido' => $value['apellido'],
+                        'sexo' => $value['sexo'],
+                        'fecha_nacimiento' => $value['fecha_nacimiento'],
+                        'jubilado_legal' => $value['jubilado_legal'],
+                        'caidas' => $value['caidas'],
+                        'n_caidas' => $value['n_caidas'],
+                        'n_convivientes_3_meses' => $value['n_convivientes_3_meses'],
+                        'id_investigador' => $value['id_investigador'],
+                        'id_ciudad' => $value['id_ciudad'],
+                        'id_nivel_educacional' => $value['id_nivel_educacional'],
+                        'id_estado_civil' => $value['id_estado_civil'],
+                        'id_tipo_convivencia' => $value['id_tipo_convivencia'],
+                        'id_profesion' => $value['id_profesion']
+                    ),
+                    'relationships' => array(
+                        'entrevistas' => array(
+                            'data' => array(
+                                'n_entrevistas' => $value['n_entrevistas']
+                            )
+                        )
+                    )
+                )
+            );
+        }
+
+        $payload['entrevistados'] = array(
+            'data' => array(
+                'n_entrevistados' => $conteo
+            )
+        );
+        $response = $response->withStatus(200);
+    } else {
+        $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server connection problem', 'A connection problem ocurred with database');
+        $response = $response->withStatus(500);
+    }
+    //Encodear resultado
+    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+    $response->getBody()->write($payload);
+
+    //Desconectar mysql
+    $mysql_adapter->disconnect();
+    return $response;
+})->add(new JwtMiddleware());
+
+//Obtener entrevistado segun id
+$app->get('/entrevistados/{id}', function ($request, $response, $args) {
+
+    $id_entrevistado = $args['id'];
+
+    //Conectar BD
+    $mysql_adapter = new MysqlAdapter();
+    $conn = $mysql_adapter->connect();
+
+    $payload = array(
+        'links' => array(
+            'self' => "/entrevistados/" . $id_entrevistado
+        )
+    );
+
+    if (!isset($id_entrevistado) || !is_numeric($id_entrevistado) ||  empty($id_entrevistado)) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
+        $response = $response->withStatus(400);
+    } else if ($conn != null) {
+
+        //Buscar usuario
+        $object = new Entrevistado();
+        $object->setId($id_entrevistado);
+        $entrevistado = $object->buscarEntrevistado($conn);
+
+        //Si usuario no existe
+        if (empty($entrevistado)) {
+            $payload['data'] = array();
+        }
+
+        //Si el usuario existe
+        else {
+            //Formatear respuesta
+            $payload['data'] = array(
+                'type' => 'entrevistados',
+                'id' => $entrevistado['id'],
+                'attributes' => array(
+                    'nombre' => $entrevistado['nombre'],
+                    'apellido' => $entrevistado['apellido'],
+                    'sexo' => $entrevistado['sexo'],
+                    'fecha_nacimiento' => $entrevistado['fecha_nacimiento'],
+                    'jubilado_legal' => $entrevistado['jubilado_legal'],
+                    'caidas' => $entrevistado['caidas'],
+                    'n_caidas' => $entrevistado['n_caidas'],
+                    'n_convivientes_3_meses' => $entrevistado['n_convivientes_3_meses'],
+                    'id_investigador' => $entrevistado['id_investigador'],
+                    'id_ciudad' => $entrevistado['id_ciudad'],
+                    'id_nivel_educacional' => $entrevistado['id_nivel_educacional'],
+                    'id_estado_civil' => $entrevistado['id_estado_civil'],
+                    'id_tipo_convivencia' => $entrevistado['id_tipo_convivencia'],
+                    'id_profesion' => $entrevistado['id_profesion']
+                )
+            );
+
+            $response = $response->withStatus(200);
+        }
+    } else {
+        $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server connection problem', 'A connection problem ocurred with database');
+        $response = $response->withStatus(500);
+    }
+
+    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $response->getBody()->write($payload);
+
+    //Desconectar mysql
+    $mysql_adapter->disconnect();
+
+    return $response;
+})->add(new JwtMiddleware());
+
+//Editar un entrevistados
 $app->put('/entrevistados/{id}', function ($request, $response, $args) {
 
     $id_entrevistado = $args['id'];
@@ -529,9 +528,7 @@ $app->put('/entrevistados/{id}', function ($request, $response, $args) {
     return $response;
 })->add(new JwtMiddleware());
 
-/**
- * DELETE /entrevistados: Eliminar un usuario
- */
+//Eliminar un usuario
 $app->delete('/entrevistados/{id}', function ($request, $response, $args) {
 
     $id_entrevistado = $args['id'];

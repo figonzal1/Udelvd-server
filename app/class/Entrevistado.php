@@ -298,7 +298,8 @@ class Entrevistado
     {
         try {
 
-            $limite = 7;
+            //TODO: MODIFICAR A 10
+            $limite = 1; //*Importante para paginacion de datos
             $stmt = $conn->prepare(
                 "SELECT
                 eo.id,
@@ -320,7 +321,7 @@ class Entrevistado
                 eo.update_time,
                 (SELECT COUNT(*) FROM entrevista WHERE id_entrevistado = eo.id) AS n_entrevistas
             FROM
-                entrevistado2 eo
+                entrevistado eo
             ORDER BY eo.id DESC
             LIMIT :limite OFFSET :offset"
             );
@@ -333,6 +334,23 @@ class Entrevistado
             return $listado;
         } catch (PDOException $e) {
             error_log("Fail search lista entrevistados: " . $e->getMessage(), 0);
+            return false;
+        }
+    }
+
+    function contarEntrevistados($conn)
+    {
+        try {
+            $stmt = $conn->query(
+                "SELECT COUNT(*) FROM entrevistado AS n_entrevistados"
+            );
+            $stmt->execute();
+
+            $conteo = $stmt->fetchColumn();
+
+            return $conteo;
+        } catch (PDOException $e) {
+            error_log("Fail conteo entrevitados: " . $e->getMessage(), 0);
             return false;
         }
     }
