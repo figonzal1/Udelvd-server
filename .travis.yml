@@ -15,10 +15,11 @@ jobs:
     #DEPLOY DEV STAGE
     - stage: deploy-dev
       name: "Deploy to heroku-dev"
-      install: true
       before_script:
         - openssl aes-256-cbc -K $encrypted_7a28ea5788df_key -iv $encrypted_7a28ea5788df_iv -in encrypt.tar.gz.enc -out encrypt.tar.gz -d
         - tar -xzvf encrypt.tar.gz
+      script:
+        - echo "skipping tests"
       deploy:
         provider: heroku
         skip_cleanup: true
