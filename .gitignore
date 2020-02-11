@@ -1,3 +1,4 @@
 .env
 vendor/*
 udelvd-server-credentials.json
+encrypt.tar.gz

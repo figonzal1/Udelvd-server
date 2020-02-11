@@ -1,0 +1,37 @@
+language: php
+dist: trusty
+php: 7.2
+
+stages:
+  - name: deploy-dev
+    if: branch = development
+
+cache:
+  directories:
+    - $HOME/.m2
+
+jobs:
+  include:
+    #DEPLOY DEV STAGE
+    - stage: deploy-dev
+      name: "Deploy to heroku-dev"
+      install:
+        - composer selfupdate
+        - composer install --no-interaction
+      before_script:
+        - openssl aes-256-cbc -K $encrypted_7a28ea5788df_key -iv $encrypted_7a28ea5788df_iv -in encrypt.tar.gz.enc -out encrypt.tar.gz -d
+        - tar -xzvf encrypt.tar.gz
+      deploy:
+        provider: heroku
+        skip_cleanup: true
+        api_key:
+          secure: "1MIJMO4m95Owr0BjvHgtyVcjxcIM/UM0JujNye9woo7L1W0YvyOcBa25nre/SkaW4e4Z2jF78fcS5EBE1NEXkeGBhHVgusj+wbU6kbrUeyXp2S1fb8C3qwPQq0aH2e0iQZVEGCUSDxxawYesoO+Znc2mfGj/LNji9+sAk1GTpsRfFPftbmaf9ET4kB6MLheKDyPER4tNgBD0ENwaiBQgYjcdiS8KBWhBo8k25C1uq2Ze9SOja7fhnkhwWqBVPc4sj4mIJXSHwB7JyOu1/OMGEg+vWH1XEZ1816c4wp3rBMBO1axpEsF/nA0hV5KoHLtEfJGTKdfvp5wsCh+f0B8TwImFZyMmXGy+GAmISjXcDy8PR/8Jp3Pkuf77IHSVginz3hGkC8MVNL1EeyPxZVCDOO3s1dFJQAgiX0anysbU/nBdv0pyozwz8AD+8fWHUhThDSt0B82hHWW/s8RcjOurSsH/uX9yNOGbghxSNBNdBLlQw+h923fo8OxVIPGy+4cyF4yU5SK/tWzoZbO5moGtBVu3qUBL4mhhgkgEeJ3JQ8BOV1iDVVGpf8JwnfsvBhwUi9I6I6OqRl/tF+VI1zXumjr1v9r1j6sMXgGprdeJaUBhjpRNFQMjEzLtvhWjo6II7aXIpMKDHNaBtW4CYEy6akz/S44zsOcJmHjk1RKAIEI="
+        app: udelvd-dev
+        on:
+          branch: development
+
+#WHITE LIST
+branches:
+  only:
+    - master
+    - development
