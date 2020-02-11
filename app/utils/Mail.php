@@ -155,7 +155,7 @@ function sendEmail($investigador, $dynamicLink)
                       <td align="center" style="border-radius: 18px;" bgcolor="#fb8c00">
                         <a href="' . $dynamicLink . '" style="font-size: 14px; font-family: sans-serif; color: #ffffff; text-decoration: none; border-radius: 18px; padding: 5px 16px; border: 1px solid #fb8c00; display: inline-block; box-shadow: 0 2px 3px 0 rgba(0,0,0,0.10);">
                           <!--[if mso]> <![endif]-->
-                          Reset Password
+                          Reestablecer contraseña
                           <!--[if mso]> <![endif]-->
                         </a>
                       </td>
