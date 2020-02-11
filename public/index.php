@@ -73,7 +73,16 @@ $app->addRoutingMiddleware();
  * Note: This middleware should be added last. It will not handle any exceptions/errors
  * for middleware added after it.
  */
-$errorMiddleware = $app->addErrorMiddleware(true, false, false);
+
+ /**
+  * DEV MODE
+  */
+  //$errorMiddleware = $app->addErrorMiddleware(true, true, true);
+
+  /**
+   * PROD MODE
+   */
+$errorMiddleware = $app->addErrorMiddleware(false, true, true);
 
 /**
  * RUTAS
