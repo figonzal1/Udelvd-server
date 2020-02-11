@@ -4,6 +4,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Factory\AppFactory;
+use Slim\Views\PhpRenderer;
 
 require '../vendor/autoload.php';
 
@@ -77,7 +78,7 @@ $app->addRoutingMiddleware();
  /**
   * DEV MODE
   */
-  //$errorMiddleware = $app->addErrorMiddleware(true, true, true);
+//$errorMiddleware = $app->addErrorMiddleware(true, true, true);
 
   /**
    * PROD MODE
@@ -87,6 +88,7 @@ $errorMiddleware = $app->addErrorMiddleware(false, true, true);
 /**
  * RUTAS
  */
+require("../app/routes/Home.php");
 require("../app/routes/Acciones.php");
 require("../app/routes/Emoticones.php");
 require("../app/routes/Entrevistas.php");
@@ -101,3 +103,4 @@ require("../app/routes/Profesiones.php");
 require("../app/routes/TiposEntrevistas.php");
 
 $app->run();
+?>
