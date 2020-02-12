@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6d87fa0680c278165367b8c2b17d4fbc",
+    "content-hash": "f23b4dc86efe22d9e72bf933ea9b75ce",
     "packages": [
         {
             "name": "fig/http-message-util",
@@ -106,16 +106,16 @@
         },
         {
             "name": "giggsey/libphonenumber-for-php",
-            "version": "8.11.3",
+            "version": "8.11.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/giggsey/libphonenumber-for-php.git",
-                "reference": "0329cf6a6ede750a78e7165b61fcc83cd72e9768"
+                "reference": "d429c468fdc8d7b68aefc6f5a2cb7fee0cc26ee9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/giggsey/libphonenumber-for-php/zipball/0329cf6a6ede750a78e7165b61fcc83cd72e9768",
-                "reference": "0329cf6a6ede750a78e7165b61fcc83cd72e9768",
+                "url": "https://api.github.com/repos/giggsey/libphonenumber-for-php/zipball/d429c468fdc8d7b68aefc6f5a2cb7fee0cc26ee9",
+                "reference": "d429c468fdc8d7b68aefc6f5a2cb7fee0cc26ee9",
                 "shasum": ""
             },
             "require": {
@@ -170,7 +170,7 @@
                 "phonenumber",
                 "validation"
             ],
-            "time": "2020-01-28T11:48:03+00:00"
+            "time": "2020-02-12T11:21:37+00:00"
         },
         {
             "name": "giggsey/locale",
@@ -223,16 +223,16 @@
         },
         {
             "name": "google/auth",
-            "version": "v1.6.1",
+            "version": "v1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-auth-library-php.git",
-                "reference": "45635ac69d0b95f38885531d4ebcdfcb2ebb6f36"
+                "reference": "e687f40eafe60f4622fa1bdb9244f9bfb835e0a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-auth-library-php/zipball/45635ac69d0b95f38885531d4ebcdfcb2ebb6f36",
-                "reference": "45635ac69d0b95f38885531d4ebcdfcb2ebb6f36",
+                "url": "https://api.github.com/repos/googleapis/google-auth-library-php/zipball/e687f40eafe60f4622fa1bdb9244f9bfb835e0a9",
+                "reference": "e687f40eafe60f4622fa1bdb9244f9bfb835e0a9",
                 "shasum": ""
             },
             "require": {
@@ -246,6 +246,7 @@
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^1.11",
                 "guzzlehttp/promises": "0.1.1|^1.3",
+                "kelvinmo/simplejwt": "^0.2.5",
                 "phpseclib/phpseclib": "^2",
                 "phpunit/phpunit": "^4.8.36|^5.7",
                 "sebastian/comparator": ">=1.2.3"
@@ -270,20 +271,20 @@
                 "google",
                 "oauth2"
             ],
-            "time": "2019-10-29T20:13:04+00:00"
+            "time": "2020-02-11T17:45:21+00:00"
         },
         {
             "name": "google/cloud-core",
-            "version": "v1.34.0",
+            "version": "v1.35.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-cloud-php-core.git",
-                "reference": "52db21acb2da25d2d79e493842de58da7836c97f"
+                "reference": "e24a49fb1df51d6cff38c97450feffae82661c2d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-cloud-php-core/zipball/52db21acb2da25d2d79e493842de58da7836c97f",
-                "reference": "52db21acb2da25d2d79e493842de58da7836c97f",
+                "url": "https://api.github.com/repos/googleapis/google-cloud-php-core/zipball/e24a49fb1df51d6cff38c97450feffae82661c2d",
+                "reference": "e24a49fb1df51d6cff38c97450feffae82661c2d",
                 "shasum": ""
             },
             "require": {
@@ -331,24 +332,24 @@
                 "Apache-2.0"
             ],
             "description": "Google Cloud PHP shared dependency, providing functionality useful to all components.",
-            "time": "2019-10-28T19:05:44+00:00"
+            "time": "2020-02-11T23:07:13+00:00"
         },
         {
             "name": "google/cloud-storage",
-            "version": "v1.17.0",
+            "version": "v1.18.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-cloud-php-storage.git",
-                "reference": "626e910530f0b9463a15563f697a66f1cfbd6369"
+                "reference": "201b69aa6f24b60718dc0bd0c1bdc6963ade0e99"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-cloud-php-storage/zipball/626e910530f0b9463a15563f697a66f1cfbd6369",
-                "reference": "626e910530f0b9463a15563f697a66f1cfbd6369",
+                "url": "https://api.github.com/repos/googleapis/google-cloud-php-storage/zipball/201b69aa6f24b60718dc0bd0c1bdc6963ade0e99",
+                "reference": "201b69aa6f24b60718dc0bd0c1bdc6963ade0e99",
                 "shasum": ""
             },
             "require": {
-                "google/cloud-core": "^1.31",
+                "google/cloud-core": "^1.35",
                 "google/crc32": "^0.1.0"
             },
             "require-dev": {
@@ -382,7 +383,7 @@
                 "Apache-2.0"
             ],
             "description": "Cloud Storage Client for PHP",
-            "time": "2020-01-07T21:25:58+00:00"
+            "time": "2020-02-11T23:07:13+00:00"
         },
         {
             "name": "google/crc32",
@@ -1825,6 +1826,55 @@
                 "uri"
             ],
             "time": "2017-06-14T03:57:53+00:00"
+        },
+        {
+            "name": "slim/php-view",
+            "version": "2.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/slimphp/PHP-View.git",
+                "reference": "a13ada9d7962ca1b48799c0d9ffbca4c33245aed"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/slimphp/PHP-View/zipball/a13ada9d7962ca1b48799c0d9ffbca4c33245aed",
+                "reference": "a13ada9d7962ca1b48799c0d9ffbca4c33245aed",
+                "shasum": ""
+            },
+            "require": {
+                "psr/http-message": "^1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8",
+                "slim/slim": "^3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Slim\\Views\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Glenn Eggleton",
+                    "email": "geggleto@gmail.com"
+                }
+            ],
+            "description": "Render PHP view scripts into a PSR-7 Response object.",
+            "keywords": [
+                "framework",
+                "php",
+                "phtml",
+                "renderer",
+                "slim",
+                "template",
+                "view"
+            ],
+            "time": "2019-04-15T20:43:28+00:00"
         },
         {
             "name": "slim/psr7",

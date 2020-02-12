@@ -4,7 +4,6 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Factory\AppFactory;
-use Slim\Views\PhpRenderer;
 
 require '../vendor/autoload.php';
 
@@ -54,7 +53,7 @@ header('Content-type: application/json; charset=UTF-8');
 header('Access-Control-Allow-Methods: GET,POST,PUT,DELETE');
 header('X-Frame-Options: DENY');
 header("X-XSS-Protection: 1; mode=block");
-header("Content-Security-Policy: default-src 'none'; script-src 'none'; connect-src 'none'; img-src 'none'; style-src 'none';");
+header("Content-Security-Policy: default-src 'none'; script-src 'none'; connect-src 'none'; img-src 'none'; style-src 'self';");
 header("Referrer-Policy: no-referrer");
 header("Feature-Policy: camera 'none'; fullscreen 'none'; geolocation 'none'; microphone 'none';");
 

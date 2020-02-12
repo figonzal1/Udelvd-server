@@ -1,8 +1,9 @@
 <?php
 
+use Slim\Views\PhpRenderer;
 $app->get('/', function ($request, $response, $args) {
 
-    $response->getBody()->write(
-        "API del proyecto del App - Un día en la vida de ...\nAutor: Felipe González");
-    return $response;
+    $renderer = new PhpRenderer('../app/templates');
+    $response = $response->withHeader('Content-type', 'text/html; charset=utf-8');
+    return $renderer->render($response, "home.html", $args);
 });

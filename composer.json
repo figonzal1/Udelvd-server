@@ -5,6 +5,7 @@
         "vlucas/phpdotenv": "^3.6",
         "phpmailer/phpmailer": "^6.1",
         "lcobucci/jwt": "3.3.1",
-        "kreait/firebase-php": "4.35"
+        "kreait/firebase-php": "4.35",
+        "slim/php-view": "^2.2"
     }
 }
