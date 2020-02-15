@@ -355,6 +355,73 @@ $app->post('/investigadores/login', function ($request, $response, $args) {
     return $response;
 });
 
+//Obtener listado de investigadores para admin
+$app->get('/investigadores/id_admin/{id_admin}', function ($request, $response, $args) {
+
+    $id_admin = $args['id_admin'];
+
+    //Conectar BD
+    $mysql_adapter = new MysqlAdapter();
+    $conn = $mysql_adapter->connect();
+
+    $payload = array(
+        'links' => array(
+            'self' => "/investigadores/id_admin/" . $id_admin
+        ),
+        'data' => array()
+    );
+
+    if (!isset($id_admin) || empty($id_admin) || !is_numeric($id_admin)) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'id admin must be integer');
+        $response = $response->withStatus(400);
+    } else if ($conn != null) {
+        //Buscar investigadores
+        $object = new Investigador();
+        $object->setId($id_admin);
+        $listado = $object->buscarTodos($conn);
+
+        //Preparar respuesta
+        foreach ($listado as $key => $value) {
+
+            array_push(
+                $payload['data'],
+                array(
+                    'type' => 'investigadores',
+                    'id' => $value['id'],
+                    'attributes' => array(
+                        'nombre' => $value['nombre'],
+                        'apellido' => $value['apellido'],
+                        'email' => $value['email'],
+                        'id_rol' => $value['id_rol'],
+                        'activado' => $value['activado']
+                    ),
+                    'relationships' => array(
+                        'rol' => array(
+                            'data' => array(
+                                'id' => $value['id_rol'],
+                                'nombre' => $value['nombre_rol']
+                            )
+                        )
+                    )
+                )
+            );
+        }
+        $response = $response->withStatus(200);
+    } else {
+        $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server connection problem', 'A connection problem ocurred with database');
+        $response = $response->withStatus(500);
+    }
+
+    //Encodear resultado
+    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+    $response->getBody()->write($payload);
+
+    //Desconectar mysql
+    $mysql_adapter->disconnect();
+    return $response;
+})->add(new JwtMiddleware());
+
 //Obtener investigador segun id
 $app->get('/investigadores/{id}', function ($request, $response, $args) {
 

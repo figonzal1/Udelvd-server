@@ -125,9 +125,17 @@ class Investigador
     {
         try {
 
-            $stmt = $conn->query(
-                "SELECT i.id,i.nombre,i.apellido,i.email,i.id_rol,i.activado,r.nombre as nombre_rol FROM investigador i INNER JOIN rol r ON i.id_rol=r.id"
-            );
+            //*FLUJO IF PARA LISTADO DE INVESTIGADORES SIN ADMIN Y SIN PROPIO USUARIO
+            if ($this->id != null) {
+                $sql = "SELECT i.id,i.nombre,i.apellido,i.email,i.id_rol,i.activado,r.nombre as nombre_rol FROM investigador i INNER JOIN rol r ON i.id_rol=r.id WHERE i.id <> ? AND r.nombre <> 'Administrador'";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute(array($this->id));
+            }
+            //*LISTADO GENERICO
+            else {
+                $sql = "SELECT i.id,i.nombre,i.apellido,i.email,i.id_rol,i.activado,r.nombre as nombre_rol FROM investigador i INNER JOIN rol r ON i.id_rol=r.id";
+                $stmt = $conn->query($sql);
+            }
             $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             return $listado;
