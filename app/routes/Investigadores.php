@@ -64,6 +64,9 @@ $app->get('/investigadores', function ($request, $response, $args) {
 //REGISTRO INVSTIGADOR
 $app->post('/investigadores', function ($request, $response, $args) {
 
+    //? CONFIGURACION DE ACTIVACION AUTOMATICA
+    $activacion_automatica = 0;
+
     //Seccion link self
     $payload = array(
         'links' => array(
@@ -108,12 +111,11 @@ $app->post('/investigadores', function ($request, $response, $args) {
         $object->setEmail(htmlspecialchars(strtolower($data['email'])));
         $object->setNombreRol(htmlspecialchars(ucfirst($data['nombre_rol'])));
         $object->setPassword($data['password']);
-        $object->setActivado(0);
+        $object->setActivado($activacion_automatica);
 
-        $existente = $object->buscarInvestigadorPorEmail($conn);
+        $investigador = $object->buscarInvestigadorPorEmail($conn);
 
-        //Si el correo existe
-        if ($existente != null || $existente) {
+        if (!empty($investigador)) {
             //Lanzar error de email
             $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Email problem', 'Email already exists');
             $response = $response->withStatus(500);
@@ -129,6 +131,10 @@ $app->post('/investigadores', function ($request, $response, $args) {
 
                 $object->setId($lastid);
                 $investigador = $object->buscarInvestigadorPorId($conn);
+
+                if ($activacion_automatica == "0") {
+                    enviarNotificacion($investigador);
+                }
 
                 //Formatear respuesta
                 $payload['data'] = array(
@@ -393,7 +399,8 @@ $app->get('/investigadores/id_admin/{id_admin}', function ($request, $response, 
                         'apellido' => $value['apellido'],
                         'email' => $value['email'],
                         'id_rol' => $value['id_rol'],
-                        'activado' => $value['activado']
+                        'activado' => $value['activado'],
+                        'create_time' => $value['create_time']
                     ),
                     'relationships' => array(
                         'rol' => array(

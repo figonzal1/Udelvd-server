@@ -51,7 +51,7 @@ class Investigador
             return $lastId['id'];
         } catch (PDOException $e) {
             //echo "Fail insert: " . $e->getMessage() . "\n";
-            error_log("Fail insert" . $e->getMessage(), 0);
+            error_log("Fail insert: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -116,7 +116,7 @@ class Investigador
             return $investigador;
         } catch (PDOException $e) {
             //echo "Fail search investigador: " . $e->getMessage() . "\n";
-            error_log("Fail search investigador: " . $e->getMessage());
+            error_log("Fail search investigador: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -127,13 +127,13 @@ class Investigador
 
             //*FLUJO IF PARA LISTADO DE INVESTIGADORES SIN ADMIN Y SIN PROPIO USUARIO
             if ($this->id != null) {
-                $sql = "SELECT i.id,i.nombre,i.apellido,i.email,i.id_rol,i.activado,r.nombre as nombre_rol FROM investigador i INNER JOIN rol r ON i.id_rol=r.id WHERE i.id <> ? AND r.nombre <> 'Administrador'";
+                $sql = "SELECT i.id,i.nombre,i.apellido,i.email,i.id_rol,i.activado,r.nombre as nombre_rol,i.create_time FROM investigador i INNER JOIN rol r ON i.id_rol=r.id WHERE i.id <> ? AND r.nombre <> 'Administrador' ORDER BY i.create_time DESC";
                 $stmt = $conn->prepare($sql);
                 $stmt->execute(array($this->id));
             }
             //*LISTADO GENERICO
             else {
-                $sql = "SELECT i.id,i.nombre,i.apellido,i.email,i.id_rol,i.activado,r.nombre as nombre_rol FROM investigador i INNER JOIN rol r ON i.id_rol=r.id";
+                $sql = "SELECT i.id,i.nombre,i.apellido,i.email,i.id_rol,i.activado,r.nombre as nombre_rol,i.create_time FROM investigador i INNER JOIN rol r ON i.id_rol=r.id";
                 $stmt = $conn->query($sql);
             }
             $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);

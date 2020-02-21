@@ -35,6 +35,7 @@ require_once("../app/class/TipoEntrevista.php");
 require_once("../app/utils/Jwt.php");
 require_once("../app/utils/DynamicLink.php");
 require_once("../app/utils/Mail.php");
+require_once("../app/utils/Notificacion.php");
 
 /**
  * MIDDLEWARE
@@ -82,7 +83,7 @@ $app->addRoutingMiddleware();
   /**
    * PROD MODE
    */
-$errorMiddleware = $app->addErrorMiddleware(false, true, true);
+$errorMiddleware = $app->addErrorMiddleware(true, true, true);
 
 /**
  * RUTAS
@@ -102,4 +103,3 @@ require("../app/routes/Profesiones.php");
 require("../app/routes/TiposEntrevistas.php");
 
 $app->run();
-?>
