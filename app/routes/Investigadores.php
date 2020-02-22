@@ -688,6 +688,81 @@ $app->post('/investigadores/recuperar/{email}', function ($request, $response, $
 });
 
 
+// Activar /Desactivar Cuenta 
+$app->patch('/investigadores/{id}/activar', function ($request, $response, $args) {
+
+    $id_investigador = $args['id'];
+
+    //Seccion link self
+    $payload = array(
+        'links' => array(
+            'self' => "/investigadores/" . $id_investigador . "/activar"
+        )
+    );
+
+    //Obtener parametros put
+    $data = $request->getBody()->getContents();
+    $patchdata = array();
+    parse_str($data, $patchdata);
+
+    //Conectar BD
+    $mysql_adapter = new MysqlAdapter();
+    $conn = $mysql_adapter->connect();
+
+    if (!isset($patchdata['activado'])) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Activado is empty');
+        $response = $response->withStatus(400);
+    } else if ($patchdata['activado'] != 0 && $patchdata['activado'] != 1) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Activado must be 1 or 0');
+        $response = $response->withStatus(400);
+    } else if ($conn != null) {
+
+        //Agregar investigador
+        $object = new Investigador();
+        $object->setId($id_investigador);
+        $object->setActivado(htmlspecialchars($patchdata['activado']));
+
+        //insertar investigador
+        $activado = $object->activar($conn);
+
+        //Insert error
+        if (!$activado) {
+            $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Activate problem', 'Activate a investigator has fail');
+            $response = $response->withStatus(500);
+        } else {
+
+            $investigador = $object->buscarInvestigadorPorId($conn);
+
+            //Formatear respuesta
+            $payload['data'] = array(
+                'type' => 'investigadores',
+                'id' => $investigador['id'],
+                'attributes' => array(
+                    'nombre' => $investigador['nombre'],
+                    'apellido' => $investigador['apellido'],
+                    'email' => $investigador['email'],
+                    'activado' => $investigador['activado']
+                )
+            );
+
+            $response = $response->withStatus(201);
+        }
+    }
+
+    //Connection error
+    else {
+        $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server problem', 'A connection problem ocurred with database');
+        $response = $response->withStatus(500);
+    }
+
+    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $response->getBody()->write($payload);
+
+    //Desconectar mysql
+    $mysql_adapter->disconnect();
+
+    return $response;
+})->add(new JwtMiddleware());
 
 
 //TODO: PENDIENTE POR REVISAR
@@ -724,87 +799,6 @@ $app->delete('/investigadores/{id}', function ($request, $response, $args) {
             $payload = ErrorJsonHandler::lanzarError($payload, 404, 'Delete problem', 'Delete object has fail');
             $response = $response->withStatus(404);
         }
-    }
-
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    $response->getBody()->write($payload);
-
-    //Desconectar mysql
-    $mysql_adapter->disconnect();
-
-    return $response;
-})->add(new JwtMiddleware());
-
-//TODO: PENDIENTE POR REVISAR
-//Activar registro de investigador
-$app->patch('/investigadores/{id}/activar', function ($request, $response, $args) {
-
-    $id_investigador = $args['id'];
-
-    //Seccion link self
-    $payload = array(
-        'links' => array(
-            'self' => "/investigadores/" . $id_investigador . "/activar"
-        )
-    );
-
-    //Obtener parametros put
-    $data = $request->getBody()->getContents();
-    $patchdata = array();
-    parse_str($data, $patchdata);
-
-    //Conectar BD
-    $mysql_adapter = new MysqlAdapter();
-    $conn = $mysql_adapter->connect();
-
-    if (!isset($patchdata['activado']) || empty($patchdata['activado']) || !is_numeric($patchdata['activado'])) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Activado must be integer');
-        $response = $response->withStatus(400);
-    } else if ($patchdata['activado'] != 0 && $patchdata['activado'] != 1) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Activado must be 1 or 0');
-        $response = $response->withStatus(400);
-    } else if (!is_numeric($id_investigador)) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
-        $response = $response->withStatus(400);
-    } else if ($conn != null) {
-
-        //Agregar investigador
-        $object = new Investigador();
-        $object->setId($id_investigador);
-        $object->setActivado(htmlspecialchars($patchdata['activado']));
-
-        //insertar investigador
-        $activado = $object->activar($conn);
-
-        //Insert error
-        if (!$activado) {
-            $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Activate problem', 'Activate a investigator has fail');
-            $response = $response->withStatus(500);
-        } else {
-
-            $investigador = $object->buscarInvestigadorPorId($conn);
-
-            //Formatear respuesta
-            $payload['data'] = array(
-                'type' => 'investigadores',
-                'id' => $investigador['id'],
-                'attributes' => array(
-                    'nombre' => $investigador['nombre'],
-                    'apellido' => $investigador['apellido'],
-                    'email' => $investigador['email'],
-                    'id_rol' => $investigador['id_rol'],
-                    'activado' => $investigador['activado']
-                )
-            );
-
-            $response = $response->withStatus(201);
-        }
-    }
-
-    //Connection error
-    else {
-        $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server problem', 'A connection problem ocurred with database');
-        $response = $response->withStatus(500);
     }
 
     $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
