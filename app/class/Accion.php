@@ -11,12 +11,11 @@ class Acciones
     private $nombre;
 
 
-    function agregar($conn)
+    function agregar($conn, $idioma)
     {
+        $sql = "INSERT INTO accion_" . $idioma . " (nombre) VALUES (?)";
         try {
-            $stmt = $conn->prepare(
-                "INSERT INTO accion (nombre) VALUES (?)"
-            );
+            $stmt = $conn->prepare($sql);
 
             $stmt->execute(
                 array(
@@ -29,17 +28,17 @@ class Acciones
             $lastId = $stmt->fetch(PDO::FETCH_ASSOC);
             return $lastId['id'];
         } catch (PDOException $e) {
-            echo "Fail insert: " . $e->getMessage() . "\n";
+            error_log("Fail insert: " . $e->getMessage(), 0);
             return false;
         }
     }
 
-    function actualizar($conn)
+    function actualizar($conn, $idioma)
     {
+        $sql = "UPDATE accion_" . $idioma . " SET nombre=? WHERE id=?";
+
         try {
-            $stmt = $conn->prepare(
-                "UPDATE accion SET nombre=? WHERE id=?"
-            );
+            $stmt = $conn->prepare($sql);
 
             $stmt->execute(array(
                 $this->nombre,
@@ -52,7 +51,7 @@ class Acciones
                 return true;
             }
         } catch (PDOException $e) {
-            echo "Fail update: " . $e->getMessage() . "\n";
+            error_log("Fail update: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -68,7 +67,7 @@ class Acciones
             $accion = $stmt->fetch(PDO::FETCH_ASSOC);
             return $accion;
         } catch (PDOException $e) {
-            echo "Fail search accion: " . $e->getMessage() . "\n";
+            error_log("Fail search accion: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -84,11 +83,12 @@ class Acciones
 
             return $listado;
         } catch (PDOException $e) {
-            echo "Fail search lista acciones: " . $e->getMessage() . "\n";
+            error_log("Fail search lista acciones: " . $e->getMessage(), 0);
             return false;
         }
     }
 
+    //TODO: Por checkear aqui e implementar en android
     function eliminar($conn)
     {
 
@@ -104,7 +104,7 @@ class Acciones
                 return true;
             }
         } catch (PDOException $e) {
-            echo "Fail delete accion: " . $e->getMessage() . "\n";
+            error_log("Fail delete accion: " . $e->getMessage(), 0);
             return false;
         }
     }
