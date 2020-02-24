@@ -1,9 +1,9 @@
 <?php
 
-/**
- * GET /emoticones: Listado de emoticones del sistema
- */
-$app->get('/emoticones[/]', function ($request, $response, $args) {
+//*GET /emoticones: Listado de emoticones del sistema
+$app->get('/emoticones/{idioma}', function ($request, $response, $args) {
+
+    $idioma = $args['idioma'];
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -11,7 +11,7 @@ $app->get('/emoticones[/]', function ($request, $response, $args) {
 
     $payload = array(
         'links' => array(
-            'self' => "/emoticones"
+            'self' => "/emoticones/" . $idioma
         ),
         'data' => array()
     );
@@ -24,6 +24,12 @@ $app->get('/emoticones[/]', function ($request, $response, $args) {
         //Preparar respuesta
         foreach ($listado as $key => $value) {
 
+            if ($idioma == 'es') {
+                $descripcion = $value['descripcion_es'];
+            } else if ($idioma == 'en') {
+                $descripcion = $value['descripcion_en'];
+            }
+
             array_push(
                 $payload['data'],
                 array(
@@ -31,7 +37,7 @@ $app->get('/emoticones[/]', function ($request, $response, $args) {
                     'id' => $value['id'],
                     'attributes' => array(
                         'url' => $value['url'],
-                        'descripcion' => $value['descripcion']
+                        'descripcion' => $descripcion
                     )
                 )
             );
@@ -50,10 +56,10 @@ $app->get('/emoticones[/]', function ($request, $response, $args) {
     return $response;
 });
 
-/**
- * GET /emoticones/{id}: Obtener emoticones segun id
- */
-$app->get('/emoticones/{id}', function ($request, $response, $args) {
+//*GET /emoticones/{id}: Obtener emoticones segun id
+$app->get('/emoticones/{id}/{idioma}', function ($request, $response, $args) {
+
+    $idioma = $args['idioma'];
 
     $id_emoticon = $args['id'];
 
@@ -63,7 +69,7 @@ $app->get('/emoticones/{id}', function ($request, $response, $args) {
 
     $payload = array(
         'links' => array(
-            'self' => "/emoticones/" . $id_emoticon
+            'self' => "/emoticones/" . $id_emoticon . "/" . $idioma
         )
     );
 
@@ -84,13 +90,20 @@ $app->get('/emoticones/{id}', function ($request, $response, $args) {
 
         //Si el emoticon existe
         else {
+
+            if ($idioma == 'es') {
+                $descripcion = $emoticon['descripcion_es'];
+            } else if ($idioma == 'en') {
+                $descripcion = $emoticon['descripcion_en'];
+            }
+
             //Formatear respuesta
             $payload['data'] = array(
                 'type' => 'emoticones',
                 'id' => $emoticon['id'],
                 'attributes' => array(
                     'url' => $emoticon['url'],
-                    'descripcion' => $emoticon['descripcion']
+                    'descripcion' => $descripcion
                 )
             );
         }
@@ -108,9 +121,8 @@ $app->get('/emoticones/{id}', function ($request, $response, $args) {
     return $response;
 });
 
-/**
- * POST /emoticones: Crear emoticones
- */
+//TODO: REVISAR e implementar en android , agregar soporte idioma
+//* POST /emoticones: Crear emoticones
 $app->post('/emoticones', function ($request, $response, $args) {
 
     //Seccion link self
@@ -184,9 +196,8 @@ $app->post('/emoticones', function ($request, $response, $args) {
     return $response;
 });
 
-/**
- * PUT /emoticones/{id}: Editar un emoticon
- */
+//TODO: Revisar e implentar en android, agregar soporte idioma
+//*PUT /emoticones/{id}: Editar un emoticon
 $app->put('/emoticones/{id}', function ($request, $response, $args) {
 
     $id_emoticon = $args['id'];
@@ -267,9 +278,8 @@ $app->put('/emoticones/{id}', function ($request, $response, $args) {
     return $response;
 });
 
-/**
- * DELETE /emoticones/{id}: Eliminar un emoticon
- */
+//TODO: Revisar e implementar en android, agregar soporte de idioma
+//*DELETE /emoticones/{id}: Eliminar un emoticon
 $app->delete('/emoticones/{id}', function ($request, $response, $args) {
 
     $id_emoticon = $args['id'];

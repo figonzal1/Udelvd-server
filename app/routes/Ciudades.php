@@ -4,7 +4,7 @@
  * GET /acciones: Listado de acciones del sistema
  */
 
- $app->get('/ciudades[/]',function($request,$response,$args){
+ $app->get('/ciudades',function($request,$response,$args){
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
