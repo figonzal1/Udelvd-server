@@ -1,9 +1,7 @@
 <?php
 
-/**
- * GET /profesiones: Listado de profesiones del sistema
- */
-$app->get("/profesiones[/]", function ($request, $response, $args) {
+//* Listado de profesiones del sistema
+$app->get("/profesiones", function ($request, $response, $args) {
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -49,4 +47,4 @@ $app->get("/profesiones[/]", function ($request, $response, $args) {
     //Desconectar mysql
     $mysql_adapter->disconnect();
     return $response;
-});
+})->add(new JwtMiddleware());

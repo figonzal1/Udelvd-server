@@ -1,6 +1,6 @@
 <?php
 
-//Listado de investigadores del sistema
+//* Listado de investigadores del sistema
 $app->get('/investigadores', function ($request, $response, $args) {
 
     //Conectar BD
@@ -61,7 +61,7 @@ $app->get('/investigadores', function ($request, $response, $args) {
     return $response;
 })->add(new JwtMiddleware());
 
-//REGISTRO INVSTIGADOR
+//* REGISTRO INVSTIGADOR
 $app->post('/investigadores', function ($request, $response, $args) {
 
     //? CONFIGURACION DE ACTIVACION AUTOMATICA
@@ -177,7 +177,7 @@ $app->post('/investigadores', function ($request, $response, $args) {
     return $response;
 });
 
-//RESETEAR CONTRASEÑA INVESTIGADOR
+//* RESETEAR CONTRASEÑA INVESTIGADOR
 $app->put('/investigadores/resetear', function ($request, $response, $args) {
 
 
@@ -254,7 +254,7 @@ $app->put('/investigadores/resetear', function ($request, $response, $args) {
     return $response;
 });
 
-//Logear en el sistema
+//* Logear en el sistema
 $app->post('/investigadores/login', function ($request, $response, $args) {
 
     $payload = array(
@@ -361,7 +361,7 @@ $app->post('/investigadores/login', function ($request, $response, $args) {
     return $response;
 });
 
-//Obtener listado de investigadores para admin
+//* Obtener listado de investigadores para admin
 $app->get('/investigadores/id_admin/{id_admin}', function ($request, $response, $args) {
 
     $id_admin = $args['id_admin'];
@@ -429,7 +429,7 @@ $app->get('/investigadores/id_admin/{id_admin}', function ($request, $response, 
     return $response;
 })->add(new JwtMiddleware());
 
-//Obtener investigador segun id
+//* Obtener investigador segun id
 $app->get('/investigadores/{id}', function ($request, $response, $args) {
 
     $id_investigador = $args['id'];
@@ -498,7 +498,7 @@ $app->get('/investigadores/{id}', function ($request, $response, $args) {
     return $response;
 })->add(new JwtMiddleware());
 
-//EDITAR INVESTIGADOR 
+//* Editar un investigador
 $app->put('/investigadores/{id}', function ($request, $response, $args) {
 
     $id_investigador = $args['id'];
@@ -607,7 +607,7 @@ $app->put('/investigadores/{id}', function ($request, $response, $args) {
     return $response;
 })->add(new JwtMiddleware());
 
-//RECUPERAR CUENTA
+//* RECUPERAR CUENTA
 $app->post('/investigadores/recuperar/{email}', function ($request, $response, $args) {
 
     $email = $args['email'];
@@ -687,8 +687,7 @@ $app->post('/investigadores/recuperar/{email}', function ($request, $response, $
     return $response;
 });
 
-
-// Activar /Desactivar Cuenta 
+//* Activar - Desactivar Cuenta 
 $app->patch('/investigadores/{id}/activar', function ($request, $response, $args) {
 
     $id_investigador = $args['id'];
@@ -764,9 +763,8 @@ $app->patch('/investigadores/{id}/activar', function ($request, $response, $args
     return $response;
 })->add(new JwtMiddleware());
 
-
-//TODO: PENDIENTE POR REVISAR
-//Eliminar un investigador
+//TODO: PENDIENTE POR REVISAR e IMPLEMENTAR EN ANDROID
+// Eliminar un investigador
 $app->delete('/investigadores/{id}', function ($request, $response, $args) {
 
     $id_investigador = $args['id'];
@@ -809,5 +807,4 @@ $app->delete('/investigadores/{id}', function ($request, $response, $args) {
 
     return $response;
 })->add(new JwtMiddleware());
-
-//TODO: AGREGAR METODO PARA RETORNAR LISTA DE INVESTIGADORES PENDIENTES DE ACTIVACION
+?>

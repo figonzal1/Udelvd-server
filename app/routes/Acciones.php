@@ -1,8 +1,6 @@
 <?php
 
-/**
- * GET /acciones: Listado de acciones del sistema
- */
+//* Listado de acciones del sistema
 $app->get('/acciones/{idioma}', function ($request, $response, $args) {
 
     $idioma = $args['idioma'];
@@ -60,9 +58,7 @@ $app->get('/acciones/{idioma}', function ($request, $response, $args) {
 })->add(new JwtMiddleware());
 
 
-/**
- * GET /acciones/{id}: Obtener acciones segun id
- */
+//* Obtener acciones segun id
 $app->get('/acciones/{id}/{idioma}', function ($request, $response, $args) {
 
     $id_accion = $args['id'];
@@ -126,10 +122,8 @@ $app->get('/acciones/{id}/{idioma}', function ($request, $response, $args) {
     return $response;
 })->add(new JwtMiddleware());
 
-//TODO: PENDIENTE POR VERIFICAR
-/**
- * POST /acciones: Crear una accion
- */
+//TODO: PENDIENTE POR VERIFICAR e implementar en android
+//* Crear una accion
 /*$app->post('/acciones', function ($request, $response, $args) {
 
     //Seccion link self
@@ -197,10 +191,8 @@ $app->get('/acciones/{id}/{idioma}', function ($request, $response, $args) {
     return $response;
 });*/
 
-//TODO: PENDIENTE POR VERIFICAR
-/**
- * PUT /acciones/{id}: Editar una accion
- */
+//TODO: PENDIENTE POR VERIFICAR e implementar en android
+//* Editar una accion
 /*$app->put('/acciones/{id}', function ($request, $response, $args) {
 
     $id_accion = $args['id'];
@@ -270,10 +262,8 @@ $app->get('/acciones/{id}/{idioma}', function ($request, $response, $args) {
     return $response;
 });*/
 
-//TODO: PENDIENTE POR VERIFICAR
-/**
- * DELETE /acciones/{id}: Eliminar una accion
- */
+//TODO: PENDIENTE POR VERIFICAR e implementar en android
+//* Eliminar una accion
 /*$app->delete('/acciones/{id}', function ($request, $response, $args) {
 
     $id_accion = $args['id'];

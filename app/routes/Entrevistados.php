@@ -1,5 +1,4 @@
 <?php
-//TODO: FALTA AGREGAR ENFERMEDADES
 
 //Listado de entrevistados del sistema
 /*$app->get('/entrevistados', function ($request, $response, $args) {

@@ -23,6 +23,9 @@ class NivelEducacional{
         }
     }
 
+    /**
+     * GETTERS & SETTERS
+     */
     function getId(){
         return $this->id;
     }

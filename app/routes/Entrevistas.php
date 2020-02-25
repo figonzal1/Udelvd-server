@@ -1,9 +1,9 @@
 <?php
 
-/**
- * GET /entrevistados/{id_entrevistado}/entrevistas: Listado de entrevistas de una persona especifica
- */
-$app->get('/entrevistados/{id_entrevistado}/entrevistas', function ($request, $response, $args) {
+//* Listado de entrevistas de una persona especifica
+$app->get('/entrevistados/{id_entrevistado}/entrevistas/idioma/{idioma}', function ($request, $response, $args) {
+
+    $idioma = $args['idioma'];
 
     $id_entrevistado = $args['id_entrevistado'];
 
@@ -13,7 +13,7 @@ $app->get('/entrevistados/{id_entrevistado}/entrevistas', function ($request, $r
 
     $payload = array(
         'links' => array(
-            'self' => "/entrevistados/" . $id_entrevistado . "/entrevistas"
+            'self' => "/entrevistados/" . $id_entrevistado . "/entrevistas/idioma/" . $idioma
         ),
         'data' => array()
     );
@@ -27,7 +27,7 @@ $app->get('/entrevistados/{id_entrevistado}/entrevistas', function ($request, $r
         //Buscar entrevistas de usuarios
         $object = new Entrevista();
         $object->setIdEntrevistado($id_entrevistado);
-        $listado = $object->buscarEntrevistasPersonales($conn);
+        $listado = $object->buscarEntrevistasPersonales($conn, $idioma);
 
         //Preparar respuesta
         foreach ($listado as $key => $value) {
@@ -67,9 +67,7 @@ $app->get('/entrevistados/{id_entrevistado}/entrevistas', function ($request, $r
     return $response;
 })->add(new JwtMiddleware());
 
-/**
- * GET /entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}: Obtener una entrevista de una persona especifica
- */
+//* Obtener una entrevista de una persona especifica
 $app->get('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', function ($request, $response, $args) {
 
     $id_entrevistado = $args['id_entrevistado'];
@@ -127,9 +125,7 @@ $app->get('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', functi
     return $response;
 })->add(new JwtMiddleware());
 
-/**
- * POST /entrevistados/{id}/entrevistas: Crear una entrevista
- */
+//* Crear una entrevista
 $app->post('/entrevistados/{id_entrevistado}/entrevistas', function ($request, $response, $args) {
 
     $id_entrevista = $args['id_entrevistado'];
@@ -211,10 +207,7 @@ $app->post('/entrevistados/{id_entrevistado}/entrevistas', function ($request, $
     return $response;
 })->add(new JwtMiddleware());
 
-
-/**
- * PUT /entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}: Editar una entrevista
- */
+//* Editar una entrevista
 $app->put('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', function ($request, $response, $args) {
 
     $id_entrevistado = $args['id_entrevistado'];
@@ -300,9 +293,7 @@ $app->put('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', functi
     return $response;
 })->add(new JwtMiddleware());
 
-/**
- * DELETE /entrevistados/{id_usuario}/entrevistas/{id_entrevista}: Eliminar una entrevista
- */
+//* Eliminar una entrevista
 $app->delete('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', function ($request, $response, $args) {
 
     $id_entrevistado = $args['id_entrevistado'];

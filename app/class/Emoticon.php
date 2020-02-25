@@ -11,6 +11,7 @@ class Emoticones
     private $url;
     private $descripcion;
 
+    //TODO: Por checkear aqui e implementar en android
     function agregar($conn)
     {
         try {
@@ -30,11 +31,12 @@ class Emoticones
             $lastId = $stmt->fetch(PDO::FETCH_ASSOC);
             return $lastId['id'];
         } catch (PDOException $e) {
-            echo "Fail insert: " . $e->getMessage() . "\n";
+            error_log("Fail insert: " . $e->getMessage(), 0);
             return false;
         }
     }
 
+    //TODO: Por checkear aqui e implementar en android
     function actualizar($conn)
     {
         try {
@@ -54,7 +56,7 @@ class Emoticones
                 return true;
             }
         } catch (PDOException $e) {
-            echo "Fail update: " . $e->getMessage() . "\n";
+            error_log("Fail update: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -71,7 +73,7 @@ class Emoticones
 
             return $emoticon;
         } catch (PDOException $e) {
-            echo "Fail search emoticon: " . $e->getMessage() . "\n";
+            error_log("Fail search emoticon: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -87,11 +89,12 @@ class Emoticones
 
             return $listado;
         } catch (PDOException $e) {
-            echo "Fail search lista emoticones: " . $e->getMessage() . "\n";
+            error_log("Fail search lista emoticones: " . $e->getMessage(), 0);
             return false;
         }
     }
 
+    //TODO: Por checkear aqui e implementar en android
     function eliminar($conn)
     {
         try {
@@ -106,7 +109,7 @@ class Emoticones
                 return true;
             }
         } catch (PDOException $e) {
-            echo "Fail delete emoticon: " . $e->getMessage() . "\n";
+            error_log("Fail delete emoticon: ".$e->getMessage(),0);
             return false;
         }
     }

@@ -33,7 +33,7 @@ class Entrevista
             $lastId = $stmt->fetch(PDO::FETCH_ASSOC);
             return $lastId['id'];
         } catch (PDOException $e) {
-            echo "Fail insert: " . $e->getMessage() . "\n";
+            error_log("Fail insert entrevista: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -58,14 +58,12 @@ class Entrevista
                 return true;
             }
         } catch (PDOException $e) {
-            echo "Fail update: " . $e->getMessage() . "\n";
+            error_log("Fail update entrevista: " . $e->getMessage(), 0);
             return false;
         }
     }
 
-    /**
-     * Buscar entrevista por ID
-     */
+    //* Buscar entrevista por ID
     function buscarEntrevista($conn)
     {
         try {
@@ -82,15 +80,13 @@ class Entrevista
 
             return $entrevista;
         } catch (PDOException $e) {
-            echo "Fail search entrevista: " . $e->getMessage() . "\n";
+            error_log("Fail search entrevista: " . $e->getMessage(), 0);
             return false;
         }
     }
 
-    /**
-     * Buscar entrevistas personales
-     */
-    function buscarEntrevistasPersonales($conn)
+    //* Buscar entrevistas de una persona
+    function buscarEntrevistasPersonales($conn,$idioma)
     {
         try {
             $stmt = $conn->prepare(
@@ -100,7 +96,7 @@ class Entrevista
                     e.id_tipo_entrevista,
                     e.fecha_entrevista,
                     t.id as id_tipo_entrevista,
-                    t.nombre as nombre_tipo_entrevista
+                    t.nombre_".$idioma." as nombre_tipo_entrevista
                 FROM
                     entrevista e
                 INNER JOIN tipo_entrevista t ON
@@ -117,14 +113,12 @@ class Entrevista
 
             return $listado;
         } catch (PDOException $e) {
-            echo "Fail search entrevistas usuario: " . $e->getMessage() . "\n";
+            error_log("Fail search entrevistas usuarios: " . $e->getMessage(), 0);
             return false;
         }
     }
 
-    /**
-     * Buscar entrevista por ID e ID_entrevistado
-     */
+    //* Buscar una entrevista de una persona
     function buscarEntrevistaPersonal($conn)
     {
         try {
@@ -142,7 +136,7 @@ class Entrevista
 
             return $entrevista;
         } catch (PDOException $e) {
-            echo "Fail search entrevista: " . $e->getMessage() . "\n";
+            error_log("Fail search entrevista: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -158,7 +152,7 @@ class Entrevista
 
             return $listado;
         } catch (PDOException $e) {
-            echo "Fail search lista entrevistas: " . $e->getMessage() . "\n";
+            error_log("Fail search lista entrevistas: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -183,7 +177,7 @@ class Entrevista
                 return true;
             }
         } catch (PDOException $e) {
-            echo "Fail delete entrevista: " . $e->getMessage() . "\n";
+            error_log("Fail delete entrevista: " . $e->getMessage(), 0);
             return false;
         }
     }
