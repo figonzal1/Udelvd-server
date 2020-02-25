@@ -1,7 +1,7 @@
 <?php
 
 //* Listado de tipos de convivencias del sistema
-$app->get("/tiposConvivencias/{idioma}", function ($request, $response, $args) {
+$app->get("/tiposConvivencias/idioma/{idioma}", function ($request, $response, $args) {
 
     $idioma = $args['idioma'];
 

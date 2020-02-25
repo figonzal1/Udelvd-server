@@ -1,7 +1,7 @@
 <?php
 
 //* Listado de niveles educacionales del sistema
-$app->get("/nivelesEducacionales/{idioma}", function ($request, $response, $args) {
+$app->get("/nivelesEducacionales/idioma/{idioma}", function ($request, $response, $args) {
 
     $idioma = $args['idioma'];
 

@@ -1,7 +1,7 @@
 <?php
 
 //* Listado de tipos de entrevistas del sistema
-$app->get("/tiposEntrevistas/{idioma}", function ($request, $response, $args) {
+$app->get("/tiposEntrevistas/idioma/{idioma}", function ($request, $response, $args) {
 
     $idioma = $args['idioma'];
 

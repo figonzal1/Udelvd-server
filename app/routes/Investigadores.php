@@ -764,8 +764,8 @@ $app->patch('/investigadores/{id}/activar', function ($request, $response, $args
 })->add(new JwtMiddleware());
 
 //TODO: PENDIENTE POR REVISAR e IMPLEMENTAR EN ANDROID
-// Eliminar un investigador
-$app->delete('/investigadores/{id}', function ($request, $response, $args) {
+//* Eliminar un investigador
+/*$app->delete('/investigadores/{id}', function ($request, $response, $args) {
 
     $id_investigador = $args['id'];
 
@@ -806,5 +806,4 @@ $app->delete('/investigadores/{id}', function ($request, $response, $args) {
     $mysql_adapter->disconnect();
 
     return $response;
-})->add(new JwtMiddleware());
-?>
+})->add(new JwtMiddleware());*/

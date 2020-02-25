@@ -1,7 +1,7 @@
 <?php
 
 //* Listado de estados civiles del sistema
-$app->get("/estadosCiviles/{idioma}", function ($request, $response, $args) {
+$app->get("/estadosCiviles/idioma/{idioma}", function ($request, $response, $args) {
 
     $idioma = $args['idioma'];
 

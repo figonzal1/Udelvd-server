@@ -54,10 +54,11 @@ $app->get('/emoticones/idioma/{idioma}', function ($request, $response, $args) {
     //Desconectar mysql
     $mysql_adapter->disconnect();
     return $response;
-});
+})->add(new JwtMiddleware());
 
+//TODO: REVISAR e implementar en android
 //* Obtener emoticones segun id
-$app->get('/emoticones/{id}/idioma/{idioma}', function ($request, $response, $args) {
+/*$app->get('/emoticones/{id}/idioma/{idioma}', function ($request, $response, $args) {
 
     $idioma = $args['idioma'];
 
@@ -119,7 +120,7 @@ $app->get('/emoticones/{id}/idioma/{idioma}', function ($request, $response, $ar
     $mysql_adapter->disconnect();
 
     return $response;
-});
+});*/
 
 //TODO: REVISAR e implementar en android , agregar soporte idioma
 //* Crear emoticones

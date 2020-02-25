@@ -1,7 +1,7 @@
 <?php
 
 //* Listado de acciones del sistema
-$app->get('/acciones/{idioma}', function ($request, $response, $args) {
+$app->get('/acciones/idioma/{idioma}', function ($request, $response, $args) {
 
     $idioma = $args['idioma'];
 
@@ -57,9 +57,9 @@ $app->get('/acciones/{idioma}', function ($request, $response, $args) {
     return $response;
 })->add(new JwtMiddleware());
 
-
+//TODO: PENDIENTE POR VERIFICAR e implementar en android
 //* Obtener acciones segun id
-$app->get('/acciones/{id}/{idioma}', function ($request, $response, $args) {
+/*$app->get('/acciones/{id}/idioma/{idioma}', function ($request, $response, $args) {
 
     $id_accion = $args['id'];
     $idioma = $args['idioma'];
@@ -120,7 +120,7 @@ $app->get('/acciones/{id}/{idioma}', function ($request, $response, $args) {
     $mysql_adapter->disconnect();
 
     return $response;
-})->add(new JwtMiddleware());
+})->add(new JwtMiddleware());*/
 
 //TODO: PENDIENTE POR VERIFICAR e implementar en android
 //* Crear una accion
