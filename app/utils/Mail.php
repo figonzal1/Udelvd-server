@@ -7,7 +7,7 @@ use PHPMailer\PHPMailer\Exception;
 
 
 
-function sendEmail($investigador, $dynamicLink)
+function sendEmail($investigador, $dynamicLink, $idioma)
 {
 
     $dotenv = Dotenv\Dotenv::create(__DIR__ . "../../../");
@@ -34,7 +34,24 @@ function sendEmail($investigador, $dynamicLink)
         // Content
         $mail->isHTML(true);
         $mail->CharSet = 'UTF-8';                              // Set email format to HTML
-        $mail->Subject = 'Recuperación de cuenta';        //TODO: AGREGAR SOPORTE INGLES
+
+        if ($idioma == "es") {
+            $titulo = "Recuperación de cuenta";
+            $saludo = "¡Hola " . $investigador['nombre'] . " " . $investigador['apellido'] . "!";
+            $mensaje = "Parece que has olvidado tu contraseña. Para reestablecerla, haz click en el botón de abajo.";
+            $footer = "Gracias,<br>
+            Administración, App - Un Día en la Vida de ...";
+            $boton = "Reestablecer contraseña";
+        } else if ($idioma == "en") {
+            $titulo = "Account recovery";
+            $saludo = "Hello " . $investigador['nombre'] . " " . $investigador['apellido'] . "!";
+            $mensaje = "You seem to have forgotten your password. To reset it, click the button below.";
+            $footer = "Thanks,<br>
+            Administration, App - A day in the life of ...";
+            $boton = "Reset password";
+        }
+
+        $mail->Subject = $titulo;        //TODO: AGREGAR SOPORTE INGLES
         $mail->Body    =
             '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
       <html xmlns="http://www.w3.org/1999/xhtml">
@@ -127,16 +144,15 @@ function sendEmail($investigador, $dynamicLink)
                     </tr>-->
                     <tr>
                       <td colspan="2" align="left" valign="center" width="640" height="40" class="100p center" style="font-family: Arial, sans-serif; font-weight: bold; font-size:14px;padding: 0px 20px;">
-                        <font face="Arial, sans-serif"><b>¡Hola ' . $investigador['nombre'] . " " . $investigador['apellido'] . '!</b></font>
+                        <font face="Arial, sans-serif"><b>' . $saludo . '</b></font>
                       </td>
                     </tr>
                     <tr>
                       <td colspan="2" align="left" valign="center" width="640" class="100p" style="font-family: Arial, sans-serif; font-size:14px; padding: 0px 20px; line-height: 18px;">
                         <font face="Arial, sans-serif">
-                            Parece que has olvidado tu contraseña. Para reestablecerla, haz click en el botón de abajo.<br>
+                            ' . $mensaje . '<br>
                             <br>
-                            Gracias,<br>
-                            Administración, App - Un Dia en la Vida de ...
+                            ' . $footer . '
                         </font>
                       </td>
                     </tr>
@@ -155,7 +171,7 @@ function sendEmail($investigador, $dynamicLink)
                       <td align="center" style="border-radius: 18px;" bgcolor="#fb8c00">
                         <a href="' . $dynamicLink . '" style="font-size: 14px; font-family: sans-serif; color: #ffffff; text-decoration: none; border-radius: 18px; padding: 5px 16px; border: 1px solid #fb8c00; display: inline-block; box-shadow: 0 2px 3px 0 rgba(0,0,0,0.10);">
                           <!--[if mso]> <![endif]-->
-                          Reestablecer contraseña
+                          ' . $boton . '
                           <!--[if mso]> <![endif]-->
                         </a>
                       </td>

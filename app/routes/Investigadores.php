@@ -608,8 +608,9 @@ $app->put('/investigadores/{id}', function ($request, $response, $args) {
 })->add(new JwtMiddleware());
 
 //* RECUPERAR CUENTA
-$app->post('/investigadores/recuperar/{email}', function ($request, $response, $args) {
+$app->post('/investigadores/recuperar/{email}/idioma/{idioma}', function ($request, $response, $args) {
 
+    $idioma = $args['idioma'];
     $email = $args['email'];
 
     //Conectar mysql
@@ -618,7 +619,7 @@ $app->post('/investigadores/recuperar/{email}', function ($request, $response, $
 
     $payload = array(
         'links' => array(
-            'self' => "/investigadores/" . $email
+            'self' => "/investigadores/recuperar/" . $email . "/idioma/" . $idioma
         )
     );
 
@@ -654,7 +655,7 @@ $app->post('/investigadores/recuperar/{email}', function ($request, $response, $
             $dynamicLink = crearDynamicLink();
 
             if ($dynamicLink != false) {
-                $status = sendEmail($investigador, $dynamicLink);
+                $status = sendEmail($investigador, $dynamicLink, $idioma);
 
                 if (!$status) {
                     $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Send mail problem', 'Email with dynamic link has not been send');
