@@ -322,9 +322,11 @@ class Entrevistado
                 (SELECT COUNT(*) FROM entrevista WHERE id_entrevistado = eo.id) AS n_entrevistas
             FROM
                 entrevistado eo
+            WHERE eo.id_investigador =:id_investigador
             ORDER BY eo.id DESC
             LIMIT :limite OFFSET :offset"
             );
+            $stmt->bindValue(':id_investigador', $this->id_investigador, PDO::PARAM_INT);
             $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
             $stmt->bindValue(':offset', ($pagina - 1) * $limite, PDO::PARAM_INT);
             $stmt->execute();
@@ -341,16 +343,18 @@ class Entrevistado
     function contarEntrevistados($conn)
     {
         try {
-            $stmt = $conn->query(
-                "SELECT COUNT(*) FROM entrevistado AS n_entrevistados"
+            $stmt = $conn->prepare(
+                "SELECT COUNT(*) FROM entrevistado AS n_entrevistados WHERE id_investigador=?"
             );
-            $stmt->execute();
+            $stmt->execute(array(
+                $this->id_investigador
+            ));
 
             $conteo = $stmt->fetchColumn();
 
             return $conteo;
         } catch (PDOException $e) {
-            error_log("Fail conteo entrevitados: " . $e->getMessage(), 0);
+            error_log("Fail conteo entrevistados: " . $e->getMessage(), 0);
             return false;
         }
     }

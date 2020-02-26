@@ -219,9 +219,10 @@ $app->post('/entrevistados', function ($request, $response, $args) {
     return $response;
 })->add(new JwtMiddleware());
 
-//Listado de entrevistados del sistema por paginacion
-$app->get('/entrevistados/pagina/{n_pag}', function ($request, $response, $args) {
+//Listado de entrevistados del sistema por paginacion e Investigador logeado
+$app->get('/entrevistados/pagina/{n_pag}/investigador/{id_investigador}', function ($request, $response, $args) {
 
+    $id_investigador = $args['id_investigador'];
     $n_pag = $args['n_pag'];
 
     //Conectar BD
@@ -230,15 +231,19 @@ $app->get('/entrevistados/pagina/{n_pag}', function ($request, $response, $args)
 
     $payload = array(
         'links' => array(
-            'self' => "/entrevistados/pagina/" . $n_pag
+            'self' => "/entrevistados/pagina/" . $n_pag . "/investigador/" . $id_investigador
         ),
         'data' => array()
     );
 
-    if ($conn != null) {
+    if (!isset($id_investigador) || !is_numeric($id_investigador) ||  empty($id_investigador)) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_investigador must be integer');
+        $response = $response->withStatus(400);
+    } else if ($conn != null) {
 
         //Buscar entrevistados
         $object = new Entrevistado();
+        $object->setIdInvestigador($id_investigador);
         $listado = $object->buscarPagina($conn, $n_pag);
 
         $conteo = $object->contarEntrevistados($conn);
