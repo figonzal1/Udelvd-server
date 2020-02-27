@@ -90,7 +90,7 @@ $app->post('/entrevistados', function ($request, $response, $args) {
      */
 
     //CAMPOS OPCIONALES
-    if (!isset($data['n_caidas']) || empty($data['n_caidas'])) {
+    if (!isset($data['n_caidas'])) {
         $data['n_caidas'] = NULL;
     }
     if (!isset($data['id_nivel_educacional']) || empty($data['id_nivel_educacional'])) {
