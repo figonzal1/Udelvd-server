@@ -387,6 +387,8 @@ $app->get('/investigadores/pagina/{n_pag}/id_admin/{id_admin}', function ($reque
         $object->setId($id_admin);
         $listado = $object->buscarPagina($conn, $n_pag);
 
+        $conteo = $object->contarInvestigadores($conn);
+
         //Preparar respuesta
         foreach ($listado as $key => $value) {
 
@@ -414,6 +416,13 @@ $app->get('/investigadores/pagina/{n_pag}/id_admin/{id_admin}', function ($reque
                 )
             );
         }
+
+        $payload['investigadores'] = array(
+            'data' => array(
+                'n_investigadores' => $conteo
+            )
+        );
+
         $response = $response->withStatus(200);
     } else {
         $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server connection problem', 'A connection problem ocurred with database');

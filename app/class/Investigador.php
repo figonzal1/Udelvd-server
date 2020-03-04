@@ -194,6 +194,32 @@ class Investigador
         }
     }
 
+    function contarInvestigadores($conn)
+    {
+        try {
+            $stmt = $conn->prepare(
+                "SELECT
+                    COUNT(*)
+                FROM
+                    investigador i
+                INNER JOIN Rol r ON
+                    i.id_rol = r.id
+                WHERE
+                    i.id <> ? AND r.nombre LIKE 'In%'"
+            );
+            $stmt->execute(array(
+                $this->id
+            ));
+
+            $conteo = $stmt->fetchColumn();
+
+            return $conteo;
+        } catch (PDOException $e) {
+            error_log("Fail conteo investigadores: " . $e->getMessage(), 0);
+            return false;
+        }
+    }
+
     function buscarTodos($conn)
     {
 
