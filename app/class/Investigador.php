@@ -141,9 +141,55 @@ class Investigador
 
             $investigador = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            return $investigador;
+            if ($stmt->rowCount() == 1) {
+                error_log("Row-count: 1", 0);
+                return $investigador;
+            } else if ($stmt->rowCount() == 0) {
+                error_log("Row-count: 0", 0);
+                return null;
+            }
         } catch (PDOException $e) {
             error_log("Fail search investigador: " . $e->getMessage(), 0);
+            return false;
+        }
+    }
+
+    function buscarPagina($conn, $pagina)
+    {
+        try {
+            $limite = 1;
+            $stmt = $conn->prepare(
+                "SELECT
+                i.id,
+                i.nombre,
+                i.apellido,
+                i.email,
+                i.id_rol,
+                i.activado,
+                r.nombre AS nombre_rol,
+                i.create_time
+            FROM
+                investigador i
+            INNER JOIN rol r ON
+                i.id_rol = r.id
+            WHERE
+                i.id <> :id_admin AND r.nombre LIKE 'In%'
+            ORDER BY
+                i.create_time
+            DESC
+            LIMIT :limite OFFSET :offset"
+            );
+
+            $stmt->bindValue(':id_admin', $this->id, PDO::PARAM_INT);
+            $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', ($pagina - 1) * $limite, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return $listado;
+        } catch (PDOException $e) {
+            error_log("Fail search lista investigadores: " . $e->getMessage(), 0);
             return false;
         }
     }

@@ -115,7 +115,7 @@ $app->post('/investigadores', function ($request, $response, $args) {
 
         $investigador = $object->buscarInvestigadorPorEmail($conn);
 
-        if (!empty($investigador)) {
+        if ($investigador != null) {
             //Lanzar error de email
             $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Email problem', 'Email already exists');
             $response = $response->withStatus(500);
@@ -362,9 +362,10 @@ $app->post('/investigadores/login', function ($request, $response, $args) {
 });
 
 //* Obtener listado de investigadores para admin
-$app->get('/investigadores/id_admin/{id_admin}', function ($request, $response, $args) {
+$app->get('/investigadores/pagina/{n_pag}/id_admin/{id_admin}', function ($request, $response, $args) {
 
     $id_admin = $args['id_admin'];
+    $n_pag = $args['n_pag'];
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -372,7 +373,7 @@ $app->get('/investigadores/id_admin/{id_admin}', function ($request, $response, 
 
     $payload = array(
         'links' => array(
-            'self' => "/investigadores/id_admin/" . $id_admin
+            'self' => "/investigadores/pagina/" . $n_pag . "/id_admin/" . $id_admin
         ),
         'data' => array()
     );
@@ -384,7 +385,7 @@ $app->get('/investigadores/id_admin/{id_admin}', function ($request, $response, 
         //Buscar investigadores
         $object = new Investigador();
         $object->setId($id_admin);
-        $listado = $object->buscarTodos($conn);
+        $listado = $object->buscarPagina($conn, $n_pag);
 
         //Preparar respuesta
         foreach ($listado as $key => $value) {
@@ -427,7 +428,7 @@ $app->get('/investigadores/id_admin/{id_admin}', function ($request, $response, 
     //Desconectar mysql
     $mysql_adapter->disconnect();
     return $response;
-})->add(new JwtMiddleware());
+});
 
 //* Obtener investigador segun id
 $app->get('/investigadores/{id}', function ($request, $response, $args) {
