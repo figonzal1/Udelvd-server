@@ -156,7 +156,8 @@ $app->post('/acciones', function ($request, $response, $args) {
                 'id' => $accion['id'],
                 'attributes' => array(
                     'nombre_es' => $accion['nombre_es'],
-                    'nombre_en' => $accion['nombre_en']
+                    'nombre_en' => $accion['nombre_en'],
+                    'create_time' => $accion['create_time']
                 )
             );
 
@@ -232,7 +233,8 @@ $app->put('/acciones/{id_accion}', function ($request, $response, $args) {
                 'id' => $acciones['id'],
                 'attributes' => array(
                     'nombre_es' => $acciones['nombre_es'],
-                    'nombre_en' => $acciones['nombre_en']
+                    'nombre_en' => $acciones['nombre_en'],
+                    'update_time' => $acciones['update_time']
                 )
             );
 
