@@ -26,6 +26,8 @@ class Entrevistado
     private $id_profesion;     //Opcional
     private $nombre_profesion;
 
+    private $limite = 10;
+
     function agregar($conn)
     {
         try {
@@ -257,49 +259,10 @@ class Entrevistado
         }
     }
 
-    function buscarTodos($conn)
+    function buscarTodosConPagina($conn, $pagina)
     {
         try {
 
-            $stmt = $conn->query(
-                "SELECT
-                eo.id,
-                eo.nombre,
-                eo.apellido,
-                eo.fecha_nacimiento,
-                eo.jubilado_legal,
-                eo.caidas,
-                eo.sexo,
-                eo.n_caidas,
-                eo.n_convivientes_3_meses,
-                eo.id_investigador,
-                eo.id_ciudad,
-                eo.id_nivel_educacional,
-                eo.id_estado_civil,
-                eo.id_tipo_convivencia,
-                eo.id_profesion,
-                eo.create_time,
-                eo.update_time,
-                (SELECT COUNT(*) FROM entrevista WHERE id_entrevistado = eo.id) AS n_entrevistas
-            FROM
-                entrevistado eo
-            ORDER BY eo.create_time DESC"
-            );
-            $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            return $listado;
-        } catch (PDOException $e) {
-            error_log("Fail search lista entrevistados: " . $e->getMessage(), 0);
-            return false;
-        }
-    }
-
-    function buscarPagina($conn, $pagina)
-    {
-        try {
-
-            //TODO: MODIFICAR A 10
-            $limite = 1; //*Importante para paginacion de datos
             $stmt = $conn->prepare(
                 "SELECT
                 eo.id,
@@ -319,33 +282,95 @@ class Entrevistado
                 eo.id_profesion,
                 eo.create_time,
                 eo.update_time,
+                i.nombre As nombre_investigador,
+                i.apellido AS apellido_investigador,
                 (SELECT COUNT(*) FROM entrevista WHERE id_entrevistado = eo.id) AS n_entrevistas
             FROM
                 entrevistado eo
-            WHERE eo.id_investigador =:id_investigador
-            ORDER BY eo.id DESC
+            INNER JOIN investigador i
+            ON i.id=eo.id_investigador
+            ORDER BY eo.create_time DESC 
             LIMIT :limite OFFSET :offset"
             );
-            $stmt->bindValue(':id_investigador', $this->id_investigador, PDO::PARAM_INT);
-            $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
-            $stmt->bindValue(':offset', ($pagina - 1) * $limite, PDO::PARAM_INT);
+            $stmt->bindValue(':limite', $this->limite, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', ($pagina - 1) * $this->limite, PDO::PARAM_INT);
             $stmt->execute();
 
             $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             return $listado;
         } catch (PDOException $e) {
-            error_log("Fail search lista entrevistados: " . $e->getMessage(), 0);
+            error_log("Fail search lista entrevistados totales: " . $e->getMessage(), 0);
             return false;
         }
     }
 
-    function contarEntrevistados($conn)
+    function buscarEntrevistadosInvestigadorPorPagina($conn, $pagina)
     {
         try {
-            $stmt = $conn->prepare(
-                "SELECT COUNT(*) FROM entrevistado AS n_entrevistados WHERE id_investigador=?"
-            );
+
+            $sql = "SELECT
+                eo.id,
+                eo.nombre,
+                eo.apellido,
+                eo.fecha_nacimiento,
+                eo.jubilado_legal,
+                eo.caidas,
+                eo.sexo,
+                eo.n_caidas,
+                eo.n_convivientes_3_meses,
+                eo.id_investigador,
+                eo.id_ciudad,
+                eo.id_nivel_educacional,
+                eo.id_estado_civil,
+                eo.id_tipo_convivencia,
+                eo.id_profesion,
+                eo.create_time,
+                eo.update_time,
+                (SELECT COUNT(*) FROM entrevista WHERE id_entrevistado = eo.id) AS n_entrevistas
+            FROM
+                entrevistado eo
+            WHERE eo.id_investigador =:id_investigador 
+            ORDER BY eo.create_time DESC
+            LIMIT :limite OFFSET :offset";
+            $stmt = $conn->prepare($sql);
+
+            $stmt->bindValue(':id_investigador', $this->id_investigador);
+            $stmt->bindValue(':limite', $this->limite, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', ($pagina - 1) * $this->limite, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return $listado;
+        } catch (PDOException $e) {
+            error_log("Fail search lista entrevistados de investigador: " . $e->getMessage(), 0);
+            return false;
+        }
+    }
+
+    //Funcion encargada de contar todos los entrevistados
+    function contarTodos($conn)
+    {
+        try {
+            $sql = "SELECT COUNT(*) FROM entrevistado AS n_entrevistados";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+
+            $conteo = $stmt->fetchColumn();
+            return $conteo;
+        } catch (PDOException $e) {
+            error_log("Fail conteo entrevistados totales: " . $e->getMessage(), 0);
+            return false;
+        }
+    }
+
+    //Funcion encargada contar todos los entrevistados de un investigador especifico
+    function contarEntrevistadosDeInvestigador($conn)
+    {
+        try {
+            $sql = "SELECT COUNT(*) FROM entrevistado AS n_entrevistados WHERE id_investigador=?";
+            $stmt = $conn->prepare($sql);
             $stmt->execute(array(
                 $this->id_investigador
             ));
@@ -354,7 +379,7 @@ class Entrevistado
 
             return $conteo;
         } catch (PDOException $e) {
-            error_log("Fail conteo entrevistados: " . $e->getMessage(), 0);
+            error_log("Fail conteo entrevistados totales del investigador: " . $e->getMessage(), 0);
             return false;
         }
     }
