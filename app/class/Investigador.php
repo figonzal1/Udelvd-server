@@ -142,10 +142,8 @@ class Investigador
             $investigador = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($stmt->rowCount() == 1) {
-                error_log("Row-count: 1", 0);
                 return $investigador;
             } else if ($stmt->rowCount() == 0) {
-                error_log("Row-count: 0", 0);
                 return null;
             }
         } catch (PDOException $e) {

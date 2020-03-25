@@ -54,7 +54,7 @@ header('Content-type: application/json; charset=UTF-8');
 header('Access-Control-Allow-Methods: GET,POST,PUT,DELETE');
 header('X-Frame-Options: DENY');
 header("X-XSS-Protection: 1; mode=block");
-header("Content-Security-Policy: default-src 'none'; script-src 'none'; connect-src 'none'; img-src 'none'; style-src 'self';");
+header("Content-Security-Policy: frame-ancestors 'none'; default-src 'none'; script-src 'none'; connect-src 'none'; img-src 'none'; style-src 'self';frame-src 'none';");
 header("Referrer-Policy: no-referrer");
 header("Feature-Policy: camera 'none'; fullscreen 'none'; geolocation 'none'; microphone 'none';");
 
@@ -75,15 +75,15 @@ $app->addRoutingMiddleware();
  * for middleware added after it.
  */
 
- /**
-  * DEV MODE
-  */
+/**
+ * DEV MODE
+ */
 //$errorMiddleware = $app->addErrorMiddleware(true, true, true);
 
-  /**
-   * PROD MODE
-   */
-$errorMiddleware = $app->addErrorMiddleware(true, true, true);
+/**
+ * PROD MODE
+ */
+$errorMiddleware = $app->addErrorMiddleware(false, true, true);
 
 /**
  * RUTAS
