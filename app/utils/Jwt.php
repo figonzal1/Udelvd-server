@@ -1,12 +1,13 @@
 <?php
 
+#require '../../vendor/autoload.php';
 date_default_timezone_set('America/Santiago');
 
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\ValidationData;
 use Lcobucci\JWT\Parser;
-use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key;
+use Lcobucci\JWT\Signer\Hmac\Sha256;
 
 /**
  * Clase para manejar Tokens JWT
@@ -14,22 +15,28 @@ use Lcobucci\JWT\Signer\Key;
 class Jwt
 {
 
+    function __construct()
+    {
+        $dotenv = Dotenv\Dotenv::create(__DIR__ . "../../../");
+        $dotenv->load();
+    }
+
     public function generarToken($id_investigador)
     {
-
         $signer = new Sha256();
+
         $time = time();
         $expiration_date = strtotime("next sunday 01:00");  //Sunday 01:00 AM
         $token = (new Builder())
             ->issuedBy('http://udelvd.cl') // Configures the issuer (iss claim)
             ->permittedFor('android') // Configures the audience (aud claim)
-            ->identifiedBy('4f1g23a12aa', true) // Configures the id (jti claim), replicating as a header item
+            ->identifiedBy(getenv("JWT_JTI")) // Configures the id (jti claim), replicating as a header item
             ->issuedAt($time) // Configures the time that the token was issue (iat claim)
             ->canOnlyBeUsedAfter($time - 1) // Configures the time that the token can be used (nbf claim)
             ->expiresAt($expiration_date) // Configures the expiration time of the token (exp claim)
             ->withClaim('uid', $id_investigador) // Configures a new claim, called "uid"
-            ->getToken($signer, new Key('Felipe')); // Retrieves the generated token
-
+            ->getToken($signer, new Key(getenv("HMAC_KEY")));
+        //->getToken($signer, new ); // Retrieves the generated token
 
         //$token->getHeaders(); // Retrieves the token headers
         //$token->getClaims(); // Retrieves the token claims
@@ -70,7 +77,7 @@ class Jwt
             $data = new ValidationData();
             $data->setIssuer("http://udelvd.cl");
             $data->setAudience("android");
-            $data->setId('4f1g23a12aa');
+            $data->setId(getenv("JWT_JTI"));
 
             try {
                 $status = $token->validate($data);
@@ -90,7 +97,8 @@ class Jwt
     {
         try {
             $signer = new Sha256();
-            $status = $token->verify($signer, 'Felipe');
+            //$status = $token->verify($signer, 'Test');
+            $status = $token->verify($signer, new Key(getenv("HMAC_KEY")));
         } catch (Exception $e) {
             error_log("Fail to verify token " . $e->getMessage(), 0);
         }

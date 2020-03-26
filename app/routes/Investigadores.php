@@ -306,8 +306,6 @@ $app->post('/investigadores/login', function ($request, $response, $args) {
                 $response = $response->withStatus(403);
             } else {
 
-                //TODO: Verificar si investigador esta activado
-
                 //Generar token
                 $jwt = new Jwt();
                 $token = $jwt->generarToken($investigador['id']);

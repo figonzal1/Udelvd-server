@@ -1,5 +1,16 @@
 <?php
 
+date_default_timezone_set('America/Santiago');
+header('Cache-Control: no-cache');
+header('X-Content-Type-Options: nosniff');
+header('Content-type: application/json; charset=UTF-8');
+header('Access-Control-Allow-Methods: GET,POST,PUT,DELETE');
+header('X-Frame-Options: DENY');
+header("X-XSS-Protection: 1; mode=block");
+header("Content-Security-Policy: frame-ancestors 'none'; default-src 'none'; script-src 'none'; connect-src 'none'; img-src 'none'; style-src 'self';frame-src 'none';");
+header("Referrer-Policy: no-referrer");
+header("Feature-Policy: camera 'none'; fullscreen 'none'; geolocation 'none'; microphone 'none';");
+
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
@@ -47,17 +58,6 @@ require_once("../app/middleware/JwtMiddleware.php");
  */
 require_once("../app/utils/ErrorJsonHandler.php");
 
-date_default_timezone_set('America/Santiago');
-header('Cache-Control: no-cache');
-header('X-Content-Type-Options: nosniff');
-header('Content-type: application/json; charset=UTF-8');
-header('Access-Control-Allow-Methods: GET,POST,PUT,DELETE');
-header('X-Frame-Options: DENY');
-header("X-XSS-Protection: 1; mode=block");
-header("Content-Security-Policy: frame-ancestors 'none'; default-src 'none'; script-src 'none'; connect-src 'none'; img-src 'none'; style-src 'self';frame-src 'none';");
-header("Referrer-Policy: no-referrer");
-header("Feature-Policy: camera 'none'; fullscreen 'none'; geolocation 'none'; microphone 'none';");
-
 $app = AppFactory::create();
 
 // Add Routing Middleware
@@ -78,12 +78,12 @@ $app->addRoutingMiddleware();
 /**
  * DEV MODE
  */
-//$errorMiddleware = $app->addErrorMiddleware(true, true, true);
+$errorMiddleware = $app->addErrorMiddleware(true, true, true);
 
 /**
  * PROD MODE
  */
-$errorMiddleware = $app->addErrorMiddleware(false, true, true);
+//$errorMiddleware = $app->addErrorMiddleware(false, true, true);
 
 /**
  * RUTAS

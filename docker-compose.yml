@@ -1,0 +1,58 @@
+version: '3.5'
+services:
+
+  proxy:
+    container_name: proxy
+    image: figonzal/http-proxy:0.1
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - RED_UDELVD
+    depends_on:
+      - mysql
+      - udelvd-api
+      
+  udelvd-api:
+    container_name: udelvd-api
+    image: figonzal/udelvd-api:0.1
+    networks:
+      - RED_UDELVD
+    depends_on:
+      - mysql
+
+  #Definicion servicio mysql
+  mysql:
+    container_name: mysql
+    image: figonzal/mysql:0.1
+    command: --default-authentication-plugin=mysql_native_password
+    env_file: .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_HOST=%
+    ports:
+      - "3306:3306"
+    networks:
+      - RED_UDELVD
+    restart: on-failure
+    volumes:
+      - db-data:/var/lib/mysql
+  
+      #Servicio de espera para mysql
+  wait_for_mysql:
+    container_name: w4database
+    image: dadarek/wait-for-dependencies
+    depends_on:
+      - mysql
+    networks:
+      - RED_UDELVD
+    command: mysql:3306
+
+networks: 
+  RED_UDELVD:
+    name: RED_UDELVD
+
+volumes:
+  db-data:

@@ -1,5 +1,6 @@
 <?php
 
+//require '../../vendor/autoload.php';
 /**
  * Adaptador mysql para conexion a BD
  */
@@ -10,6 +11,7 @@ class MysqlAdapter
     private $hostname;
     private $username;
     private $password;
+    private $options;
 
     /**
      * Constructor de clase
@@ -17,18 +19,27 @@ class MysqlAdapter
     function __construct()
     {
 
-        //$dotenv = Dotenv\Dotenv::create(__DIR__ . "../../../");
-        //$dotenv->load();
+        $dotenv = Dotenv\Dotenv::create(__DIR__ . "../../../");
+        $dotenv->load();
 
-        /*$this->db = getenv('DB_DATABASE_TEST');
-            $this->hostname = getenv('DB_HOSTNAME_TEST');
-            $this->username = getenv('DB_USERNAME_TEST');
-            $this->password = getenv('DB_PASSWORD_TEST');*/
+        $this->db = getenv('MYSQL_DATABASE');
+        $this->hostname = getenv('MYSQL_HOSTNAME');
+        $this->username = getenv('MYSQL_USER');
+        $this->password = getenv('MYSQL_PASSWORD');
+        $this->options = array(
+            PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'",
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::MYSQL_ATTR_SSL_KEY    => '../../mysql-files/client-key.pem',
+            PDO::MYSQL_ATTR_SSL_CERT => '../../mysql-files/client-cert.pem',
+            PDO::MYSQL_ATTR_SSL_CA    => '../../mysql-files/ca-cert.pem',
+            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false
 
-        $this->db = getenv('DB_DATABASE');
+        );
+
+        /*$this->db = getenv('DB_DATABASE');
         $this->hostname = getenv('DB_HOSTNAME');
         $this->username = getenv('DB_USERNAME');
-        $this->password = getenv('DB_PASSWORD');
+        $this->password = getenv('DB_PASSWORD');*/
     }
 
     /**
@@ -42,15 +53,11 @@ class MysqlAdapter
                 "mysql:host=" . $this->hostname . ";dbname=" . $this->db . "",
                 $this->username,
                 $this->password,
-                array(
-                    PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'",
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-                )
+                $this->options
             );
             //echo "Connectado" . "\n";
             return $this->conn;
         } catch (PDOException $e) {
-            //echo "Connection failed: " . $e->getMessage() . "\n";
             error_log("Connection failed: " . $e->getMessage(), 0);
             return null;
         }
