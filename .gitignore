@@ -2,3 +2,8 @@
 vendor/*
 udelvd-server-credentials.json
 encrypt.tar.gz
+
+#CERTS
+mysql-files/*.pem
+app/utils/jwt_keys/*
+proxy-files/ssl/*
