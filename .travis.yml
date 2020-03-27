@@ -9,6 +9,9 @@ cache:
   directories:
     - $HOME/.m2
 
+before_install:
+  - openssl aes-256-cbc -K $encrypted_b9929ad0dae9_key -iv $encrypted_b9929ad0dae9_iv -in encrypt.tar.gz.enc -out encrypt.tar.gz -d
+
 install:
   #Docker login
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
