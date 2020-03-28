@@ -11,6 +11,7 @@ cache:
 
 before_install:
   - openssl aes-256-cbc -K $encrypted_b9929ad0dae9_key -iv $encrypted_b9929ad0dae9_iv -in encrypt.tar.gz.enc -out encrypt.tar.gz -d
+  - tar xzvf encrypt.tar.gz
 
 install:
   #Docker login
@@ -20,7 +21,7 @@ script:
   - docker build -t figonzal/udelvd-api:0.2 -f api.DockerFile . 
   - docker build -t figonzal/http-proxy:0.2 -f proxy.DockerFile .
   - docker build -t figonzal/mysql:0.2 -f mysql.DockerFile .
-  - docker create network RED_UDELVD
+  - docker network create RED_UDELVD
   - docker run --name udelvd-api-test -p 80:80 --network RED_UDELVD figonzal/udelvd-api:0.2
   - docker run --name owasp --network RED_UDELVD -t owasp/zap2docker-weekly zap-full-scan.py -t http://udelvd-api-test/
   - sleep 15
