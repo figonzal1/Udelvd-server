@@ -23,7 +23,7 @@ script:
   - docker build -t figonzal/mysql:0.2 -f mysql.DockerFile .
   - docker network create RED_UDELVD
   - docker run -d --name udelvd-api-test -p 80:80 --network RED_UDELVD figonzal/udelvd-api:0.2
-  - docker run --name owasp --network RED_UDELVD -t owasp/zap2docker-weekly zap-full-scan.py -t http://udelvd-api-test/
+  - docker run --name owasp --network RED_UDELVD -v "$(PWD):/zap/wrk/:rw" -t owasp/zap2docker-weekly zap-full-scan.py -t http://udelvd-api-test/ -c gen_file
   - sleep 15
 
 after_success:
