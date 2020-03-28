@@ -7,8 +7,8 @@ RUN apt-get clean
 COPY /mysql-files/my.cnf /etc/mysql/conf.d/my.cnf
 RUN mkdir /etc/mysql/certs
 
-#Copiar certificados
-COPY /mysql-files/*.pem /etc/mysql/certs/
+#Copiar certificados de produccion
+COPY /mysql-files/*-prod.pem /etc/mysql/certs/
 
 # Add a database
 ENV MYSQL_DATABASE udelvd

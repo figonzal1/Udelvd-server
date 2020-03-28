@@ -13,8 +13,8 @@ COPY . /var/www/
 COPY ./public/ /var/www/html/
 
 # Archivo de configuracion PHP
-#COPY /api-files/php-production.ini "$PHP_INI_DIR/php.ini"
-COPY ./api-files/php-development.ini "$PHP_INI_DIR/php.ini"
+COPY /api-files/php-production.ini "$PHP_INI_DIR/php.ini"
+#COPY ./api-files/php-development.ini "$PHP_INI_DIR/php.ini"
 
 RUN usermod -u 1000 www-data
 RUN chown -R www-data:www-data /var/www/
