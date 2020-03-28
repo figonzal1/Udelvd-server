@@ -32,7 +32,7 @@ class MysqlAdapter
             PDO::MYSQL_ATTR_SSL_KEY    => '../../mysql-files/client-key-prod.pem',
             PDO::MYSQL_ATTR_SSL_CERT => '../../mysql-files/client-cert-prod.pem',
             PDO::MYSQL_ATTR_SSL_CA    => '../../mysql-files/ca-prod.pem',
-            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false
+            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => true
 
         );
 
