@@ -200,7 +200,7 @@ class Investigador
                     COUNT(*)
                 FROM
                     investigador i
-                INNER JOIN Rol r ON
+                INNER JOIN rol r ON
                     i.id_rol = r.id
                 WHERE
                     i.id <> ? AND r.nombre LIKE 'In%'"
