@@ -59,7 +59,7 @@ $app->get('/investigadores', function ($request, $response, $args) {
     //Desconectar mysql
     $mysql_adapter->disconnect();
     return $response;
-})->add(new JwtMiddleware());
+});
 
 //* REGISTRO INVSTIGADOR
 $app->post('/investigadores', function ($request, $response, $args) {
@@ -435,7 +435,7 @@ $app->get('/investigadores/pagina/{n_pag}/id_admin/{id_admin}', function ($reque
     //Desconectar mysql
     $mysql_adapter->disconnect();
     return $response;
-});
+})->add(new JwtMiddleware());
 
 //* Obtener investigador segun id
 $app->get('/investigadores/{id}', function ($request, $response, $args) {

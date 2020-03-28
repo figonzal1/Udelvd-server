@@ -20,6 +20,8 @@ class Investigador
     private $idRol;
     private $activado;
 
+    private $limite = 10;
+
     function agregar($conn)
     {
         try {
@@ -155,7 +157,6 @@ class Investigador
     function buscarPagina($conn, $pagina)
     {
         try {
-            $limite = 1;
             $stmt = $conn->prepare(
                 "SELECT
                 i.id,
@@ -179,8 +180,8 @@ class Investigador
             );
 
             $stmt->bindValue(':id_admin', $this->id, PDO::PARAM_INT);
-            $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
-            $stmt->bindValue(':offset', ($pagina - 1) * $limite, PDO::PARAM_INT);
+            $stmt->bindValue(':limite', $this->limite, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', ($pagina - 1) * $this->limite, PDO::PARAM_INT);
             $stmt->execute();
 
             $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -296,7 +297,6 @@ class Investigador
             return false;
         }
     }
-
 
     function activar($conn)
     {
