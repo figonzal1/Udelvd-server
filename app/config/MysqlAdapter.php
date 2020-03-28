@@ -31,8 +31,8 @@ class MysqlAdapter
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::MYSQL_ATTR_SSL_KEY    => '../../mysql-files/client-key.pem',
             PDO::MYSQL_ATTR_SSL_CERT => '../../mysql-files/client-cert.pem',
-            PDO::MYSQL_ATTR_SSL_CA    => '../../mysql-files/ca-cert.pem',
-            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false
+            PDO::MYSQL_ATTR_SSL_CA    => '../../mysql-files/ca.pem',
+            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => true
 
         );
 
