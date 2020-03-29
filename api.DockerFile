@@ -1,16 +1,18 @@
 FROM php:7.3-apache
-RUN apt-get clean
-RUN apt-get update
-RUN apt-get install git unzip libicu-dev g++ libzip-dev libmcrypt-dev -y 
-RUN docker-php-source extract
-RUN docker-php-ext-install zip pdo_mysql
-RUN a2enmod rewrite
-RUN service apache2 restart 
-RUN apt-get clean
+RUN apt-get clean \ 
+&& apt-get update \ 
+&& apt-get install git unzip libicu-dev g++ libzip-dev libmcrypt-dev libapache2-mod-security2 -y \ 
+&& docker-php-source extract \ 
+&& docker-php-ext-install zip pdo_mysql \ 
+&& docker-php-source delete \ 
+&& a2enmod rewrite \ 
+&& service apache2 restart \ 
+&& apt-get clean
 
 # Copiar carpeta projecto
 COPY . /var/www/
 COPY ./public/ /var/www/html/
+COPY ./api-files/apache2.conf /etc/apache2/apache2.conf
 
 # Archivo de configuracion PHP
 COPY /api-files/php-production.ini "$PHP_INI_DIR/php.ini"

@@ -1,7 +1,7 @@
 # Derived from official mysql image (our base image)
 FROM mysql:8.0
-RUN apt-get update && apt-get install nano -y
-RUN apt-get clean
+RUN apt-get update && apt-get install nano -y \ 
+&& apt-get clean
 
 # Condifuracion mysql con certificados
 COPY /mysql-files/my.cnf /etc/mysql/conf.d/my.cnf
