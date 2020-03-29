@@ -29,10 +29,10 @@ class MysqlAdapter
         $this->options = array(
             PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'",
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::MYSQL_ATTR_SSL_KEY    => '../../mysql-files/client-key-usm.pem',
-            PDO::MYSQL_ATTR_SSL_CERT => '../../mysql-files/client-cert-usm.pem',
-            PDO::MYSQL_ATTR_SSL_CA    => '../../mysql-files/ca-usm.pem',
-            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => true
+            PDO::MYSQL_ATTR_SSL_KEY    => '../../mysql-files/client-key-localhost.pem',
+            PDO::MYSQL_ATTR_SSL_CERT => '../../mysql-files/client-cert-localhost.pem',
+            PDO::MYSQL_ATTR_SSL_CA    => '../../mysql-files/ca-localhost.pem',
+            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false
 
         );
 
@@ -71,3 +71,6 @@ class MysqlAdapter
         $this->conn = null;
     }
 }
+
+//$hola = new MysqlAdapter();
+//$hola ->connect();

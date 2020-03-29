@@ -8,7 +8,7 @@ COPY /mysql-files/my.cnf /etc/mysql/conf.d/my.cnf
 RUN mkdir /etc/mysql/certs
 
 #Copiar certificados de produccion
-COPY /mysql-files/*-usm.pem /etc/mysql/certs/
+COPY /mysql-files/*.pem /etc/mysql/certs/
 
 # Add a database
 ENV MYSQL_DATABASE udelvd
