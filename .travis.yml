@@ -19,7 +19,6 @@ install:
 
 script: 
   - docker build -t figonzal/udelvd-api:0.3-dev -f api.DockerFile . 
-  - docker build -t figonzal/http-proxy:0.3-dev -f proxy.DockerFile .
   - docker build -t figonzal/mysql:0.3-dev -f mysql.DockerFile .
   - docker network create RED_UDELVD
   - docker run -d --name udelvd-api-test -p 80:80 --network RED_UDELVD figonzal/udelvd-api:0.3-dev
@@ -28,6 +27,5 @@ script:
 
 after_success:
   - docker push figonzal/udelvd-api:0.3-dev
-  - docker push figonzal/http-proxy:0.3-dev
   - docker push figonzal/mysql:0.3-dev
   
