@@ -78,7 +78,7 @@ $app->addRoutingMiddleware();
 /**
  * DEV MODE
  */
-//$errorMiddleware = $app->addErrorMiddleware(true, true, true);
+#$errorMiddleware = $app->addErrorMiddleware(true, true, true);
 
 /**
  * PROD MODE

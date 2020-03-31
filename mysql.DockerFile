@@ -1,6 +1,7 @@
 # Derived from official mysql image (our base image)
 FROM mysql:8.0
-RUN apt-get update && apt-get install nano -y \ 
+ENV TZ="America/Santiago"
+RUN apt-get update && apt-get install vim -y \ 
 && apt-get clean
 
 # Condifuracion mysql con certificados

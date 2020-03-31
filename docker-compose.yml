@@ -1,21 +1,22 @@
 version: '3.5'
 services:
 
-  proxy:
-    container_name: proxy
-    image: figonzal/http-proxy:0.3-dev
-    ports:
-      - "80:80"
-      - "443:443"
-    networks:
-      - RED_UDELVD
-    depends_on:
-      - mysql
-      - udelvd-api
+  #proxy:
+  #  container_name: proxy
+  #  image: figonzal/http-proxy:0.3-dev
+  #  ports:
+  #    - "80:80"
+  #  networks:
+  #    - RED_UDELVD
+  #  depends_on:
+  #    - mysql
+  #    - udelvd-api
       
   udelvd-api:
     container_name: udelvd-api
     image: figonzal/udelvd-api:0.3-dev
+    ports:
+      - "443:443"
     networks:
       - RED_UDELVD
     depends_on:
@@ -33,7 +34,7 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_ROOT_HOST=%
     ports:
-      - "3306:3306"
+      - "5021:3306"
     networks:
       - RED_UDELVD
     restart: on-failure
