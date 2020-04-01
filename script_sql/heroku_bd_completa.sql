@@ -551,7 +551,7 @@ CREATE TABLE `entrevista` (
   SET
     NULL ON UPDATE CASCADE,
     CONSTRAINT `foreign_tipo_entrevista` FOREIGN KEY (`id_tipo_entrevista`) REFERENCES `tipo_entrevista` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE = InnoDB AUTO_INCREMENT = 71 DEFAULT CHARSET = utf8 COLLATE = utf8_spanish_ci;
+) ENGINE = InnoDB AUTO_INCREMENT = 0 DEFAULT CHARSET = utf8 COLLATE = utf8_spanish_ci;
 
 --
 -- Table structure for table `entrevistado`
@@ -595,7 +595,7 @@ CREATE TABLE `entrevistado` (
   CONSTRAINT `foreign_id_nivel_educacional` FOREIGN KEY (`id_nivel_educacional`) REFERENCES `nivel_educacional` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `foreign_id_profesion` FOREIGN KEY (`id_profesion`) REFERENCES `profesion` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `foreign_id_tipo_conviviente` FOREIGN KEY (`id_tipo_convivencia`) REFERENCES `tipo_convivencia` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE = InnoDB AUTO_INCREMENT = 81 DEFAULT CHARSET = utf8 COLLATE = utf8_spanish_ci;
+) ENGINE = InnoDB AUTO_INCREMENT = 0 DEFAULT CHARSET = utf8 COLLATE = utf8_spanish_ci;
 
 --
 -- Table structure for table `estado_civil`
@@ -679,7 +679,7 @@ CREATE TABLE `evento` (
     CONSTRAINT `foreign_id_entrevista` FOREIGN KEY (`id_entrevista`) REFERENCES `entrevista` (`id`) ON DELETE
   SET
     NULL ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 71 DEFAULT CHARSET = utf8 COLLATE = utf8_spanish_ci;
+) ENGINE = InnoDB AUTO_INCREMENT = 0 DEFAULT CHARSET = utf8 COLLATE = utf8_spanish_ci;
 
 --
 -- Table structure for table `investigador`
@@ -706,7 +706,7 @@ CREATE TABLE `investigador` (
   UNIQUE KEY `email_UNIQUE` (`email`),
   KEY `foreign_id_rol_idx` (`id_rol`),
   CONSTRAINT `foreign_id_rol` FOREIGN KEY (`id_rol`) REFERENCES `rol` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE = InnoDB AUTO_INCREMENT = 41 DEFAULT CHARSET = utf8 COLLATE = utf8_spanish_ci;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 DEFAULT CHARSET = utf8 COLLATE = utf8_spanish_ci;
 
 /*!40101 SET character_set_client = @saved_cs_client */
 ;
@@ -826,7 +826,26 @@ CREATE TABLE `profesion` (
   `nombre` varchar(255) COLLATE utf8_spanish_ci NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `nombre_UNIQUE` (`nombre`)
-) ENGINE = InnoDB AUTO_INCREMENT = 11 DEFAULT CHARSET = utf8 COLLATE = utf8_spanish_ci;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 DEFAULT CHARSET = utf8 COLLATE = utf8_spanish_ci;
+
+--
+-- Dumping data for table `rol`
+--
+LOCK TABLES `profesion` WRITE;
+
+/*!40000 ALTER TABLE `profesion` DISABLE KEYS */
+;
+
+INSERT INTO
+  `profesion`
+VALUES
+  (1, 'Ingeniero'),
+  (2, 'Médico');
+
+/*!40000 ALTER TABLE `profesion` ENABLE KEYS */
+;
+
+UNLOCK TABLES;
 
 --
 -- Table structure for table `rol`
