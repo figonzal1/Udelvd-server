@@ -6,4 +6,4 @@ encrypt.tar.gz
 #CERTS
 api-files/*.pem
 mysql-files/*.pem
-app/utils/jwt_keys/*
+*.pem
