@@ -14,7 +14,7 @@ services:
       
   udelvd-api:
     container_name: udelvd-api
-    image: figonzal/udelvd-api:0.3-prod
+    image: figonzal/udelvd-api:0.3-dev
     ports:
       - "443:443"
     networks:
@@ -25,7 +25,7 @@ services:
   #Definicion servicio mysql
   mysql:
     container_name: mysql
-    image: figonzal/mysql:0.3-prod
+    image: figonzal/mysql:0.3-dev
     command: --default-authentication-plugin=mysql_native_password
     env_file: .env
     environment:

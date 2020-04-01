@@ -18,14 +18,14 @@ install:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
 script: 
-  - docker build -t figonzal/udelvd-api:0.3-prod -f api.DockerFile . 
-  - docker build -t figonzal/mysql:0.3-prod -f mysql.DockerFile .
+  - docker build -t figonzal/udelvd-api:0.3-dev -f api.DockerFile . 
+  - docker build -t figonzal/mysql:0.3-dev -f mysql.DockerFile .
   - docker network create RED_UDELVD
-  - docker run -d --name udelvd-api-test -p 80:80 --network RED_UDELVD figonzal/udelvd-api:0.3-prod
+  - docker run -d --name udelvd-api-test -p 80:80 --network RED_UDELVD figonzal/udelvd-api:0.3-dev
   - docker run --name owasp --network RED_UDELVD -v "$(pwd):/zap/wrk/:rw" -t owasp/zap2docker-weekly zap-full-scan.py -t http://udelvd-api-test/ -c gen_file
   - sleep 15
 
 after_success:
-  - docker push figonzal/udelvd-api:0.3-prod
-  - docker push figonzal/mysql:0.3-prod
+  - docker push figonzal/udelvd-api:0.3-dev
+  - docker push figonzal/mysql:0.3-dev
   
