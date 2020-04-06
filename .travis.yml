@@ -29,3 +29,6 @@ after_success:
   - docker push figonzal/udelvd-api:0.3-prod
   - docker push figonzal/mysql:0.3-prod
   
+branches:
+  only:
+  - udelvd.tk
