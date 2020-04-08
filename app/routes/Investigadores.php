@@ -663,7 +663,8 @@ $app->post('/investigadores/recuperar/{email}/idioma/{idioma}', function ($reque
             $dynamicLink = crearDynamicLink();
 
             if ($dynamicLink != false) {
-                $status = sendEmail($investigador, $dynamicLink, $idioma);
+                $email = new Email();
+                $status = $email->sendEmailRecuperar($investigador, $dynamicLink, $idioma);
 
                 if (!$status) {
                     $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Send mail problem', 'Email with dynamic link has not been send');
@@ -740,6 +741,9 @@ $app->patch('/investigadores/{id}/activar', function ($request, $response, $args
         } else {
 
             $investigador = $object->buscarInvestigadorPorId($conn);
+
+            $email = new Email();
+            $email->sendEmailActivation($investigador);
 
             //Formatear respuesta
             $payload['data'] = array(
