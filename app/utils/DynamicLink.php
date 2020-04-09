@@ -21,17 +21,17 @@ function crearDynamicLink()
             ->withUnguessableSuffix()
             ->withAndroidInfo(
                 AndroidInfo::new()
-                    ->withFallbackLink('https://udelvd-dev.herokuapp.com')
+                    ->withFallbackLink('https://undiaenlavidade.cl')
                     ->withPackageName('cl.udelvd')
             );
 
         $link = $dynamicLinks->createDynamicLink($action);
 
         $uriString = (string) $link;
-
+        error_log("Create dynamic link:" . $uriString, 0);
         return $uriString;
     } catch (FailedToCreateDynamicLink $e) {
-        error_log("Failed to create dynamic link:" . $e->getMessage(),0);
+        error_log("Failed to create dynamic link:" . $e->getMessage(), 0);
         return false;
     }
 }

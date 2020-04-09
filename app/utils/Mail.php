@@ -66,6 +66,7 @@ class Email
 
 
             $this->mail->send();
+            error_log("Email sended to: " . $investigador['email'], 0);
             return true;
         } catch (Exception $e) {
             error_log("Failed to send email: " . $e->getMessage(), 0);
@@ -92,6 +93,7 @@ class Email
             $this->buildBody("activation", $saludo, $mensaje, $footer, null, null);
 
             $this->mail->send();
+            error_log("Email sended to: " . $investigador['email'], 0);
             return true;
         } catch (Exception $e) {
             error_log("Failed to send email: " . $e->getMessage(), 0);

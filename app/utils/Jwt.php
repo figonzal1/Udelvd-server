@@ -28,7 +28,7 @@ class Jwt
         $time = time();
         $expiration_date = strtotime("next sunday 01:00");  //Sunday 01:00 AM
         $token = (new Builder())
-            ->issuedBy('http://udelvd.cl') // Configures the issuer (iss claim)
+            ->issuedBy('https://undiaenlavidade.cl') // Configures the issuer (iss claim)
             ->permittedFor('android') // Configures the audience (aud claim)
             ->identifiedBy(getenv("JWT_JTI")) // Configures the id (jti claim), replicating as a header item
             ->issuedAt($time) // Configures the time that the token was issue (iat claim)
@@ -75,7 +75,7 @@ class Jwt
 
             //Datos para valicacion
             $data = new ValidationData();
-            $data->setIssuer("http://udelvd.cl");
+            $data->setIssuer("https://undiaenlavidade.cl");
             $data->setAudience("android");
             $data->setId(getenv("JWT_JTI"));
 

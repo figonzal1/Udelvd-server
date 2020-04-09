@@ -40,6 +40,6 @@ $ openssl x509 -req -in client-req.pem -days 3600 -CA ca.pem -CAkey ca-key.pem -
 
 ## Encriptación datos sensibles - Travis
 ````sh
-$ tar -czvf encrypt.tar.gz proxy-files/ssl/ mysql-files/ .env udelvd-server-credentials.json 
+$ tar -czvf encrypt.tar.gz api-files/server-key.pem api-files/server.pem mysql-files/ .env udelvd-server-credentials.json
 $ travis encrypt-file encrypt.tar.gz --pro
 ````
