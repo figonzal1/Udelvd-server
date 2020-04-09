@@ -742,8 +742,10 @@ $app->patch('/investigadores/{id}/activar', function ($request, $response, $args
 
             $investigador = $object->buscarInvestigadorPorId($conn);
 
-            $email = new Email();
-            $email->sendEmailActivation($investigador);
+            if ($patchdata['activado'] == 1) {
+                $email = new Email();
+                $email->sendEmailActivation($investigador);
+            }
 
             //Formatear respuesta
             $payload['data'] = array(
