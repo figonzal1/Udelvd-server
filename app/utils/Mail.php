@@ -48,14 +48,14 @@ class Email
             if ($idioma == "es") {
                 $titulo = "Recuperación de cuenta";
                 $saludo = "¡Hola " . $investigador['nombre'] . " " . $investigador['apellido'] . "!";
-                $mensaje = "Parece que has olvidado tu contraseña. Para reestablecerla, haz click en el botón de abajo.";
+                $mensaje = "Parece que has olvidado tu contraseña. Para reestablecerla, haz click en el botón de abajo desde el celular.";
                 $footer = "Gracias,<br>
             Administración, App - Un Día en la Vida de ...";
                 $boton = "Reestablecer contraseña";
             } else if ($idioma == "en") {
                 $titulo = "Account recovery";
                 $saludo = "Hello " . $investigador['nombre'] . " " . $investigador['apellido'] . "!";
-                $mensaje = "You seem to have forgotten your password. To reset it, click the button below.";
+                $mensaje = "You seem to have forgotten your password. To reset it, click the button below from your phone.";
                 $footer = "Thanks,<br>
             Administration, App - A day in the life of ...";
                 $boton = "Reset password";
