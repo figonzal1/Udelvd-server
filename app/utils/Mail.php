@@ -26,13 +26,13 @@ class Email
         $this->mail->isSMTP();                                            // Send using SMTP
         $this->mail->Host       = 'smtp.gmail.com';                       // Set the SMTP server to send through
         $this->mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-        $this->mail->Username   = 'felipe.gonzalezalarcon94@gmail.com';   // SMTP username
+        $this->mail->Username   = 'undiaenlavidade.cl@gmail.com';   // SMTP username
         $this->mail->Password   = getenv('GOOGLE_PASSWORD_EMAIL');        // SMTP password
         $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` also accepted
         $this->mail->Port       = 587;                                    // TCP port to connect to
 
         //Recipients
-        $this->mail->setFrom('felipe.gonzalezalarcon94@gmail.com', 'App - UDELVD');
+        $this->mail->setFrom('undiaenlavidade.cl@gmail.com', 'App - UDELVD');
     }
 
 

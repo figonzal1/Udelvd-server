@@ -490,7 +490,7 @@ INSERT INTO
 VALUES
   (
     1,
-    'https://udelvd-dev.herokuapp.com/img/smiley.png',
+    'https://undiaenlavidade.cl/img/smiley.png',
     'Emoticon que describe felicidad',
     'Emoticon that describes happiness',
     '2020-01-10 02:03:00',
@@ -498,7 +498,7 @@ VALUES
   ),
   (
     2,
-    'https://udelvd-dev.herokuapp.com/img/sad.png',
+    'https://undiaenlavidade.cl/img/sad.png',
     'Emoticon que describe tristeza',
     'Emoticon that describes sadness',
     '2020-01-10 02:03:00',
@@ -506,7 +506,7 @@ VALUES
   ),
   (
     3,
-    'https://udelvd-dev.herokuapp.com/img/afraid.png',
+    'https://undiaenlavidade.cl/img/afraid.png',
     'Emoticon que describe miedo',
     'Emoticon that describes fear',
     '2020-01-08 01:07:00',
@@ -514,7 +514,7 @@ VALUES
   ),
   (
     4,
-    'https://udelvd-dev.herokuapp.com/img/angry.png',
+    'https://undiaenlavidade.cl/img/angry.png',
     'Emoticon que describe enojo',
     'Emoticon that describes anger',
     '2020-01-10 02:03:00',

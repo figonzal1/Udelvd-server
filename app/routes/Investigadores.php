@@ -59,7 +59,7 @@ $app->get('/investigadores', function ($request, $response, $args) {
     //Desconectar mysql
     $mysql_adapter->disconnect();
     return $response;
-});
+})->add(new JwtMiddleware()); 
 
 //* REGISTRO INVSTIGADOR
 $app->post('/investigadores', function ($request, $response, $args) {
