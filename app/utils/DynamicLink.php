@@ -12,7 +12,7 @@ function crearDynamicLink()
         ->withServiceAccount('../udelvd-server-credentials.json');
 
 
-    $dynamicLinksDomain = 'https://udelvd.page.link';
+    $dynamicLinksDomain = 'https://undiaenlavidade.page.link';
     $dynamicLinks = $factory->createDynamicLinksService($dynamicLinksDomain);
 
     try {
