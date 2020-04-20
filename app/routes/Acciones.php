@@ -1,9 +1,9 @@
 <?php
 
-/**
- * GET /acciones: Listado de acciones del sistema
- */
-$app->get('/acciones[/]', function ($request, $response, $args) {
+//* Listado de acciones del sistema segun IDIOMA
+$app->get('/acciones/idioma/{idioma}', function ($request, $response, $args) {
+
+    $idioma = $args['idioma'];
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -11,7 +11,7 @@ $app->get('/acciones[/]', function ($request, $response, $args) {
 
     $payload = array(
         'links' => array(
-            'self' => "/acciones"
+            'self' => "/acciones/idioma/" . $idioma
         ),
         'data' => array()
     );
@@ -25,13 +25,19 @@ $app->get('/acciones[/]', function ($request, $response, $args) {
         //Preparar respuesta
         foreach ($listado as $key => $value) {
 
+            if ($idioma == "es") {
+                $nombre = $value['nombre_es'];
+            } else if ($idioma == "en") {
+                $nombre = $value['nombre_en'];
+            }
+
             array_push(
                 $payload['data'],
                 array(
                     'type' => 'acciones',
                     'id' => $value['id'],
                     'attributes' => array(
-                        'nombre' => $value['nombre']
+                        'nombre' => $nombre
                     )
                 )
             );
@@ -51,48 +57,36 @@ $app->get('/acciones[/]', function ($request, $response, $args) {
     return $response;
 })->add(new JwtMiddleware());
 
+//* Listado de acciones del sistema (INGLES & ESPAÑOL)
+$app->get('/acciones', function ($request, $response, $args) {
 
-/**
- * GET /acciones/{id}: Obtener acciones segun id
- */
-$app->get('/acciones/{id}', function ($request, $response, $args) {
-
-    $id_accion = $args['id'];
-
-    //conectar bd
     $mysql_adapter = new MysqlAdapter();
     $conn = $mysql_adapter->connect();
 
-
     $payload = array(
         'links' => array(
-            'self' => "/acciones/" . $id_accion
-        )
+            'self' => "/acciones"
+        ),
+        'data' => array()
     );
 
-    if (!is_numeric($id_accion)) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
-        $response = $response->withStatus(400);
-    } else if ($conn != null) {
-
+    if ($conn != null) {
         //Buscar acciones
         $object = new Acciones();
-        $object->setId($id_accion);
+        $listado = $object->buscarTodos($conn);
 
-        $acciones = $object->buscarAccion($conn);
+        //Preparar respuesta
+        foreach ($listado as $key => $value) {
 
-        //Si investigador no existe
-        if (empty($acciones)) {
-            $payload['data'] = array();
-        }
-
-        //Si el investigador existe
-        else {
-            $payload['data'] = array(
-                'type' => 'acciones',
-                'id' => $acciones['id'],
-                'attributes' => array(
-                    'nombre' => $acciones['nombre']
+            array_push(
+                $payload['data'],
+                array(
+                    'type' => 'acciones',
+                    'id' => $value['id'],
+                    'attributes' => array(
+                        'nombre_es' => $value['nombre_es'],
+                        'nombre_en' => $value['nombre_en']
+                    )
                 )
             );
         }
@@ -101,25 +95,23 @@ $app->get('/acciones/{id}', function ($request, $response, $args) {
         $response = $response->withStatus(500);
     }
 
+    //Encodear resultado
     $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
     $response->getBody()->write($payload);
 
     //Desconectar mysql
     $mysql_adapter->disconnect();
-
     return $response;
 })->add(new JwtMiddleware());
 
-//TODO: PENDIENTE POR VERIFICAR
-/**
- * POST /acciones: Crear una accion
- */
+//* Crear una accion
 $app->post('/acciones', function ($request, $response, $args) {
 
     //Seccion link self
     $payload = array(
         'links' => array(
-            'self' => '/investigadores'
+            'self' => '/acciones'
         )
     );
 
@@ -133,15 +125,20 @@ $app->post('/acciones', function ($request, $response, $args) {
     /**
      * VALIDACION PARAMETROS
      */
-    if (!isset($data['nombre']) || empty($data['nombre'])) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre is empty');
+    if (!isset($data['nombre_es']) || empty($data['nombre_es'])) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre_es is empty');
+        $response = $response->withStatus(400);
+    }
+    if (!isset($data['nombre_en']) || empty($data['nombre_en'])) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre_en is empty');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
 
         //Agregar accion
 
         $object = new Acciones();
-        $object->setNombre(htmlspecialchars($data['nombre']));
+        $object->setNombreEs(htmlspecialchars($data['nombre_es']));
+        $object->setNombreEn(htmlspecialchars($data['nombre_en']));
 
         $lastid = $object->agregar($conn);
 
@@ -151,14 +148,16 @@ $app->post('/acciones', function ($request, $response, $args) {
             $response = $response->withStatus(500);
         } else {
             $object->setId($lastid);
-            $acciones = $object->buscarAccion($conn);
+            $accion = $object->buscarAccion($conn);
 
             //Formatear respuesta
             $payload['data'] = array(
                 'type' => 'investigadores',
-                'id' => $acciones['id'],
+                'id' => $accion['id'],
                 'attributes' => array(
-                    'nombre' => $acciones['nombre']
+                    'nombre_es' => $accion['nombre_es'],
+                    'nombre_en' => $accion['nombre_en'],
+                    'create_time' => $accion['create_time']
                 )
             );
 
@@ -179,15 +178,12 @@ $app->post('/acciones', function ($request, $response, $args) {
     $mysql_adapter->disconnect();
 
     return $response;
-});
+})->add(new JwtMiddleware());
 
-//TODO: PENDIENTE POR VERIFICAR
-/**
- * PUT /acciones/{id}: Editar una accion
- */
-$app->put('/acciones/{id}', function ($request, $response, $args) {
+//* Editar o actualizar una accion
+$app->put('/acciones/{id_accion}', function ($request, $response, $args) {
 
-    $id_accion = $args['id'];
+    $id_accion = $args['id_accion'];
 
     //Seccion link self
     $payload = array(
@@ -205,15 +201,20 @@ $app->put('/acciones/{id}', function ($request, $response, $args) {
     $mysql_adapter = new MysqlAdapter();
     $conn = $mysql_adapter->connect();
 
-    if (!isset($putdata['nombre']) || empty($putdata['nombre'])) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre is empty');
+    if (!isset($putdata['nombre_es']) || empty($putdata['nombre_es'])) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre_es is empty');
+        $response = $response->withStatus(400);
+    }
+    if (!isset($putdata['nombre_en']) || empty($putdata['nombre_en'])) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre_en is empty');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
 
         //Agregar accion
         $object = new Acciones();
         $object->setId(htmlspecialchars($id_accion));
-        $object->setNombre(htmlspecialchars($putdata['nombre']));
+        $object->setNombreEs(htmlspecialchars($putdata['nombre_es']));
+        $object->setNombreEn(htmlspecialchars($putdata['nombre_en']));
 
         //Actualizar investigador
         $actualizar = $object->actualizar($conn);
@@ -231,7 +232,9 @@ $app->put('/acciones/{id}', function ($request, $response, $args) {
                 'type' => 'investigadores',
                 'id' => $acciones['id'],
                 'attributes' => array(
-                    'nombre' => $acciones['nombre']
+                    'nombre_es' => $acciones['nombre_es'],
+                    'nombre_en' => $acciones['nombre_en'],
+                    'update_time' => $acciones['update_time']
                 )
             );
 
@@ -252,15 +255,12 @@ $app->put('/acciones/{id}', function ($request, $response, $args) {
     $mysql_adapter->disconnect();
 
     return $response;
-});
+})->add(new JwtMiddleware());
 
-//TODO: PENDIENTE POR VERIFICAR
-/**
- * DELETE /acciones/{id}: Eliminar una accion
- */
-$app->delete('/acciones/{id}', function ($request, $response, $args) {
+//* Eliminar una accion
+$app->delete('/acciones/{id_accion}', function ($request, $response, $args) {
 
-    $id_accion = $args['id'];
+    $id_accion = $args['id_accion'];
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -298,4 +298,4 @@ $app->delete('/acciones/{id}', function ($request, $response, $args) {
     $mysql_adapter->disconnect();
 
     return $response;
-});
+})->add(new JwtMiddleware());

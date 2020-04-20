@@ -1,0 +1,34 @@
+language: php
+dist: trusty
+php: 7.3
+
+services:
+  - docker
+
+cache:
+  directories:
+    - $HOME/.m2
+
+before_install:
+  - openssl aes-256-cbc -K $encrypted_b9929ad0dae9_key -iv $encrypted_b9929ad0dae9_iv -in encrypt.tar.gz.enc -out encrypt.tar.gz -d
+  - tar xzvf encrypt.tar.gz
+
+install:
+  #Docker login
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+script: 
+  - docker build -t figonzal/udelvd-api:0.3-prod -f api.DockerFile . 
+  - docker build -t figonzal/mysql:0.3-prod -f mysql.DockerFile .
+  - docker network create RED_UDELVD
+  - docker run -d --name udelvd-api-test -p 80:80 --network RED_UDELVD figonzal/udelvd-api:0.3-prod
+  - docker run --name owasp --network RED_UDELVD -v "$(pwd):/zap/wrk/:rw" -t owasp/zap2docker-weekly zap-full-scan.py -t http://udelvd-api-test/ -c gen_file
+  - sleep 15
+
+after_success:
+  - docker push figonzal/udelvd-api:0.3-prod
+  - docker push figonzal/mysql:0.3-prod
+  
+branches:
+  only:
+  - udelvd.tk

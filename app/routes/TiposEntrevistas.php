@@ -1,16 +1,16 @@
 <?php
 
-/**
- * GET /tiposEntrevistas: Listado de tipos de entrevistas del sistema
- */
-$app->get("/tiposEntrevistas[/]",function($request,$response,$args){
+//* Listado de tipos de entrevistas del sistema
+$app->get("/tiposEntrevistas/idioma/{idioma}", function ($request, $response, $args) {
+
+    $idioma = $args['idioma'];
 
     $mysql_adapter = new MysqlAdapter();
     $conn = $mysql_adapter->connect();
 
     $payload = array(
         'links' => array(
-            'self' => "/tiposEntrevistas"
+            'self' => "/tiposEntrevistas/" . $idioma
         ),
         'data' => array()
     );
@@ -24,13 +24,19 @@ $app->get("/tiposEntrevistas[/]",function($request,$response,$args){
         //Preparar respuesta
         foreach ($listado as $key => $value) {
 
+            if ($idioma == "es") {
+                $nombre_idioma = $value['nombre_es'];
+            } else if ($idioma == "en") {
+                $nombre_idioma = $value['nombre_en'];
+            }
+
             array_push(
                 $payload['data'],
                 array(
                     'type' => 'tiposEntrevistas',
                     'id' => $value['id'],
                     'attributes' => array(
-                        'nombre' => $value['nombre']
+                        'nombre' => $nombre_idioma
                     )
                 )
             );
@@ -48,4 +54,4 @@ $app->get("/tiposEntrevistas[/]",function($request,$response,$args){
     //Desconectar mysql
     $mysql_adapter->disconnect();
     return $response;
-});
+})->add(new JwtMiddleware());

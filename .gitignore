@@ -1,3 +1,9 @@
 .env
 vendor/*
 udelvd-server-credentials.json
+encrypt.tar.gz
+
+#CERTS
+api-files/*.pem
+mysql-files/*.pem
+*.pem

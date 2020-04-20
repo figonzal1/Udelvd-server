@@ -1,9 +1,9 @@
 <?php
 
-/**
- * GET /nivelesEducacionales: Listado de niveles educacionales del sistema
- */
-$app->get("/nivelesEducacionales[/]", function ($request, $response, $args) {
+//* Listado de niveles educacionales del sistema
+$app->get("/nivelesEducacionales/idioma/{idioma}", function ($request, $response, $args) {
+
+    $idioma = $args['idioma'];
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -11,7 +11,7 @@ $app->get("/nivelesEducacionales[/]", function ($request, $response, $args) {
 
     $payload = array(
         'links' => array(
-            'self' => "/nivelesEducacionales"
+            'self' => "/nivelesEducacionales/" . $idioma
         ),
         'data' => array()
     );
@@ -25,13 +25,19 @@ $app->get("/nivelesEducacionales[/]", function ($request, $response, $args) {
         //Preparar respuesta
         foreach ($listado as $key => $value) {
 
+            if ($idioma == "es") {
+                $nombre_idioma = $value['nombre_es'];
+            } else if ($idioma == "en") {
+                $nombre_idioma = $value['nombre_en'];
+            }
+
             array_push(
                 $payload['data'],
                 array(
                     'type' => 'nivelesEducacionales',
                     'id' => $value['id'],
                     'attributes' => array(
-                        'nombre' => $value['nombre']
+                        'nombre' => $nombre_idioma
                     )
                 )
             );
@@ -49,4 +55,4 @@ $app->get("/nivelesEducacionales[/]", function ($request, $response, $args) {
     //Desconectar mysql
     $mysql_adapter->disconnect();
     return $response;
-});
+})->add(new JwtMiddleware());

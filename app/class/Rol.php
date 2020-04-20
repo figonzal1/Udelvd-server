@@ -1,28 +1,30 @@
 <?php
 
 
-class Rol {
+class Rol
+{
 
     private $id;
     private $nombre;
 
 
 
-    function buscarRolPorNombre($conn){
+    function buscarRolPorNombre($conn)
+    {
 
-        try{
+        try {
 
             $stmt = $conn->prepare(
                 "SELECT * FROM rol WHERE nombre=?"
             );
 
-            $stmt -> execute(array($this->nombre));
+            $stmt->execute(array($this->nombre));
 
-            $rol = $stmt ->fetch(PDO::FETCH_ASSOC);
+            $rol = $stmt->fetch(PDO::FETCH_ASSOC);
 
             return $rol;
-        }catch(PDOException $e){
-            echo "Fail search rol: ".$e->getMessage();
+        } catch (PDOException $e) {
+            error_log("Fail search rol:" . $e->getMessage(), 0);
             return false;
         }
     }
@@ -30,19 +32,23 @@ class Rol {
     /**
      * GETTERS & SETTERS
      */
-    function setId($id){
-        $this->id=$id;
+    function setId($id)
+    {
+        $this->id = $id;
     }
 
-    function setNombre($nombre){
-        $this->nombre=$nombre;
+    function setNombre($nombre)
+    {
+        $this->nombre = $nombre;
     }
 
-    function getId(){
+    function getId()
+    {
         return $this->id;
     }
 
-    function getNombre(){
+    function getNombre()
+    {
         return $this->nombre;
     }
 }

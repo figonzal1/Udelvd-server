@@ -1,5 +1,16 @@
 <?php
 
+date_default_timezone_set('America/Santiago');
+header('Cache-Control: no-cache');
+header('X-Content-Type-Options: nosniff');
+header('Content-type: application/json; charset=UTF-8');
+header('Access-Control-Allow-Methods: GET,POST,PUT,DELETE');
+header('X-Frame-Options: DENY');
+header("X-XSS-Protection: 1; mode=block");
+header("Content-Security-Policy: frame-ancestors 'none'; default-src 'none'; script-src 'none'; connect-src 'none'; img-src https:; style-src 'self' 'unsafe-hashes' 'sha256-kFFSyb/hkPlXQ8hJVUNQl6uhREsufccdstyT9tWK+04=';frame-src 'none';");
+header("Referrer-Policy: no-referrer");
+header("Feature-Policy: camera 'none'; fullscreen 'none'; geolocation 'none'; microphone 'none';");
+
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
@@ -35,6 +46,7 @@ require_once("../app/class/TipoEntrevista.php");
 require_once("../app/utils/Jwt.php");
 require_once("../app/utils/DynamicLink.php");
 require_once("../app/utils/Mail.php");
+require_once("../app/utils/Notificacion.php");
 
 /**
  * MIDDLEWARE
@@ -45,17 +57,6 @@ require_once("../app/middleware/JwtMiddleware.php");
  * UTILS
  */
 require_once("../app/utils/ErrorJsonHandler.php");
-
-date_default_timezone_set('America/Santiago');
-header('Cache-Control: no-cache');
-header('X-Content-Type-Options: nosniff');
-header('Content-type: application/json; charset=UTF-8');
-header('Access-Control-Allow-Methods: GET,POST,PUT,DELETE');
-header('X-Frame-Options: DENY');
-header("X-XSS-Protection: 1; mode=block");
-header("Content-Security-Policy: default-src 'none'; script-src 'none'; connect-src 'none'; img-src 'none'; style-src 'none';");
-header("Referrer-Policy: no-referrer");
-header("Feature-Policy: camera 'none'; fullscreen 'none'; geolocation 'none'; microphone 'none';");
 
 $app = AppFactory::create();
 
@@ -73,11 +74,21 @@ $app->addRoutingMiddleware();
  * Note: This middleware should be added last. It will not handle any exceptions/errors
  * for middleware added after it.
  */
-$errorMiddleware = $app->addErrorMiddleware(true, false, false);
+
+/**
+ * DEV MODE
+ */
+#$errorMiddleware = $app->addErrorMiddleware(true, true, true);
+
+/**
+ * PROD MODE
+ */
+$errorMiddleware = $app->addErrorMiddleware(false, true, true);
 
 /**
  * RUTAS
  */
+require("../app/routes/Home.php");
 require("../app/routes/Acciones.php");
 require("../app/routes/Emoticones.php");
 require("../app/routes/Entrevistas.php");

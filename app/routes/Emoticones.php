@@ -1,9 +1,9 @@
 <?php
 
-/**
- * GET /emoticones: Listado de emoticones del sistema
- */
-$app->get('/emoticones[/]', function ($request, $response, $args) {
+//* Listado de emoticones del sistema
+$app->get('/emoticones/idioma/{idioma}', function ($request, $response, $args) {
+
+    $idioma = $args['idioma'];
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -11,7 +11,7 @@ $app->get('/emoticones[/]', function ($request, $response, $args) {
 
     $payload = array(
         'links' => array(
-            'self' => "/emoticones"
+            'self' => "/emoticones/" . $idioma
         ),
         'data' => array()
     );
@@ -24,6 +24,12 @@ $app->get('/emoticones[/]', function ($request, $response, $args) {
         //Preparar respuesta
         foreach ($listado as $key => $value) {
 
+            if ($idioma == 'es') {
+                $descripcion = $value['descripcion_es'];
+            } else if ($idioma == 'en') {
+                $descripcion = $value['descripcion_en'];
+            }
+
             array_push(
                 $payload['data'],
                 array(
@@ -31,7 +37,7 @@ $app->get('/emoticones[/]', function ($request, $response, $args) {
                     'id' => $value['id'],
                     'attributes' => array(
                         'url' => $value['url'],
-                        'descripcion' => $value['descripcion']
+                        'descripcion' => $descripcion
                     )
                 )
             );
@@ -48,12 +54,13 @@ $app->get('/emoticones[/]', function ($request, $response, $args) {
     //Desconectar mysql
     $mysql_adapter->disconnect();
     return $response;
-});
+})->add(new JwtMiddleware());
 
-/**
- * GET /emoticones/{id}: Obtener emoticones segun id
- */
-$app->get('/emoticones/{id}', function ($request, $response, $args) {
+//TODO: REVISAR e implementar en android
+//* Obtener emoticones segun id
+/*$app->get('/emoticones/{id}/idioma/{idioma}', function ($request, $response, $args) {
+
+    $idioma = $args['idioma'];
 
     $id_emoticon = $args['id'];
 
@@ -63,7 +70,7 @@ $app->get('/emoticones/{id}', function ($request, $response, $args) {
 
     $payload = array(
         'links' => array(
-            'self' => "/emoticones/" . $id_emoticon
+            'self' => "/emoticones/" . $id_emoticon . "/" . $idioma
         )
     );
 
@@ -84,13 +91,20 @@ $app->get('/emoticones/{id}', function ($request, $response, $args) {
 
         //Si el emoticon existe
         else {
+
+            if ($idioma == 'es') {
+                $descripcion = $emoticon['descripcion_es'];
+            } else if ($idioma == 'en') {
+                $descripcion = $emoticon['descripcion_en'];
+            }
+
             //Formatear respuesta
             $payload['data'] = array(
                 'type' => 'emoticones',
                 'id' => $emoticon['id'],
                 'attributes' => array(
                     'url' => $emoticon['url'],
-                    'descripcion' => $emoticon['descripcion']
+                    'descripcion' => $descripcion
                 )
             );
         }
@@ -106,12 +120,11 @@ $app->get('/emoticones/{id}', function ($request, $response, $args) {
     $mysql_adapter->disconnect();
 
     return $response;
-});
+});*/
 
-/**
- * POST /emoticones: Crear emoticones
- */
-$app->post('/emoticones', function ($request, $response, $args) {
+//TODO: REVISAR e implementar en android , agregar soporte idioma
+//* Crear emoticones
+/*$app->post('/emoticones', function ($request, $response, $args) {
 
     //Seccion link self
     $payload = array(
@@ -130,7 +143,7 @@ $app->post('/emoticones', function ($request, $response, $args) {
     /**
      * VALIDACION PARAMETROS
      */
-    if (!isset($data['url']) || empty($data['url'])) {
+    /*if (!isset($data['url']) || empty($data['url'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Url is empty');
         $response = $response->withStatus(400);
     } else if (!isset($data['descripcion']) || empty($data['descripcion'])) {
@@ -182,12 +195,11 @@ $app->post('/emoticones', function ($request, $response, $args) {
     $mysql_adapter->disconnect();
 
     return $response;
-});
+});*/
 
-/**
- * PUT /emoticones/{id}: Editar un emoticon
- */
-$app->put('/emoticones/{id}', function ($request, $response, $args) {
+//TODO: Revisar e implentar en android, agregar soporte idioma
+//* Editar un emoticon
+/*$app->put('/emoticones/{id}', function ($request, $response, $args) {
 
     $id_emoticon = $args['id'];
 
@@ -210,7 +222,7 @@ $app->put('/emoticones/{id}', function ($request, $response, $args) {
     /**
      * VALIDACION PARAMETROS
      */
-    if (!isset($id_emoticon) || empty($id_emoticon) || !is_numeric($id_emoticon)) {
+    /*if (!isset($id_emoticon) || empty($id_emoticon) || !is_numeric($id_emoticon)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
     } else if (!isset($putdata['url']) || empty($putdata['url'])) {
@@ -265,12 +277,11 @@ $app->put('/emoticones/{id}', function ($request, $response, $args) {
     $mysql_adapter->disconnect();
 
     return $response;
-});
+});*/
 
-/**
- * DELETE /emoticones/{id}: Eliminar un emoticon
- */
-$app->delete('/emoticones/{id}', function ($request, $response, $args) {
+//TODO: Revisar e implementar en android, agregar soporte de idioma
+//* Eliminar un emoticon
+/*$app->delete('/emoticones/{id}', function ($request, $response, $args) {
 
     $id_emoticon = $args['id'];
 
@@ -311,4 +322,4 @@ $app->delete('/emoticones/{id}', function ($request, $response, $args) {
     $mysql_adapter->disconnect();
 
     return $response;
-});
+});*/

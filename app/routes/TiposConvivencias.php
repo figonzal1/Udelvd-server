@@ -1,16 +1,17 @@
 <?php
 
-/**
- * GET /tiposConvivencias: Listado de tipos de convivencias del sistema
- */
-$app->get("/tiposConvivencias[/]", function ($request, $response, $args) {
+//* Listado de tipos de convivencias del sistema
+$app->get("/tiposConvivencias/idioma/{idioma}", function ($request, $response, $args) {
+
+    $idioma = $args['idioma'];
+
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
     $conn = $mysql_adapter->connect();
 
     $payload = array(
         'links' => array(
-            'self' => "/tiposConvivencias"
+            'self' => "/tiposConvivencias/" . $idioma
         ),
         'data' => array()
     );
@@ -24,13 +25,19 @@ $app->get("/tiposConvivencias[/]", function ($request, $response, $args) {
         //Preparar respuesta
         foreach ($listado as $key => $value) {
 
+            if ($idioma == "es") {
+                $nombre_idioma = $value['nombre_es'];
+            } else if ($idioma == "en") {
+                $nombre_idioma = $value['nombre_en'];
+            }
+
             array_push(
                 $payload['data'],
                 array(
                     'type' => 'tiposConvivencias',
                     'id' => $value['id'],
                     'attributes' => array(
-                        'nombre' => $value['nombre']
+                        'nombre' => $nombre_idioma
                     )
                 )
             );
@@ -48,4 +55,4 @@ $app->get("/tiposConvivencias[/]", function ($request, $response, $args) {
     //Desconectar mysql
     $mysql_adapter->disconnect();
     return $response;
-});
+})->add(new JwtMiddleware());

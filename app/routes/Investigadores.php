@@ -1,6 +1,6 @@
 <?php
 
-//Listado de investigadores del sistema
+//* Listado de investigadores del sistema
 $app->get('/investigadores', function ($request, $response, $args) {
 
     //Conectar BD
@@ -59,10 +59,13 @@ $app->get('/investigadores', function ($request, $response, $args) {
     //Desconectar mysql
     $mysql_adapter->disconnect();
     return $response;
-})->add(new JwtMiddleware());
+})->add(new JwtMiddleware()); 
 
-//REGISTRO INVSTIGADOR
+//* REGISTRO INVSTIGADOR
 $app->post('/investigadores', function ($request, $response, $args) {
+
+    //? CONFIGURACION DE ACTIVACION AUTOMATICA
+    $activacion_automatica = 1;
 
     //Seccion link self
     $payload = array(
@@ -108,12 +111,11 @@ $app->post('/investigadores', function ($request, $response, $args) {
         $object->setEmail(htmlspecialchars(strtolower($data['email'])));
         $object->setNombreRol(htmlspecialchars(ucfirst($data['nombre_rol'])));
         $object->setPassword($data['password']);
-        $object->setActivado(0);
+        $object->setActivado($activacion_automatica);
 
-        $existente = $object->buscarInvestigadorPorEmail($conn);
+        $investigador = $object->buscarInvestigadorPorEmail($conn);
 
-        //Si el correo existe
-        if ($existente != null || $existente) {
+        if ($investigador != null) {
             //Lanzar error de email
             $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Email problem', 'Email already exists');
             $response = $response->withStatus(500);
@@ -129,6 +131,10 @@ $app->post('/investigadores', function ($request, $response, $args) {
 
                 $object->setId($lastid);
                 $investigador = $object->buscarInvestigadorPorId($conn);
+
+                if ($activacion_automatica == "0") {
+                    enviarNotificacion($investigador);
+                }
 
                 //Formatear respuesta
                 $payload['data'] = array(
@@ -171,7 +177,7 @@ $app->post('/investigadores', function ($request, $response, $args) {
     return $response;
 });
 
-//RESETEAR CONTRASEÑA INVESTIGADOR
+//* RESETEAR CONTRASEÑA INVESTIGADOR
 $app->put('/investigadores/resetear', function ($request, $response, $args) {
 
 
@@ -248,7 +254,7 @@ $app->put('/investigadores/resetear', function ($request, $response, $args) {
     return $response;
 });
 
-//Logear en el sistema
+//* Logear en el sistema
 $app->post('/investigadores/login', function ($request, $response, $args) {
 
     $payload = array(
@@ -299,8 +305,6 @@ $app->post('/investigadores/login', function ($request, $response, $args) {
                 $payload = ErrorJsonHandler::lanzarError($payload, 403, 'Login problem', 'Please check your credentials');
                 $response = $response->withStatus(403);
             } else {
-
-                //TODO: Verificar si investigador esta activado
 
                 //Generar token
                 $jwt = new Jwt();
@@ -355,7 +359,85 @@ $app->post('/investigadores/login', function ($request, $response, $args) {
     return $response;
 });
 
-//Obtener investigador segun id
+//* Obtener listado de investigadores para admin
+$app->get('/investigadores/pagina/{n_pag}/id_admin/{id_admin}', function ($request, $response, $args) {
+
+    $id_admin = $args['id_admin'];
+    $n_pag = $args['n_pag'];
+
+    //Conectar BD
+    $mysql_adapter = new MysqlAdapter();
+    $conn = $mysql_adapter->connect();
+
+    $payload = array(
+        'links' => array(
+            'self' => "/investigadores/pagina/" . $n_pag . "/id_admin/" . $id_admin
+        ),
+        'data' => array()
+    );
+
+    if (!isset($id_admin) || empty($id_admin) || !is_numeric($id_admin)) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'id admin must be integer');
+        $response = $response->withStatus(400);
+    } else if ($conn != null) {
+        //Buscar investigadores
+        $object = new Investigador();
+        $object->setId($id_admin);
+        $listado = $object->buscarPagina($conn, $n_pag);
+
+        $conteo = $object->contarInvestigadores($conn);
+
+        //Preparar respuesta
+        foreach ($listado as $key => $value) {
+
+            array_push(
+                $payload['data'],
+                array(
+                    'type' => 'investigadores',
+                    'id' => $value['id'],
+                    'attributes' => array(
+                        'nombre' => $value['nombre'],
+                        'apellido' => $value['apellido'],
+                        'email' => $value['email'],
+                        'id_rol' => $value['id_rol'],
+                        'activado' => $value['activado'],
+                        'create_time' => $value['create_time']
+                    ),
+                    'relationships' => array(
+                        'rol' => array(
+                            'data' => array(
+                                'id' => $value['id_rol'],
+                                'nombre' => $value['nombre_rol']
+                            )
+                        )
+                    )
+                )
+            );
+        }
+
+        $payload['investigadores'] = array(
+            'data' => array(
+                'n_investigadores' => $conteo
+            )
+        );
+
+        $response = $response->withStatus(200);
+    } else {
+        $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server connection problem', 'A connection problem ocurred with database');
+        $response = $response->withStatus(500);
+    }
+
+    //Encodear resultado
+    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+    $response->getBody()->write($payload);
+
+    //Desconectar mysql
+    $mysql_adapter->disconnect();
+    return $response;
+})->add(new JwtMiddleware());
+
+//* Obtener investigador segun id
 $app->get('/investigadores/{id}', function ($request, $response, $args) {
 
     $id_investigador = $args['id'];
@@ -424,7 +506,7 @@ $app->get('/investigadores/{id}', function ($request, $response, $args) {
     return $response;
 })->add(new JwtMiddleware());
 
-//EDITAR INVESTIGADOR 
+//* Editar un investigador
 $app->put('/investigadores/{id}', function ($request, $response, $args) {
 
     $id_investigador = $args['id'];
@@ -533,9 +615,10 @@ $app->put('/investigadores/{id}', function ($request, $response, $args) {
     return $response;
 })->add(new JwtMiddleware());
 
-//RECUPERAR CUENTA
-$app->post('/investigadores/recuperar/{email}', function ($request, $response, $args) {
+//* RECUPERAR CUENTA
+$app->post('/investigadores/recuperar/{email}/idioma/{idioma}', function ($request, $response, $args) {
 
+    $idioma = $args['idioma'];
     $email = $args['email'];
 
     //Conectar mysql
@@ -544,7 +627,7 @@ $app->post('/investigadores/recuperar/{email}', function ($request, $response, $
 
     $payload = array(
         'links' => array(
-            'self' => "/investigadores/" . $email
+            'self' => "/investigadores/recuperar/" . $email . "/idioma/" . $idioma
         )
     );
 
@@ -580,7 +663,8 @@ $app->post('/investigadores/recuperar/{email}', function ($request, $response, $
             $dynamicLink = crearDynamicLink();
 
             if ($dynamicLink != false) {
-                $status = sendEmail($investigador, $dynamicLink);
+                $email = new Email();
+                $status = $email->sendEmailRecuperar($investigador, $dynamicLink, $idioma);
 
                 if (!$status) {
                     $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Send mail problem', 'Email with dynamic link has not been send');
@@ -613,12 +697,90 @@ $app->post('/investigadores/recuperar/{email}', function ($request, $response, $
     return $response;
 });
 
+//* Activar - Desactivar Cuenta 
+$app->patch('/investigadores/{id}/activar', function ($request, $response, $args) {
 
+    $id_investigador = $args['id'];
 
+    //Seccion link self
+    $payload = array(
+        'links' => array(
+            'self' => "/investigadores/" . $id_investigador . "/activar"
+        )
+    );
 
-//TODO: PENDIENTE POR REVISAR
-//Eliminar un investigador
-$app->delete('/investigadores/{id}', function ($request, $response, $args) {
+    //Obtener parametros put
+    $data = $request->getBody()->getContents();
+    $patchdata = array();
+    parse_str($data, $patchdata);
+
+    //Conectar BD
+    $mysql_adapter = new MysqlAdapter();
+    $conn = $mysql_adapter->connect();
+
+    if (!isset($patchdata['activado'])) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Activado is empty');
+        $response = $response->withStatus(400);
+    } else if ($patchdata['activado'] != 0 && $patchdata['activado'] != 1) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Activado must be 1 or 0');
+        $response = $response->withStatus(400);
+    } else if ($conn != null) {
+
+        //Agregar investigador
+        $object = new Investigador();
+        $object->setId($id_investigador);
+        $object->setActivado(htmlspecialchars($patchdata['activado']));
+
+        //insertar investigador
+        $activado = $object->activar($conn);
+
+        //Insert error
+        if (!$activado) {
+            $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Activate problem', 'Activate a investigator has fail');
+            $response = $response->withStatus(500);
+        } else {
+
+            $investigador = $object->buscarInvestigadorPorId($conn);
+
+            if ($patchdata['activado'] == 1) {
+                $email = new Email();
+                $email->sendEmailActivation($investigador);
+            }
+
+            //Formatear respuesta
+            $payload['data'] = array(
+                'type' => 'investigadores',
+                'id' => $investigador['id'],
+                'attributes' => array(
+                    'nombre' => $investigador['nombre'],
+                    'apellido' => $investigador['apellido'],
+                    'email' => $investigador['email'],
+                    'activado' => $investigador['activado']
+                )
+            );
+
+            $response = $response->withStatus(201);
+        }
+    }
+
+    //Connection error
+    else {
+        $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server problem', 'A connection problem ocurred with database');
+        $response = $response->withStatus(500);
+    }
+
+    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $response->getBody()->write($payload);
+
+    //Desconectar mysql
+    $mysql_adapter->disconnect();
+
+    return $response;
+})->add(new JwtMiddleware());
+
+//! Probablemente no será implementado
+//* Eliminar un investigador
+/*$app->delete('/investigadores/{id}', function ($request, $response, $args) {
 
     $id_investigador = $args['id'];
 
@@ -659,87 +821,4 @@ $app->delete('/investigadores/{id}', function ($request, $response, $args) {
     $mysql_adapter->disconnect();
 
     return $response;
-})->add(new JwtMiddleware());
-
-//TODO: PENDIENTE POR REVISAR
-//Activar registro de investigador
-$app->patch('/investigadores/{id}/activar', function ($request, $response, $args) {
-
-    $id_investigador = $args['id'];
-
-    //Seccion link self
-    $payload = array(
-        'links' => array(
-            'self' => "/investigadores/" . $id_investigador . "/activar"
-        )
-    );
-
-    //Obtener parametros put
-    $data = $request->getBody()->getContents();
-    $patchdata = array();
-    parse_str($data, $patchdata);
-
-    //Conectar BD
-    $mysql_adapter = new MysqlAdapter();
-    $conn = $mysql_adapter->connect();
-
-    if (!isset($patchdata['activado']) || empty($patchdata['activado']) || !is_numeric($patchdata['activado'])) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Activado must be integer');
-        $response = $response->withStatus(400);
-    } else if ($patchdata['activado'] != 0 && $patchdata['activado'] != 1) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Activado must be 1 or 0');
-        $response = $response->withStatus(400);
-    } else if (!is_numeric($id_investigador)) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
-        $response = $response->withStatus(400);
-    } else if ($conn != null) {
-
-        //Agregar investigador
-        $object = new Investigador();
-        $object->setId($id_investigador);
-        $object->setActivado(htmlspecialchars($patchdata['activado']));
-
-        //insertar investigador
-        $activado = $object->activar($conn);
-
-        //Insert error
-        if (!$activado) {
-            $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Activate problem', 'Activate a investigator has fail');
-            $response = $response->withStatus(500);
-        } else {
-
-            $investigador = $object->buscarInvestigadorPorId($conn);
-
-            //Formatear respuesta
-            $payload['data'] = array(
-                'type' => 'investigadores',
-                'id' => $investigador['id'],
-                'attributes' => array(
-                    'nombre' => $investigador['nombre'],
-                    'apellido' => $investigador['apellido'],
-                    'email' => $investigador['email'],
-                    'id_rol' => $investigador['id_rol'],
-                    'activado' => $investigador['activado']
-                )
-            );
-
-            $response = $response->withStatus(201);
-        }
-    }
-
-    //Connection error
-    else {
-        $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server problem', 'A connection problem ocurred with database');
-        $response = $response->withStatus(500);
-    }
-
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    $response->getBody()->write($payload);
-
-    //Desconectar mysql
-    $mysql_adapter->disconnect();
-
-    return $response;
-})->add(new JwtMiddleware());
-
-//TODO: AGREGAR METODO PARA RETORNAR LISTA DE INVESTIGADORES PENDIENTES DE ACTIVACION
+})->add(new JwtMiddleware());*/

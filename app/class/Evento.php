@@ -69,9 +69,7 @@ class Evento
         }
     }
 
-    /**
-     * Buscar evento por id
-     */
+    //*Buscar evento por id
     function buscarEvento($conn)
     {
         try {
@@ -92,36 +90,34 @@ class Evento
         }
     }
 
-    /**
-     * Buscar evento de entrevista
-     */
-    function buscarEventosEntrevista($conn)
+    //*Buscar evento de entrevista
+    function buscarEventosEntrevista($conn, $idioma)
     {
+        $sql = "SELECT
+            e.id,
+            e.id_entrevista,
+            e.id_accion,
+            e.id_emoticon,
+            e.justificacion,
+            e.hora_evento,
+            a.id AS id_accion_a,
+            a.nombre_" . $idioma . " AS nombre_accion,
+            em.id AS id_emoticon_e,
+            em.url AS url_emoticon,
+            em.descripcion_" . $idioma . " AS descripcion_emoticon
+        FROM
+            evento e
+        INNER JOIN accion a ON
+            e.id_accion = a.id
+        INNER JOIN emoticon em ON
+            e.id_emoticon = em.id
+        WHERE
+            id_entrevista = ?
+        ORDER BY e.hora_evento ASC";
+
         try {
 
-            $stmt = $conn->prepare(
-                "SELECT
-                e.id,
-                e.id_entrevista,
-                e.id_accion,
-                e.id_emoticon,
-                e.justificacion,
-                e.hora_evento,
-                a.id AS id_accion_a,
-                a.nombre AS nombre_accion,
-                em.id AS id_emoticon_e,
-                em.url AS url_emoticon,
-                em.descripcion AS descripcion_emoticon
-            FROM
-                evento e
-            INNER JOIN accion a ON
-                e.id_accion = a.id
-            INNER JOIN emoticon em ON
-                e.id_emoticon = em.id
-            WHERE
-                id_entrevista = ?
-            ORDER BY e.hora_evento ASC"
-            );
+            $stmt = $conn->prepare($sql);
             $stmt->execute(array($this->id_entrevista));
 
             $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);

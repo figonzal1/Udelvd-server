@@ -8,19 +8,20 @@ class Acciones
 {
 
     private $id;
-    private $nombre;
+    private $nombre_es;
+    private $nombre_en;
 
 
     function agregar($conn)
     {
+        $sql = "INSERT INTO accion (nombre_es,nombre_en) VALUES (?,?)";
         try {
-            $stmt = $conn->prepare(
-                "INSERT INTO accion (nombre) VALUES (?)"
-            );
+            $stmt = $conn->prepare($sql);
 
             $stmt->execute(
                 array(
-                    $this->nombre
+                    $this->nombre_es,
+                    $this->nombre_en
                 )
             );
 
@@ -29,20 +30,21 @@ class Acciones
             $lastId = $stmt->fetch(PDO::FETCH_ASSOC);
             return $lastId['id'];
         } catch (PDOException $e) {
-            echo "Fail insert: " . $e->getMessage() . "\n";
+            error_log("Fail insert accion: " . $e->getMessage(), 0);
             return false;
         }
     }
 
     function actualizar($conn)
     {
+        $sql = "UPDATE accion SET nombre_es=?,nombre_en=? WHERE id=?";
+
         try {
-            $stmt = $conn->prepare(
-                "UPDATE accion SET nombre=? WHERE id=?"
-            );
+            $stmt = $conn->prepare($sql);
 
             $stmt->execute(array(
-                $this->nombre,
+                $this->nombre_es,
+                $this->nombre_en,
                 $this->id
             ));
 
@@ -52,7 +54,7 @@ class Acciones
                 return true;
             }
         } catch (PDOException $e) {
-            echo "Fail update: " . $e->getMessage() . "\n";
+            error_log("Fail update accion: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -68,7 +70,7 @@ class Acciones
             $accion = $stmt->fetch(PDO::FETCH_ASSOC);
             return $accion;
         } catch (PDOException $e) {
-            echo "Fail search accion: " . $e->getMessage() . "\n";
+            error_log("Fail search accion: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -84,7 +86,7 @@ class Acciones
 
             return $listado;
         } catch (PDOException $e) {
-            echo "Fail search lista acciones: " . $e->getMessage() . "\n";
+            error_log("Fail search lista acciones: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -104,7 +106,7 @@ class Acciones
                 return true;
             }
         } catch (PDOException $e) {
-            echo "Fail delete accion: " . $e->getMessage() . "\n";
+            error_log("Fail delete accion: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -112,17 +114,25 @@ class Acciones
     /**
      * GETTERS & SETTERS
      */
-    function getNombre()
+    function getNombreEs()
     {
-        return $this->nombre;
+        return $this->nombre_es;
+    }
+    function getNombreEn()
+    {
+        return $this->nombre_en;
     }
     function getId()
     {
         return $this->id;
     }
-    function setNombre($nombre)
+    function setNombreEs($nombre_es)
     {
-        $this->nombre = $nombre;
+        $this->nombre_es = $nombre_es;
+    }
+    function setNombreEn($nombre_en)
+    {
+        $this->nombre_en = $nombre_en;
     }
     function setId($id)
     {

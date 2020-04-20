@@ -20,6 +20,8 @@ class Investigador
     private $idRol;
     private $activado;
 
+    private $limite = 10;
+
     function agregar($conn)
     {
         try {
@@ -50,8 +52,7 @@ class Investigador
             $lastId = $stmt->fetch(PDO::FETCH_ASSOC);
             return $lastId['id'];
         } catch (PDOException $e) {
-            //echo "Fail insert: " . $e->getMessage() . "\n";
-            error_log("Fail insert" . $e->getMessage(), 0);
+            error_log("Fail insert: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -78,8 +79,7 @@ class Investigador
                 return true;
             }
         } catch (PDOException $e) {
-            //echo "Fail update: " . $e->getMessage() . "\n";
-            error_log("Fail update: " . $e->getMessage(), 0);
+            error_log("Fail update investigador: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -87,58 +87,197 @@ class Investigador
 
     function buscarInvestigadorPorId($conn)
     {
+        $sql = "SELECT
+            i.id,
+            i.nombre,
+            i.apellido,
+            i.email,
+            i.id_rol,
+            i.activado,
+            i.create_time,
+            i.update_time,
+            r.id AS id_rol,
+            r.nombre AS nombre_rol
+        FROM
+            investigador i
+        INNER JOIN rol r ON
+            i.id_rol = r.id
+        WHERE
+            i.id = ?";
+
         try {
-            $stmt = $conn->prepare(
-                "SELECT i.id,i.nombre,i.apellido,i.email,i.id_rol,i.activado,i.create_time,i.update_time,r.id as id_rol,r.nombre as nombre_rol FROM investigador i INNER JOIN rol r ON i.id_rol=r.id WHERE i.id=?"
-            );
+            $stmt = $conn->prepare($sql);
             $stmt->execute(array($this->id));
 
             $investigador = $stmt->fetch(PDO::FETCH_ASSOC);
 
             return $investigador;
         } catch (PDOException $e) {
-            //echo "Fail search investigador: " . $e->getMessage() . "\n";
-            error_log("Fail search investigador: " . $e->getMessage());
+            error_log("Fail search investigador: " . $e->getMessage(), 0);
             return false;
         }
     }
 
     function buscarInvestigadorPorEmail($conn)
     {
+        $sql = "SELECT
+            i.id,
+            i.nombre,
+            i.apellido,
+            i.email,
+            i.id_rol,
+            i.activado,
+            i.create_time,
+            i.update_time,
+            r.nombre AS nombre_rol
+        FROM
+            investigador i
+        INNER JOIN rol r ON
+            i.id_rol = r.id
+        WHERE
+            i.email = ?";
+
         try {
-            $stmt = $conn->prepare(
-                "SELECT i.id,i.nombre,i.apellido,i.email,i.id_rol,i.activado,i.create_time,i.update_time,r.nombre as nombre_rol FROM investigador i INNER JOIN rol r ON i.id_rol=r.id WHERE i.email=?"
-            );
+            $stmt = $conn->prepare($sql);
             $stmt->execute(array($this->email));
 
             $investigador = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            return $investigador;
+            if ($stmt->rowCount() == 1) {
+                return $investigador;
+            } else if ($stmt->rowCount() == 0) {
+                return null;
+            }
         } catch (PDOException $e) {
-            //echo "Fail search investigador: " . $e->getMessage() . "\n";
-            error_log("Fail search investigador: " . $e->getMessage());
+            error_log("Fail search investigador: " . $e->getMessage(), 0);
+            return false;
+        }
+    }
+
+    function buscarPagina($conn, $pagina)
+    {
+        try {
+            $stmt = $conn->prepare(
+                "SELECT
+                i.id,
+                i.nombre,
+                i.apellido,
+                i.email,
+                i.id_rol,
+                i.activado,
+                r.nombre AS nombre_rol,
+                i.create_time
+            FROM
+                investigador i
+            INNER JOIN rol r ON
+                i.id_rol = r.id
+            WHERE
+                i.id <> :id_admin AND r.nombre LIKE 'In%'
+            ORDER BY
+                i.create_time
+            DESC
+            LIMIT :limite OFFSET :offset"
+            );
+
+            $stmt->bindValue(':id_admin', $this->id, PDO::PARAM_INT);
+            $stmt->bindValue(':limite', $this->limite, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', ($pagina - 1) * $this->limite, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return $listado;
+        } catch (PDOException $e) {
+            error_log("Fail search lista investigadores: " . $e->getMessage(), 0);
+            return false;
+        }
+    }
+
+    function contarInvestigadores($conn)
+    {
+        try {
+            $stmt = $conn->prepare(
+                "SELECT
+                    COUNT(*)
+                FROM
+                    investigador i
+                INNER JOIN rol r ON
+                    i.id_rol = r.id
+                WHERE
+                    i.id <> ? AND r.nombre LIKE 'In%'"
+            );
+            $stmt->execute(array(
+                $this->id
+            ));
+
+            $conteo = $stmt->fetchColumn();
+
+            return $conteo;
+        } catch (PDOException $e) {
+            error_log("Fail conteo investigadores: " . $e->getMessage(), 0);
             return false;
         }
     }
 
     function buscarTodos($conn)
     {
+
         try {
 
-            $stmt = $conn->query(
-                "SELECT i.id,i.nombre,i.apellido,i.email,i.id_rol,i.activado,r.nombre as nombre_rol FROM investigador i INNER JOIN rol r ON i.id_rol=r.id"
-            );
+            //*FLUJO IF PARA LISTADO DE INVESTIGADORES SIN ADMIN Y SIN PROPIO USUARIO
+            if ($this->id != null) {
+                $sql =
+                    "SELECT
+                        i.id,
+                        i.nombre,
+                        i.apellido,
+                        i.email,
+                        i.id_rol,
+                        i.activado,
+                        r.nombre AS nombre_rol,
+                        i.create_time
+                    FROM
+                        investigador i
+                    INNER JOIN rol r ON
+                        i.id_rol = r.id
+                    WHERE
+                        i.id <> ? AND r.nombre LIKE 'In%'
+                    ORDER BY
+                        i.create_time
+                    DESC";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->execute(array($this->id));
+            }
+            //*LISTADO GENERICO
+            else {
+                $sql =
+                    "SELECT
+                    i.id,
+                    i.nombre,
+                    i.apellido,
+                    i.email,
+                    i.id_rol,
+                    i.activado,
+                    r.nombre AS nombre_rol,
+                    i.create_time
+                FROM
+                    investigador i
+                INNER JOIN rol r ON
+                    i.id_rol = r.id";
+
+                $stmt = $conn->query($sql);
+            }
             $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             return $listado;
         } catch (PDOException $e) {
-            //echo "Fail search lista investigadores: " . $e->getMessage() . "\n";
-            error_log("Fail search lista investigadores: " . $e->getMessage());
+            error_log("Fail search lista investigadores: " . $e->getMessage(), 0);
             return false;
         }
     }
 
-    //TODO: COMPROBAR
+    //TODO: COMPROBAR e implementar en android
     function eliminar($conn)
     {
 
@@ -154,16 +293,13 @@ class Investigador
                 return true;
             }
         } catch (PDOException $e) {
-            //echo "Fail delete investigador: " . $e->getMessage() . "\n";
-            error_log("Fail delete investigador: " . $e->getMessage());
+            error_log("Fail delete investigador: " . $e->getMessage(), 0);
             return false;
         }
     }
 
-    //TODO: COMPROBAR
     function activar($conn)
     {
-
         try {
 
             $stmt = $conn->prepare(
@@ -181,8 +317,7 @@ class Investigador
                 return true;
             }
         } catch (PDOException $e) {
-            //echo "Fail to activate investigador: " . $e->getMessage() . "\n";
-            error_log("Fail to activate investigador: " . $e->getMessage());
+            error_log("Fail to activate investigador: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -206,8 +341,7 @@ class Investigador
                 return false;
             }
         } catch (PDOException $e) {
-            //echo "Fail to find hash: " . $e->getMessage() . "\n";
-            error_log("Fail to find hash: " . $e->getMessage());
+            error_log("Fail to find hash: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -232,7 +366,6 @@ class Investigador
                 return true;
             }
         } catch (PDOException $e) {
-            //echo "Fail to activate investigador: " . $e->getMessage() . "\n";
             error_log("Fail to reset pass investigador: " . $e->getMessage(), 0);
             return false;
         }
