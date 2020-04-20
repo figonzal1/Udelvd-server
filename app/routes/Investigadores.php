@@ -65,7 +65,7 @@ $app->get('/investigadores', function ($request, $response, $args) {
 $app->post('/investigadores', function ($request, $response, $args) {
 
     //? CONFIGURACION DE ACTIVACION AUTOMATICA
-    $activacion_automatica = 0;
+    $activacion_automatica = 1;
 
     //Seccion link self
     $payload = array(
@@ -778,7 +778,7 @@ $app->patch('/investigadores/{id}/activar', function ($request, $response, $args
     return $response;
 })->add(new JwtMiddleware());
 
-//TODO: PENDIENTE POR REVISAR e IMPLEMENTAR EN ANDROID
+//! Probablemente no será implementado
 //* Eliminar un investigador
 /*$app->delete('/investigadores/{id}', function ($request, $response, $args) {
 

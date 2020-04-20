@@ -1,22 +1,17 @@
-# Udelvd-server <br/> [![Project Status](https://opensource.box.com/badges/active.svg)](https://opensource.box.com/badges) [![CodeFactor](https://www.codefactor.io/repository/github/figonzal1/udelvd-server/badge)](https://www.codefactor.io/repository/github/figonzal1/udelvd-server) [![Known Vulnerabilities](https://snyk.io/test/github/figonzal1/Udelvd-server/badge.svg?targetFile=composer.lock)](https://snyk.io/test/github/figonzal1/Udelvd-server?targetFile=composer.lock)
+# Udelvd-server <br/> [![Build Status](https://travis-ci.com/figonzal1/Udelvd-server.svg?branch=master)](https://travis-ci.com/figonzal1/Udelvd-server) [![CodeFactor](https://www.codefactor.io/repository/github/figonzal1/udelvd-server/badge)](https://www.codefactor.io/repository/github/figonzal1/udelvd-server) ![GitHub top language](https://img.shields.io/github/languages/top/figonzal1/Udelvd-server) ![GitHub repo size](https://img.shields.io/github/repo-size/figonzal1/Udelvd-server) ![GitHub last commit](https://img.shields.io/github/last-commit/figonzal1/Udelvd-server) ![Docker Image Version (latest by date)](https://img.shields.io/docker/v/figonzal/udelvd-api?label=Docker%20udelvd-api) ![Docker Image Version (latest by date)](https://img.shields.io/docker/v/figonzal/mysql?label=Docker%20mysql) ![Uptime Robot status](https://img.shields.io/uptimerobot/status/m784784797-355fdf5539abcc0df0dcd13c)
 Servidor-APIRest utilizado para procesamiento de los datos generados por aplicativo móvil [Udelvd-app](https://github.com/figonzal1/Udelvd-app)
 
 ## Construir imágenes Docker
 ```sh
-$ docker build -t figonzal/http-proxy:{VERSION_TAG} -f proxy.DockerFile .
 $ docker build -t figonzal/udelvd-api:{VERSION_TAG} -f api.DockerFile .
 $ docker build -t figonzal/mysq:{VERSION_TAG} -f mysq.DockerFile .
 ```
 ## Ejecutar imágenes Docker
 ```sh
-$ docker run --name proxy -p 80:80 -p 443:443 --network RED_UDELVD figonzal/http-proxy:{VERSION_TAG}
-$ docker run --name udelvd-api --network RED_UDELVD figonzal/udelvd-api:{VERSION_TAG}
-$ docker run --name mysql -p 3306:3306 --network RED_UDELVD -e MYSQL_DATABASE={MYSQL_DATABASE} -e MYSQL_USER={MYSQL_USER} -e MYSQL_ROOT_PASSWORD={MYSQL_ROOT_PASSWORD} -e MYSQL_PASSWORD={MYSQL_PASSWORD} -d mysql:{VERSION_TAG}
+$ docker run --name udelvd-api -p 43:43 --network RED_UDELVD figonzal/udelvd-api:{VERSION_TAG}
+$ docker run --name mysql -p 5021:3306 --network RED_UDELVD -e MYSQL_DATABASE={MYSQL_DATABASE} -e MYSQL_USER={MYSQL_USER} -e MYSQL_ROOT_PASSWORD={MYSQL_ROOT_PASSWORD} -e MYSQL_PASSWORD={MYSQL_PASSWORD} -d mysql:{VERSION_TAG}
 ```
 ## Generación de certificados autofirmados
-#### Apache proxy
-```sh
-$ openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout apache.key -out apache.crt
 ```
 #### Mysql-Server
 Certificado CA
