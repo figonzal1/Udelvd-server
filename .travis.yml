@@ -17,8 +17,8 @@ install:
   #Docker login
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
-script: 
-  - docker build -t figonzal/udelvd-api:0.3-prod -f api.DockerFile . 
+script:
+  - docker build -t figonzal/udelvd-api:0.3-prod -f api.DockerFile .
   - docker build -t figonzal/mysql:0.3-prod -f mysql.DockerFile .
   - docker network create RED_UDELVD
   - docker run -d --name udelvd-api-test -p 80:80 --network RED_UDELVD figonzal/udelvd-api:0.3-prod
@@ -28,7 +28,7 @@ script:
 after_success:
   - docker push figonzal/udelvd-api:0.3-prod
   - docker push figonzal/mysql:0.3-prod
-  
+
 branches:
   only:
   - udelvd.tk

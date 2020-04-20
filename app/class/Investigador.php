@@ -277,7 +277,7 @@ class Investigador
         }
     }
 
-    //TODO: COMPROBAR e implementar en android
+    //! Probablemente no será implementado
     function eliminar($conn)
     {
 
