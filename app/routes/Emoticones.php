@@ -56,7 +56,7 @@ $app->get('/emoticones/idioma/{idioma}', function ($request, $response, $args) {
     return $response;
 })->add(new JwtMiddleware());
 
-//TODO: REVISAR e implementar en android
+//! CARACTERISTICAS FUTURAS
 //* Obtener emoticones segun id
 /*$app->get('/emoticones/{id}/idioma/{idioma}', function ($request, $response, $args) {
 
@@ -122,7 +122,7 @@ $app->get('/emoticones/idioma/{idioma}', function ($request, $response, $args) {
     return $response;
 });*/
 
-//TODO: REVISAR e implementar en android , agregar soporte idioma
+//! CARACTERISTICAS FUTURAS
 //* Crear emoticones
 /*$app->post('/emoticones', function ($request, $response, $args) {
 
@@ -197,7 +197,7 @@ $app->get('/emoticones/idioma/{idioma}', function ($request, $response, $args) {
     return $response;
 });*/
 
-//TODO: Revisar e implentar en android, agregar soporte idioma
+//! CARACTERISTICAS FUTURAS
 //* Editar un emoticon
 /*$app->put('/emoticones/{id}', function ($request, $response, $args) {
 
@@ -279,7 +279,7 @@ $app->get('/emoticones/idioma/{idioma}', function ($request, $response, $args) {
     return $response;
 });*/
 
-//TODO: Revisar e implementar en android, agregar soporte de idioma
+//! CARACTERISTICAS FUTURAS
 //* Eliminar un emoticon
 /*$app->delete('/emoticones/{id}', function ($request, $response, $args) {
 

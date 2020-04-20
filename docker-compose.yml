@@ -1,17 +1,5 @@
 version: '3.5'
 services:
-
-  #proxy:
-  #  container_name: proxy
-  #  image: figonzal/http-proxy:0.3-dev
-  #  ports:
-  #    - "80:80"
-  #  networks:
-  #    - RED_UDELVD
-  #  depends_on:
-  #    - mysql
-  #    - udelvd-api
-      
   udelvd-api:
     container_name: udelvd-api
     image: figonzal/udelvd-api:0.3-prod
@@ -21,7 +9,6 @@ services:
       - RED_UDELVD
     depends_on:
       - mysql
-
   #Definicion servicio mysql
   mysql:
     container_name: mysql
@@ -40,8 +27,7 @@ services:
     restart: on-failure
     volumes:
       - db-data:/var/lib/mysql
-  
-      #Servicio de espera para mysql
+  #Servicio de espera para mysql
   wait_for_mysql:
     container_name: w4database
     image: dadarek/wait-for-dependencies
@@ -50,10 +36,8 @@ services:
     networks:
       - RED_UDELVD
     command: mysql:3306
-
-networks: 
+networks:
   RED_UDELVD:
     name: RED_UDELVD
-
 volumes:
   db-data:

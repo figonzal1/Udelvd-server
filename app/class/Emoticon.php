@@ -11,7 +11,7 @@ class Emoticones
     private $url;
     private $descripcion;
 
-    //TODO: Por checkear aqui e implementar en android
+    //! CARACTERISTICAS FUTURAS
     function agregar($conn)
     {
         try {
@@ -36,7 +36,7 @@ class Emoticones
         }
     }
 
-    //TODO: Por checkear aqui e implementar en android
+    //! CARACTERISTICAS FUTURAS
     function actualizar($conn)
     {
         try {
@@ -94,7 +94,7 @@ class Emoticones
         }
     }
 
-    //TODO: Por checkear aqui e implementar en android
+    //! CARACTERISTICAS FUTURAS
     function eliminar($conn)
     {
         try {
