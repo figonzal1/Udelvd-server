@@ -39,6 +39,7 @@ require_once("../app/class/NivelEducacional.php");
 require_once("../app/class/TipoConvivencia.php");
 require_once("../app/class/Profesion.php");
 require_once("../app/class/TipoEntrevista.php");
+require_once("../app/class/Estadisticas.php");
 
 /**
  * UTILS
@@ -101,5 +102,6 @@ require("../app/routes/NivelesEducacionales.php");
 require("../app/routes/TiposConvivencias.php");
 require("../app/routes/Profesiones.php");
 require("../app/routes/TiposEntrevistas.php");
+require("../app/routes/Estadisticas.php");
 
 $app->run();
