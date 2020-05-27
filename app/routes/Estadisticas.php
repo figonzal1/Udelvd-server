@@ -27,7 +27,9 @@ $app->get('/estadisticas', function ($request, $response, $args) {
                     'type' => 'estadisticas',
                     'id' => $value['id'],
                     'attributes' => array(
-                        'url' => $value['url']
+                        'url' => $value['url'],
+                        'nombre_es' => $value['nombre_es'],
+                        'nombre_en' => $value['nombre_en']
                     )
                 )
             );
