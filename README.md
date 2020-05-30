@@ -1,4 +1,42 @@
-# Udelvd-server <br/> [![Build Status](https://travis-ci.com/figonzal1/Udelvd-server.svg?branch=udelvd.tk)](https://travis-ci.com/figonzal1/Udelvd-server) [![CodeFactor](https://www.codefactor.io/repository/github/figonzal1/udelvd-server/badge)](https://www.codefactor.io/repository/github/figonzal1/udelvd-server) ![GitHub top language](https://img.shields.io/github/languages/top/figonzal1/Udelvd-server) ![GitHub repo size](https://img.shields.io/github/repo-size/figonzal1/Udelvd-server) ![GitHub last commit](https://img.shields.io/github/last-commit/figonzal1/Udelvd-server) ![Docker Image Version (latest by date)](https://img.shields.io/docker/v/figonzal/udelvd-api?label=Docker%20udelvd-api) ![Docker Image Version (latest by date)](https://img.shields.io/docker/v/figonzal/mysql?label=Docker%20mysql) ![Uptime Robot status](https://img.shields.io/uptimerobot/status/m784784797-355fdf5539abcc0df0dcd13c)
+<p align="center">
+  <img src="https://github.com/figonzal1/Udelvd-app/blob/master/app/src/main/ic_launcher-web.png" width="200" height="200">
+</p>
+<h1 align="center">Udelvd-server</h1>
+
+<p align="center">
+  <a href="https://travis-ci.com/figonzal1/Udelvd-server" alt="Travis">
+        <img alt="Travis Builds" src="https://travis-ci.com/figonzal1/Udelvd-server.svg?branch=udelvd.tk">
+  </a>
+  
+  <a href="https://www.codefactor.io/repository/github/figonzal1/udelvd-server" alt="CodeFactor">
+        <img src="https://www.codefactor.io/repository/github/figonzal1/udelvd-server/badge" />
+  </a>
+  
+  <a href="https://img.shields.io/github/languages/top/figonzal1/Udelvd-server" alt="Top Language">
+        <img alt="GitHub repo language" src="https://img.shields.io/github/languages/top/figonzal1/Udelvd-server">
+  </a>
+  
+  <a href="https://img.shields.io/github/repo-size/figonzal1/Udelvd-server" alt="GitHub repo size">
+        <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/figonzal1/Udelvd-server">
+  </a>
+  
+  <a href="https://img.shields.io/github/last-commit/figonzal1/Udelvd-server" alt="Last Commit">
+        <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/figonzal1/Udelvd-server">
+  </a>
+  
+  <a href="https://img.shields.io/docker/v/figonzal/udelvd-api?label=Docker%20udelvd-api" alt="Docker Image Version">
+        <img alt="Docker Image Version" src="https://img.shields.io/docker/v/figonzal/udelvd-api?label=Docker%20udelvd-api">
+  </a>
+  
+  <a href="https://img.shields.io/docker/v/figonzal/mysql?label=Docker%20mysql" alt="Docker Image Version">
+        <img alt="Docker Image Version" src="https://img.shields.io/docker/v/figonzal/mysql?label=Docker%20mysql">
+  </a>
+  
+  <a href="https://img.shields.io/uptimerobot/status/m784784797-355fdf5539abcc0df0dcd13c?label=website%20status" alt="Uptime Status">
+        <img alt="Uptime Status" src="https://img.shields.io/uptimerobot/status/m784784797-355fdf5539abcc0df0dcd13c?label=website%20status">
+  </a>
+  
+</p>
 
 Backend PHP construido con [Slim](http://www.slimframework.com/) que contiene una APIRest utilizada para el procesamiento de los datos generados por el aplicativo móvil [Udelvd-app](https://github.com/figonzal1/Udelvd-app)
 
