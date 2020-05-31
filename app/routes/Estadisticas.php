@@ -8,13 +8,13 @@ $app->get('/estadisticas', function ($request, $response, $args) {
 
     $payload = array(
         'links' => array(
-            'self' => "/acciones"
+            'self' => "/estadisticas"
         ),
         'data' => array()
     );
 
     if ($conn != null) {
-        //Buscar acciones
+        //Buscar estadisticas
         $object = new Estadisticas();
         $listado = $object->buscarEstadisticas($conn);
 
