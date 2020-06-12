@@ -59,13 +59,19 @@ $app->get('/investigadores', function ($request, $response, $args) {
     //Desconectar mysql
     $mysql_adapter->disconnect();
     return $response;
-})->add(new JwtMiddleware()); 
+})->add(new JwtMiddleware());
 
 //* REGISTRO INVSTIGADOR
 $app->post('/investigadores', function ($request, $response, $args) {
 
     //? CONFIGURACION DE ACTIVACION AUTOMATICA
-    $activacion_automatica = 1;
+    $activacion_env = getenv("auto_activacion"); //true | false
+
+    if ($activacion_env == 'true') {
+        $activacion_automatica = 1;
+    } else if ($activacion_env == 'false') {
+        $activacion_automatica = 0;
+    }
 
     //Seccion link self
     $payload = array(
@@ -132,7 +138,7 @@ $app->post('/investigadores', function ($request, $response, $args) {
                 $object->setId($lastid);
                 $investigador = $object->buscarInvestigadorPorId($conn);
 
-                if ($activacion_automatica == "0") {
+                if ($activacion_env == "false") {
                     enviarNotificacion($investigador);
                 }
 

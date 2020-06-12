@@ -1,6 +1,8 @@
 version: '3.5'
 services:
   udelvd-api:
+    environment:
+      - auto_activacion=true
     container_name: udelvd-api
     image: figonzal/udelvd-api:0.3-prod
     ports:
