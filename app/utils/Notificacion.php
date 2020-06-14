@@ -17,21 +17,18 @@ function enviarNotificacion($investigador)
 
     //Configuracion mensaje ANDROID
     $config = AndroidConfig::fromArray([
-        'ttl' => '7200s',   // 1 Hora de expiracion para sismo verificado
+        'ttl' => '7200s',   // 2 horas de expiracion si el dispositiv no se conecta a internet
         'priority' => 'HIGH'  //Prioridad HIGH
     ]);
 
     //Configuracion de data
     $data = [
-        'titulo' => 'Solicitud de activacion de cuenta',
-        'descripcion' => $investigador['nombre'] . ' ' . $investigador['apellido'] . ', email ' . $investigador['email'] . ', solicita activacion de cuenta.',
+        'titulo_es' => 'Solicitud de activacion de cuenta',
+        'titulo_en' => 'Account activation request',
+        'descripcion_es' => $investigador['nombre'] . ' ' . $investigador['apellido'] . ', email ' . $investigador['email'] . ', solicita activacion de cuenta.',
+        'descripcion_en' => $investigador['nombre'] . ' ' . $investigador['apellido'] . ', email ' . $investigador['email'] . ', request account activation.',
         'id' => $investigador['id']
     ];
-    /*
-    $data = [
-        'titulo' => 'Solicitud de activacion de cuenta',
-        'descripcion' => 'descripcion de emoticon'
-    ];*/
 
     //Envio por tema
     $topic = 'RegistroInvestigador';
@@ -48,5 +45,3 @@ function enviarNotificacion($investigador)
         error_log("Fail to send notification: " . $e->errors(), 0);
     }
 }
-
-//enviarNotificacion("");

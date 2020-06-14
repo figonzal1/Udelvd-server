@@ -233,7 +233,7 @@ $app->put('/investigadores/resetear', function ($request, $response, $args) {
 
             //Insert error
             if (!$reset) {
-                $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Reset problem', 'Reset password investigator has fail');
+                $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Reset problem', 'Reset password researcher has fail');
                 $response = $response->withStatus(500);
             } else {
                 $payload['reset'] = array(
@@ -742,7 +742,7 @@ $app->patch('/investigadores/{id}/activar', function ($request, $response, $args
 
         //Insert error
         if (!$activado) {
-            $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Activate problem', 'Activate a investigator has fail');
+            $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Activate problem', 'Activate a researcher has fail');
             $response = $response->withStatus(500);
         } else {
 
