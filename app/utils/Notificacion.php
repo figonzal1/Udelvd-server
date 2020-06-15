@@ -23,9 +23,9 @@ function enviarNotificacion($investigador)
 
     //Configuracion de data
     $data = [
-        'titulo_es' => 'Solicitud de activacion de cuenta',
+        'titulo_es' => 'Solicitud de activación de cuenta',
         'titulo_en' => 'Account activation request',
-        'descripcion_es' => $investigador['nombre'] . ' ' . $investigador['apellido'] . ', email ' . $investigador['email'] . ', solicita activacion de cuenta.',
+        'descripcion_es' => $investigador['nombre'] . ' ' . $investigador['apellido'] . ', email ' . $investigador['email'] . ', solicita activación de cuenta.',
         'descripcion_en' => $investigador['nombre'] . ' ' . $investigador['apellido'] . ', email ' . $investigador['email'] . ', request account activation.',
         'id' => $investigador['id']
     ];
