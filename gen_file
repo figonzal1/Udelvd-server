@@ -41,7 +41,7 @@
 10052	WARN	(X-ChromeLogger-Data (XCOLD) Header Information Leak - Passive/beta)
 10053	WARN	(Apache Range Header DoS (CVE-2011-3192) - Active/beta)
 10054	WARN	(Cookie Without SameSite Attribute - Passive/release)
-10055	WARN	(CSP Scanner - Passive/release)
+10055	IGNORE	(CSP Scanner - Passive/release)
 10056	WARN	(X-Debug-Token Information Leak - Passive/release)
 10057	WARN	(Username Hash Found - Passive/release)
 10058	WARN	(GET for POST - Active/beta)
