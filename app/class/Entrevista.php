@@ -68,7 +68,7 @@ class Entrevista
     {
         try {
             $stmt = $conn->prepare(
-                "SELECT * FROM entrevista WHERE id=?"
+                "SELECT * FROM entrevista WHERE id=? AND visible=1"
             );
             $stmt->execute(
                 array(
@@ -86,7 +86,7 @@ class Entrevista
     }
 
     //* Buscar entrevistas de una persona
-    function buscarEntrevistasPersonales($conn,$idioma)
+    function buscarEntrevistasPersonales($conn, $idioma)
     {
         try {
             $stmt = $conn->prepare(
@@ -96,18 +96,24 @@ class Entrevista
                     e.id_tipo_entrevista,
                     e.fecha_entrevista,
                     t.id as id_tipo_entrevista,
-                    t.nombre_".$idioma." as nombre_tipo_entrevista
+                    t.nombre_" . $idioma . " as nombre_tipo_entrevista
                 FROM
                     entrevista e
                 INNER JOIN tipo_entrevista t ON
                     t.id = e.id_tipo_entrevista
                 WHERE
                     e.id_entrevistado = ?
+                AND
+                    e.visible = 1
                 ORDER BY
                     e.fecha_entrevista
                 DESC"
             );
-            $stmt->execute(array($this->id_entrevistado));
+            $stmt->execute(
+                array(
+                    $this->id_entrevistado
+                )
+            );
 
             $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -123,7 +129,7 @@ class Entrevista
     {
         try {
             $stmt = $conn->prepare(
-                "SELECT * FROM entrevista WHERE id=? AND id_entrevistado=?"
+                "SELECT * FROM entrevista WHERE id=? AND id_entrevistado=? AND visible=1"
             );
             $stmt->execute(
                 array(
@@ -146,7 +152,7 @@ class Entrevista
         try {
 
             $stmt = $conn->query(
-                "SELECT * FROM entrevista ORDER BY fecha_entrevista"
+                "SELECT * FROM entrevista WHERE visible=1 ORDER BY fecha_entrevista"
             );
             $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -161,12 +167,20 @@ class Entrevista
     {
 
         try {
+
+            //PYSHICAL DELETE
+            //$stmt = $conn->prepare(
+            //    "DELETE FROM entrevista WHERE id=? AND id_entrevistado=?"
+            //);
+
+            //LOGICAL DELETE
             $stmt = $conn->prepare(
-                "DELETE FROM entrevista WHERE id=? AND id_entrevistado=?"
+                "UPDATE entrevista SET visible=? WHERE id=? AND id_entrevistado=?"
             );
 
             $stmt->execute(
                 array(
+                    0,
                     $this->id,
                     $this->id_entrevistado
                 )
