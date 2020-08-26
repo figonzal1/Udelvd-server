@@ -32,7 +32,7 @@ class Jwt
             ->permittedFor('android') // Configures the audience (aud claim)
             ->identifiedBy(getenv("JWT_JTI")) // Configures the id (jti claim), replicating as a header item
             ->issuedAt($time) // Configures the time that the token was issue (iat claim)
-            ->canOnlyBeUsedAfter($time - 1) // Configures the time that the token can be used (nbf claim)
+            ->canOnlyBeUsedAfter($time - 10) // Configures the time that the token can be used (nbf claim)
             ->expiresAt($expiration_date) // Configures the expiration time of the token (exp claim)
             ->withClaim('uid', $id_investigador) // Configures a new claim, called "uid"
             ->getToken($signer, new Key(getenv("HMAC_KEY")));

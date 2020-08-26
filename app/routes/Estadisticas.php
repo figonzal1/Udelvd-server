@@ -29,7 +29,8 @@ $app->get('/estadisticas', function ($request, $response, $args) {
                     'attributes' => array(
                         'url' => $value['url'],
                         'nombre_es' => $value['nombre_es'],
-                        'nombre_en' => $value['nombre_en']
+                        'nombre_en' => $value['nombre_en'],
+                        'pin_pass' => $value['pin_pass']
                     )
                 )
             );

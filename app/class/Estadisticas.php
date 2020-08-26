@@ -7,6 +7,7 @@ class Estadisticas
     private $nombre_es;
     private $nombre_en;
     private $url;
+    private $pin_pass;
 
     public function getId()
     {
@@ -46,6 +47,14 @@ class Estadisticas
     public function setNombreEn($nombre_en)
     {
         $this->nombre_en = $nombre_en;
+    }
+
+    public function getPinPass(){
+        return $this->pin_pass;
+    }
+
+    public function setPinPass($pin_pass){
+        $this->pin_pass = $pin_pass;
     }
 
     public function buscarEstadisticas($conn)
