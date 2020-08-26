@@ -74,7 +74,7 @@ class Evento
     {
         try {
             $stmt = $conn->prepare(
-                "SELECT * FROM evento WHERE id=? AND id_entrevista=?"
+                "SELECT * FROM evento WHERE id=? AND id_entrevista=? AND visible=1"
             );
             $stmt->execute(array(
                 $this->id,
@@ -113,6 +113,8 @@ class Evento
             e.id_emoticon = em.id
         WHERE
             id_entrevista = ?
+        AND
+            e.visible = 1
         ORDER BY e.hora_evento ASC";
 
         try {
@@ -132,11 +134,18 @@ class Evento
     {
 
         try {
+
+            //PHISICAL DELETE
+            //$stmt = $conn->prepare(
+            //    "DELETE FROM evento WHERE id=?"
+            //);
+
+            //LOGICAL DELETE
             $stmt = $conn->prepare(
-                "DELETE FROM evento WHERE id=?"
+                "UPDATE evento SET visible=? WHERE id=?"
             );
 
-            $stmt->execute(array($this->id));
+            $stmt->execute(array(0, $this->id));
             if ($stmt->rowCount() == 0) {
                 return false;
             } else if ($stmt->rowCount() == 1) {
