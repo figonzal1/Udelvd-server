@@ -142,10 +142,15 @@ class Evento
 
             //LOGICAL DELETE
             $stmt = $conn->prepare(
-                "UPDATE evento SET visible=? WHERE id=?"
+                "UPDATE evento SET visible=0 WHERE id=?"
             );
 
-            $stmt->execute(array(0, $this->id));
+            $stmt->execute(
+                array(
+                    $this->id
+                )
+            );
+            
             if ($stmt->rowCount() == 0) {
                 return false;
             } else if ($stmt->rowCount() == 1) {

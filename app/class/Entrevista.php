@@ -175,12 +175,11 @@ class Entrevista
 
             //LOGICAL DELETE
             $stmt = $conn->prepare(
-                "UPDATE entrevista SET visible=? WHERE id=? AND id_entrevistado=?"
+                "UPDATE entrevista SET visible=0 WHERE id=? AND id_entrevistado=?"
             );
 
             $stmt->execute(
                 array(
-                    0,
                     $this->id,
                     $this->id_entrevistado
                 )
