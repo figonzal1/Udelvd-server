@@ -23,15 +23,19 @@ $app->post('/entrevistados', function ($request, $response, $args) {
 
     //CAMPOS OPCIONALES
     if (!isset($data['n_caidas'])) {
+        
         $data['n_caidas'] = NULL;
     }
     if (!isset($data['id_nivel_educacional']) || empty($data['id_nivel_educacional'])) {
+
         $data['id_nivel_educacional'] = NULL;
     }
     if (!isset($data['id_tipo_convivencia']) || empty($data['id_tipo_convivencia'])) {
+
         $data['id_tipo_convivencia'] = NULL;
     }
     if (!isset($data['nombre_profesion']) || empty($data['nombre_profesion'])) {
+
         $data['nombre_profesion'] = NULL;
     }
 
@@ -538,6 +542,7 @@ $app->put('/entrevistados/{id}', function ($request, $response, $args) {
 
         //UPDATE error
         if (!$actualizar) {
+            
             $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Update problem', 'Update a object has fail');
             $response = $response->withStatus(500);
         } else {

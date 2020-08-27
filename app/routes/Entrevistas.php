@@ -20,6 +20,7 @@ $app->get('/entrevistados/{id_entrevistado}/entrevistas/idioma/{idioma}', functi
 
 
     if (!isset($id_entrevistado) || empty($id_entrevistado) || !is_numeric($id_entrevistado)) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevistado must be integer');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
@@ -27,6 +28,7 @@ $app->get('/entrevistados/{id_entrevistado}/entrevistas/idioma/{idioma}', functi
         //Buscar entrevistas de usuarios
         $object = new Entrevista();
         $object->setIdEntrevistado($id_entrevistado);
+
         $listado = $object->buscarEntrevistasPersonales($conn, $idioma);
 
         //Preparar respuesta
@@ -86,10 +88,12 @@ $app->get('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', functi
 
 
     if (!isset($id_entrevistado) || empty($id_entrevistado) || !is_numeric($id_entrevistado)) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevistado must be integer');
         $response = $response->withStatus(400);
     }
     if (!isset($id_entrevista) || empty($id_entrevista) || !is_numeric($id_entrevista)) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevista must be integer');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
@@ -98,6 +102,7 @@ $app->get('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', functi
         $object = new Entrevista();
         $object->setIdEntrevistado($id_entrevistado);
         $object->setId($id_entrevista);
+
         $entrevista = $object->buscarEntrevistaPersonal($conn);
 
         //Preparar respuesta
@@ -147,12 +152,15 @@ $app->post('/entrevistados/{id_entrevistado}/entrevistas', function ($request, $
      * Validacion de parametros
      */
     if (!isset($id_entrevista) || empty($id_entrevista)) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevista is empty');
         $response = $response->withStatus(400);
     } else if (!isset($data['id_tipo_entrevista']) || empty($data['id_tipo_entrevista'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_tipo_entrevista is empty');
         $response = $response->withStatus(400);
     } else if (!isset($data['fecha_entrevista']) || empty($data['fecha_entrevista'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Fecha entrevista is empty');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
@@ -168,6 +176,7 @@ $app->post('/entrevistados/{id_entrevistado}/entrevistas', function ($request, $
 
         //Insert error
         if (!$lastid) {
+
             $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Create problem', 'Create a new object has fail');
             $response = $response->withStatus(500);
         } else {
@@ -232,15 +241,19 @@ $app->put('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', functi
      * VALIDACION PARAMETROS
      */
     if (!is_numeric($id_entrevistado)) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevistado must be integer');
         $response = $response->withStatus(400);
     } else if (!is_numeric($id_entrevista)) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevista must be integer');
         $response = $response->withStatus(400);
     } else if (!isset($putdata['fecha_entrevista']) || empty($putdata['fecha_entrevista'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'fecha_entrevista is empty');
         $response = $response->withStatus(400);
     } else if (!isset($putdata['id_tipo_entrevista']) || empty($putdata['id_tipo_entrevista'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_tipo_entrevista is empty');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
@@ -256,6 +269,7 @@ $app->put('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', functi
         $actualizar = $object->actualizar($conn);
 
         if (!$actualizar) {
+
             $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Update problem', 'Update a object has fail');
             $response = $response->withStatus(500);
         } else {
@@ -310,9 +324,11 @@ $app->delete('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', fun
     );
 
     if (!isset($id_entrevistado) || empty($id_entrevistado) || !is_numeric($id_entrevistado)) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevistado must be integer');
         $response = $response->withStatus(400);
     } else if (!isset($id_entrevista) || empty($id_entrevista) || !is_numeric($id_entrevista)) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevista must be integer');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
@@ -324,6 +340,7 @@ $app->delete('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', fun
         $eliminar = $object->eliminar($conn);
 
         if ($eliminar) {
+            
             $response = $response->withStatus(200);
             $payload['data'] = array();
         } //Error de eliminacion

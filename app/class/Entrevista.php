@@ -16,9 +16,10 @@ class Entrevista
     function agregar($conn)
     {
         try {
-            $stmt = $conn->prepare(
-                "INSERT INTO entrevista (id_entrevistado,id_tipo_entrevista,fecha_entrevista) VALUES (?,?,?)"
-            );
+
+            $sql = "INSERT INTO entrevista (id_entrevistado,id_tipo_entrevista,fecha_entrevista) VALUES (?,?,?)";
+
+            $stmt = $conn->prepare($sql);
 
             $stmt->execute(
                 array(
@@ -31,6 +32,7 @@ class Entrevista
             //Consultar ultimo id
             $stmt = $conn->query("SELECT MAX(id) as id from entrevista");
             $lastId = $stmt->fetch(PDO::FETCH_ASSOC);
+
             return $lastId['id'];
         } catch (PDOException $e) {
             error_log("Fail insert entrevista: " . $e->getMessage(), 0);
@@ -41,9 +43,10 @@ class Entrevista
     function actualizar($conn)
     {
         try {
-            $stmt = $conn->prepare(
-                "UPDATE entrevista SET id_entrevistado=?,id_tipo_entrevista=?,fecha_entrevista=? WHERE id=?"
-            );
+
+            $sql = "UPDATE entrevista SET id_entrevistado=?,id_tipo_entrevista=?,fecha_entrevista=? WHERE id=?";
+
+            $stmt = $conn->prepare($sql);
 
             $stmt->execute(array(
                 $this->id_entrevistado,
@@ -67,9 +70,11 @@ class Entrevista
     function buscarEntrevista($conn)
     {
         try {
-            $stmt = $conn->prepare(
-                "SELECT * FROM entrevista WHERE id=? AND visible=1"
-            );
+
+            $sql = "SELECT * FROM entrevista WHERE id=? AND visible=1";
+
+            $stmt = $conn->prepare($sql);
+
             $stmt->execute(
                 array(
                     $this->id
@@ -89,26 +94,28 @@ class Entrevista
     function buscarEntrevistasPersonales($conn, $idioma)
     {
         try {
-            $stmt = $conn->prepare(
-                "SELECT
-                    e.id,
-                    e.id_entrevistado,
-                    e.id_tipo_entrevista,
-                    e.fecha_entrevista,
-                    t.id as id_tipo_entrevista,
-                    t.nombre_" . $idioma . " as nombre_tipo_entrevista
-                FROM
-                    entrevista e
-                INNER JOIN tipo_entrevista t ON
-                    t.id = e.id_tipo_entrevista
-                WHERE
-                    e.id_entrevistado = ?
-                AND
-                    e.visible = 1
-                ORDER BY
-                    e.fecha_entrevista
-                DESC"
-            );
+
+            $sql = "SELECT
+                e.id,
+                e.id_entrevistado,
+                e.id_tipo_entrevista,
+                e.fecha_entrevista,
+                t.id as id_tipo_entrevista,
+                t.nombre_" . $idioma . " as nombre_tipo_entrevista
+            FROM
+                entrevista e
+            INNER JOIN tipo_entrevista t ON
+                t.id = e.id_tipo_entrevista
+            WHERE
+                e.id_entrevistado = ?
+            AND
+                e.visible = 1
+            ORDER BY
+                e.fecha_entrevista
+            DESC";
+
+            $stmt = $conn->prepare($sql);
+
             $stmt->execute(
                 array(
                     $this->id_entrevistado
@@ -128,9 +135,11 @@ class Entrevista
     function buscarEntrevistaPersonal($conn)
     {
         try {
-            $stmt = $conn->prepare(
-                "SELECT * FROM entrevista WHERE id=? AND id_entrevistado=? AND visible=1"
-            );
+
+            $sql = "SELECT * FROM entrevista WHERE id=? AND id_entrevistado=? AND visible=1";
+
+            $stmt = $conn->prepare($sql);
+
             $stmt->execute(
                 array(
                     $this->id,
@@ -151,9 +160,10 @@ class Entrevista
     {
         try {
 
-            $stmt = $conn->query(
-                "SELECT * FROM entrevista WHERE visible=1 ORDER BY fecha_entrevista"
-            );
+            $sql = "SELECT * FROM entrevista WHERE visible=1 ORDER BY fecha_entrevista";
+
+            $stmt = $conn->query($sql);
+
             $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             return $listado;
@@ -174,9 +184,10 @@ class Entrevista
             //);
 
             //LOGICAL DELETE
-            $stmt = $conn->prepare(
-                "UPDATE entrevista SET visible=0 WHERE id=? AND id_entrevistado=?"
-            );
+
+            $sql = "UPDATE entrevista SET visible=0 WHERE id=? AND id_entrevistado=?";
+
+            $stmt = $conn->prepare($sql);
 
             $stmt->execute(
                 array(
@@ -184,6 +195,7 @@ class Entrevista
                     $this->id_entrevistado
                 )
             );
+            
             if ($stmt->rowCount() == 0) {
                 return false;
             } else if ($stmt->rowCount() == 1) {

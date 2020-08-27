@@ -71,26 +71,26 @@ class Entrevistado
                 $this->id_ciudad = NULL;
             }
 
-            $stmt = $conn->prepare(
-                "INSERT 
-                INTO entrevistado 
-                (nombre,
-                apellido,
-                sexo,
-                fecha_nacimiento,
-                jubilado_legal,
-                caidas,
-                n_caidas,
-                n_convivientes_3_meses,
-                id_investigador,
-                id_ciudad,
-                id_nivel_educacional,
-                id_estado_civil,
-                id_tipo_convivencia,
-                id_profesion
-                ) 
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-            );
+            $sql = "INSERT 
+            INTO entrevistado 
+            (nombre,
+            apellido,
+            sexo,
+            fecha_nacimiento,
+            jubilado_legal,
+            caidas,
+            n_caidas,
+            n_convivientes_3_meses,
+            id_investigador,
+            id_ciudad,
+            id_nivel_educacional,
+            id_estado_civil,
+            id_tipo_convivencia,
+            id_profesion
+            ) 
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+            $stmt = $conn->prepare($sql);
 
             $stmt->execute(
                 array(
@@ -166,27 +166,27 @@ class Entrevistado
                 $this->id_ciudad = NULL;
             }
 
-            $stmt = $conn->prepare(
-                "UPDATE 
-                    entrevistado 
-                SET 
-                    nombre=?,
-                    apellido=?,
-                    sexo=?,
-                    fecha_nacimiento=?,
-                    jubilado_legal=?,
-                    caidas=?,
-                    n_caidas=?,
-                    n_convivientes_3_meses=?,
-                    id_investigador=?,
-                    id_ciudad=?,
-                    id_nivel_educacional=?,
-                    id_estado_civil=?,
-                    id_tipo_convivencia=?,
-                    id_profesion=? 
-                WHERE
-                    id=?"
-            );
+            $sql = "UPDATE 
+                entrevistado 
+            SET 
+                nombre=?,
+                apellido=?,
+                sexo=?,
+                fecha_nacimiento=?,
+                jubilado_legal=?,
+                caidas=?,
+                n_caidas=?,
+                n_convivientes_3_meses=?,
+                id_investigador=?,
+                id_ciudad=?,
+                id_nivel_educacional=?,
+                id_estado_civil=?,
+                id_tipo_convivencia=?,
+                id_profesion=? 
+            WHERE
+                id=?";
+
+            $stmt = $conn->prepare($sql);
 
             $stmt->execute(
                 array(
@@ -414,15 +414,17 @@ class Entrevistado
             //);
 
             //LOGICAL DELETE
-            $stmt = $conn->prepare(
-                "UPDATE entrevistado SET visible = 0 WHERE id=?"
-            );
+
+            $sql = "UPDATE entrevistado SET visible = 0 WHERE id=?";
+
+            $stmt = $conn->prepare($sql);
 
             $stmt->execute(
                 array(
                     $this->id
                 )
             );
+            
             if ($stmt->rowCount() == 0) {
                 return false;
             } else if ($stmt->rowCount() == 1) {
