@@ -66,6 +66,7 @@ $app->post('/investigadores', function ($request, $response, $args) {
 
     //? CONFIGURACION DE ACTIVACION AUTOMATICA
     $activacion_env = getenv("auto_activacion"); //true | false
+    //$activacion_env = 'true'; //true | false
 
     if ($activacion_env == 'true') {
         $activacion_automatica = 1;
