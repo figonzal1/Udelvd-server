@@ -37,42 +37,55 @@ $app->post('/entrevistados', function ($request, $response, $args) {
 
     //CAMPOS OBLIGATORIOS
     if (!isset($data['nombre']) || empty($data['nombre'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre is empty');
         $response = $response->withStatus(400);
     } else if (!isset($data['apellido']) || empty($data['apellido'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Apellido is empty');
         $response = $response->withStatus(400);
     } else if (!isset($data['sexo']) || empty($data['sexo'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Sexo is empty');
         $response = $response->withStatus(400);
     } else if (!isset($data['fecha_nacimiento']) || empty($data['fecha_nacimiento'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Fecha_nac is empty');
         $response = $response->withStatus(400);
     } else if (!isset($data['nombre_ciudad']) || empty($data['nombre_ciudad'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre_ciudad is empty');
         $response = $response->withStatus(400);
     } else if (!isset($data['jubilado_legal'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Jubilado legal is empty');
         $response = $response->withStatus(400);
     } else if (!is_numeric($data['jubilado_legal'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Jubilado_legal must be integer');
         $response = $response->withStatus(400);
     } else if (!isset($data['caidas'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Caidas is empty');
         $response = $response->withStatus(400);
     } else if (!is_numeric($data['caidas'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Caidas must be integer');
         $response = $response->withStatus(400);
     } else if (!isset($data['id_estado_civil']) || empty($data['id_estado_civil'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_estado_civil is empty');
         $response = $response->withStatus(400);
     } else if (!is_numeric($data['id_estado_civil'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_estado_civil must be integer');
         $response = $response->withStatus(400);
     } else if (!isset($data['id_investigador']) || empty($data['id_investigador'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_investigador is empty');
         $response = $response->withStatus(400);
     } else if (!is_numeric($data['id_investigador'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_investigador must be integer');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
@@ -102,6 +115,7 @@ $app->post('/entrevistados', function ($request, $response, $args) {
 
         //Insert error
         if (!$lastid) {
+
             $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Create problem', 'Create a new object has fail');
             $response = $response->withStatus(500);
         } else {
@@ -257,6 +271,7 @@ $app->get('/entrevistados/pagina/{n_pag}/investigador/{id_investigador}', functi
     );
 
     if (!isset($id_investigador) || !is_numeric($id_investigador) ||  empty($id_investigador)) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_investigador must be integer');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
@@ -340,6 +355,7 @@ $app->get('/entrevistados/{id}', function ($request, $response, $args) {
     );
 
     if (!isset($id_entrevistado) || !is_numeric($id_entrevistado) ||  empty($id_entrevistado)) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
@@ -419,62 +435,80 @@ $app->put('/entrevistados/{id}', function ($request, $response, $args) {
      * VALIDACION PARAMETROS
      */
     if (!is_numeric($id_entrevistado)) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
     }
 
     //CAMPOS OPCIONALES
     if (!isset($putdata['n_caidas']) || empty($putdata['n_caidas'])) {
+
         $putdata['n_caidas'] = NULL;
     }
     if (!isset($putdata['id_nivel_educacional']) || empty($putdata['id_nivel_educacional'])) {
+
         $putdata['id_nivel_educacional'] = NULL;
     }
     if (!isset($putdata['id_tipo_convivencia']) || empty($putdata['id_tipo_convivencia'])) {
+
         $putdata['id_tipo_convivencia'] = NULL;
     }
     if (!isset($putdata['nombre_profesion']) || empty($putdata['nombre_profesion'])) {
+
         $putdata['nombre_profesion'] = NULL;
     }
 
     //Campos obligatorios
     if (!isset($putdata['nombre']) || empty($putdata['nombre'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre is empty');
         $response = $response->withStatus(400);
     } else if (!isset($putdata['apellido']) || empty($putdata['apellido'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Apellido is empty');
         $response = $response->withStatus(400);
     } else if (!isset($putdata['sexo']) || empty($putdata['sexo'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Sexo is empty');
         $response = $response->withStatus(400);
     } else if (!isset($putdata['fecha_nacimiento']) || empty($putdata['fecha_nacimiento'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Fecha_nac is empty');
         $response = $response->withStatus(400);
     } else if (!isset($putdata['nombre_ciudad']) || empty($putdata['nombre_ciudad'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre ciudad is empty');
         $response = $response->withStatus(400);
     } else if (!isset($putdata['jubilado_legal'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Jubilado legal is empty');
         $response = $response->withStatus(400);
     } else if (!is_numeric($putdata['jubilado_legal'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Jubilado_legal must be integer');
         $response = $response->withStatus(400);
     } else if (!isset($putdata['caidas'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Caidas is empty');
         $response = $response->withStatus(400);
     } else if (!is_numeric($putdata['caidas'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Caidas must be integer');
         $response = $response->withStatus(400);
     } else if (!isset($putdata['id_estado_civil']) || empty($putdata['id_estado_civil'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_estado_civil is empty');
         $response = $response->withStatus(400);
     } else if (!is_numeric($putdata['id_estado_civil'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_estado_civil must be integer');
         $response = $response->withStatus(400);
     } else if (!isset($putdata['id_investigador']) || empty($putdata['id_investigador'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_investigador is empty');
         $response = $response->withStatus(400);
     } else if (!is_numeric($putdata['id_investigador'])) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_investigador must be integer');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
@@ -492,7 +526,6 @@ $app->put('/entrevistados/{id}', function ($request, $response, $args) {
         $object->setNConvivientes(htmlspecialchars($putdata['n_convivientes_3_meses']));
         $object->setIdInvestigador(htmlspecialchars($putdata['id_investigador']));
         $object->setIdEstadoCivil(htmlspecialchars($putdata['id_estado_civil']));
-
 
         //Opcionales
         $object->setNCaidas($putdata['n_caidas']);
@@ -569,6 +602,7 @@ $app->delete('/entrevistados/{id}', function ($request, $response, $args) {
     );
 
     if (!isset($id_entrevistado) || !is_numeric($id_entrevistado) || empty($id_entrevistado)) {
+
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
     } else if ($conn != null) {
@@ -578,11 +612,10 @@ $app->delete('/entrevistados/{id}', function ($request, $response, $args) {
         $eliminar = $object->eliminar($conn);
 
         if ($eliminar) {
+            
             $response = $response->withStatus(200);
             $payload['data'] = array();
-        }
-        //Error de eliminacion
-        else {
+        } else {
             $payload = ErrorJsonHandler::lanzarError($payload, 404, 'Delete problem', 'Delete object has fail');
             $response = $response->withStatus(404);
         }

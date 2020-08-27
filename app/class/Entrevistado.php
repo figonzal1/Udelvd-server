@@ -34,6 +34,7 @@ class Entrevistado
 
             //Intentar agregar profesion
             if ($this->nombre_profesion != NULL) {
+
                 $profesion = new Profesion();
                 $profesion->setNombre($this->nombre_profesion);
                 $existente = $profesion->buscarProfesionPorNombre($conn);
@@ -113,9 +114,10 @@ class Entrevistado
             //Consultar ultimo id
             $stmt = $conn->query("SELECT MAX(id) as id from entrevistado");
             $lastId = $stmt->fetch(PDO::FETCH_ASSOC);
+
             return $lastId['id'];
         } catch (PDOException $e) {
-            error_log("Fail insert: " . $e->getMessage());
+            error_log("Fail insert: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -127,6 +129,7 @@ class Entrevistado
 
             //Intentar agregar profesion
             if ($this->nombre_profesion != NULL) {
+
                 $profesion = new Profesion();
                 $profesion->setNombre($this->nombre_profesion);
                 $existente = $profesion->buscarProfesionPorNombre($conn);
@@ -165,23 +168,24 @@ class Entrevistado
 
             $stmt = $conn->prepare(
                 "UPDATE 
-                entrevistado 
+                    entrevistado 
                 SET 
-                nombre=?,
-                apellido=?,
-                sexo=?,
-                fecha_nacimiento=?,
-                jubilado_legal=?,
-                caidas=?,
-                n_caidas=?,
-                n_convivientes_3_meses=?,
-                id_investigador=?,
-                id_ciudad=?,
-                id_nivel_educacional=?,
-                id_estado_civil=?,
-                id_tipo_convivencia=?,
-                id_profesion=? 
-                WHERE id=?"
+                    nombre=?,
+                    apellido=?,
+                    sexo=?,
+                    fecha_nacimiento=?,
+                    jubilado_legal=?,
+                    caidas=?,
+                    n_caidas=?,
+                    n_convivientes_3_meses=?,
+                    id_investigador=?,
+                    id_ciudad=?,
+                    id_nivel_educacional=?,
+                    id_estado_civil=?,
+                    id_tipo_convivencia=?,
+                    id_profesion=? 
+                WHERE
+                    id=?"
             );
 
             $stmt->execute(
@@ -210,7 +214,7 @@ class Entrevistado
                 return true;
             }
         } catch (PDOException $e) {
-            error_log("Fail update: " . $e->getMessage());
+            error_log("Fail update: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -218,8 +222,8 @@ class Entrevistado
     function buscarEntrevistado($conn)
     {
         try {
-            $stmt = $conn->prepare(
-                "SELECT
+
+            $sql = "SELECT
                 id,
                 nombre,
                 apellido,
@@ -241,8 +245,12 @@ class Entrevistado
             FROM
                 entrevistado
             WHERE
-                id = ?"
-            );
+                id = ?
+            AND
+                visible = 1";
+
+            $stmt = $conn->prepare($sql);
+
             $stmt->execute(
                 array(
                     $this->id,
@@ -254,7 +262,7 @@ class Entrevistado
 
             return $entrevistado;
         } catch (PDOException $e) {
-            error_log("Fail search entrevistado: " . $e->getMessage());
+            error_log("Fail search entrevistado: " . $e->getMessage(), 0);
             return false;
         }
     }
@@ -263,8 +271,7 @@ class Entrevistado
     {
         try {
 
-            $stmt = $conn->prepare(
-                "SELECT
+            $sql = "SELECT
                 eo.id,
                 eo.nombre,
                 eo.apellido,
@@ -289,9 +296,13 @@ class Entrevistado
                 entrevistado eo
             INNER JOIN investigador i
             ON i.id=eo.id_investigador
+            WHERE
+                eo.visible = 1
             ORDER BY eo.create_time DESC 
-            LIMIT :limite OFFSET :offset"
-            );
+            LIMIT :limite OFFSET :offset";
+
+            $stmt = $conn->prepare($sql);
+
             $stmt->bindValue(':limite', $this->limite, PDO::PARAM_INT);
             $stmt->bindValue(':offset', ($pagina - 1) * $this->limite, PDO::PARAM_INT);
             $stmt->execute();
@@ -330,9 +341,13 @@ class Entrevistado
                 (SELECT COUNT(*) FROM entrevista WHERE id_entrevistado = eo.id) AS n_entrevistas
             FROM
                 entrevistado eo
-            WHERE eo.id_investigador =:id_investigador 
+            WHERE 
+                eo.id_investigador =:id_investigador
+            AND
+                eo.visible = 1
             ORDER BY eo.create_time DESC
             LIMIT :limite OFFSET :offset";
+
             $stmt = $conn->prepare($sql);
 
             $stmt->bindValue(':id_investigador', $this->id_investigador);
@@ -353,11 +368,14 @@ class Entrevistado
     function contarTodos($conn)
     {
         try {
-            $sql = "SELECT COUNT(*) FROM entrevistado AS n_entrevistados";
+
+            $sql = "SELECT COUNT(*) FROM entrevistado AS n_entrevistados WHERE visible=1";
+
             $stmt = $conn->prepare($sql);
             $stmt->execute();
 
             $conteo = $stmt->fetchColumn();
+
             return $conteo;
         } catch (PDOException $e) {
             error_log("Fail conteo entrevistados totales: " . $e->getMessage(), 0);
@@ -369,8 +387,10 @@ class Entrevistado
     function contarEntrevistadosDeInvestigador($conn)
     {
         try {
-            $sql = "SELECT COUNT(*) FROM entrevistado AS n_entrevistados WHERE id_investigador=?";
+
+            $sql = "SELECT COUNT(*) FROM entrevistado AS n_entrevistados WHERE id_investigador=? AND visible=1";
             $stmt = $conn->prepare($sql);
+
             $stmt->execute(array(
                 $this->id_investigador
             ));
@@ -388,18 +408,28 @@ class Entrevistado
     {
 
         try {
+            //PYSHICAL DELETE
+            //$stmt = $conn->prepare(
+            //    "DELETE FROM entrevistado WHERE id=?"
+            //);
+
+            //LOGICAL DELETE
             $stmt = $conn->prepare(
-                "DELETE FROM entrevistado WHERE id=?"
+                "UPDATE entrevistado SET visible = 0 WHERE id=?"
             );
 
-            $stmt->execute(array($this->id));
+            $stmt->execute(
+                array(
+                    $this->id
+                )
+            );
             if ($stmt->rowCount() == 0) {
                 return false;
             } else if ($stmt->rowCount() == 1) {
                 return true;
             }
         } catch (PDOException $e) {
-            error_log("Fail delete entrevistado: " . $e->getMessage());
+            error_log("Fail delete entrevistado: " . $e->getMessage(), 0);
             return false;
         }
     }
