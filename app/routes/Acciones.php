@@ -20,7 +20,7 @@ $app->get('/acciones/idioma/{idioma}', function ($request, $response, $args) {
 
         //Buscar acciones
         $object = new Acciones();
-        $listado = $object->buscarTodos($conn);
+        $listado = $object->buscarTodosPorIdioma($conn,$idioma);
 
         //Preparar respuesta
         foreach ($listado as $key => $value) {
@@ -57,7 +57,7 @@ $app->get('/acciones/idioma/{idioma}', function ($request, $response, $args) {
     return $response;
 })->add(new JwtMiddleware());
 
-//* Listado de acciones del sistema (INGLES & ESPAÑOL)
+//* Listado de acciones del sistema
 $app->get('/acciones', function ($request, $response, $args) {
 
     $mysql_adapter = new MysqlAdapter();
@@ -71,6 +71,7 @@ $app->get('/acciones', function ($request, $response, $args) {
     );
 
     if ($conn != null) {
+        
         //Buscar acciones
         $object = new Acciones();
         $listado = $object->buscarTodos($conn);

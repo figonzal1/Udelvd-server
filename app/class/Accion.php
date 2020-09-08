@@ -91,6 +91,22 @@ class Acciones
         }
     }
 
+    function buscarTodosPorIdioma($conn, $idioma)
+    {
+        try {
+
+            $stmt = $conn->query(
+                "SELECT * FROM accion ORDER BY nombre_" . $idioma
+            );
+            $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return $listado;
+        } catch (PDOException $e) {
+            error_log("Fail search lista acciones por idioma: " . $e->getMessage(), 0);
+            return false;
+        }
+    }
+
     function eliminar($conn)
     {
 
