@@ -301,6 +301,12 @@ $app->post('/investigadores/login', function ($request, $response, $args) {
             $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Email problem', 'Email does not exist');
             $response = $response->withStatus(500);
         }
+        //Si el usuario no esta activado
+        else if($investigador['activado']==0){
+            //Lanzar error de activacion
+            $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Account problem', 'Account deactivated');
+            $response = $response->withStatus(500);
+        }
         //Si el correo existe
         else {
 
