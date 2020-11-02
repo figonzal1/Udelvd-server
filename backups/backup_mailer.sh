@@ -1,5 +1,7 @@
 #!/bin/bash
 
+SHELL=/bin/bash
+
 #Reference to send email with mutt
 #https://devstudioonline.com/article/take-mysql-database-backup-daily-automatically-in-ubuntu-server-using-cron
 #https://ubunlog.com/mutt-cliente-correo-terminal/#Instalar_el_cliente_de_correo_electronico_Mutt

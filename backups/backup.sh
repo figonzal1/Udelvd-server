@@ -1,4 +1,7 @@
 #!/bin/bash
+
+SHELL=/bin/bash
+
 now=$(date +%d%m%Y)
 filename=$1
 backupfilename=$1-$now
