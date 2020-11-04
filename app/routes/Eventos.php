@@ -127,20 +127,26 @@ $app->get('/entrevistas/{id_entrevista}/eventos/{id_evento}', function ($request
 
         $evento = $object->buscarEvento($conn);
 
-        //Preparar respuesta
-        $payload['data'] =
-            array(
-                'type' => 'eventos',
-                'id' => $evento['id'],
-                'attributes' => array(
-                    'id_entrevista' => $evento['id_entrevista'],
-                    'id_accion' => $evento['id_accion'],
-                    'id_emoticon' => $evento['id_emoticon'],
-                    'justificacion' => $evento['justificacion'],
-                    'hora_evento' => $evento['hora_evento']
+        //Si usuario no existe
+        if (empty($evento)) {
+            $payload['data'] = array();
+        } else {
 
-                )
-            );
+            //Preparar respuesta
+            $payload['data'] =
+                array(
+                    'type' => 'eventos',
+                    'id' => $evento['id'],
+                    'attributes' => array(
+                        'id_entrevista' => $evento['id_entrevista'],
+                        'id_accion' => $evento['id_accion'],
+                        'id_emoticon' => $evento['id_emoticon'],
+                        'justificacion' => $evento['justificacion'],
+                        'hora_evento' => $evento['hora_evento']
+
+                    )
+                );
+        }
     } else {
         $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server connection problem', 'A connection problem ocurred with database');
         $response = $response->withStatus(500);
@@ -293,8 +299,7 @@ $app->delete('/entrevistas/{id_entrevista}/eventos/{id_evento}', function ($requ
 
             $response = $response->withStatus(200);
             $payload['data'] = array();
-        }
-        else {
+        } else {
             $payload = ErrorJsonHandler::lanzarError($payload, 404, 'Delete problem', 'Delete object has fail');
             $response = $response->withStatus(404);
         }
@@ -335,7 +340,7 @@ $app->get('/entrevistas/{id_entrevista}/eventos/idioma/{idioma}', function ($req
         //Buscar eventos de entrevista
         $object = new Evento();
         $object->setIdEntrevista($id_entrevista);
-        
+
         $listado = $object->buscarEventosEntrevista($conn, $idioma);
 
         //Preparar respuesta

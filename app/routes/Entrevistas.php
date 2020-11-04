@@ -105,17 +105,22 @@ $app->get('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', functi
 
         $entrevista = $object->buscarEntrevistaPersonal($conn);
 
-        //Preparar respuesta
-        $payload['data'] = array(
-            'type' => 'entrevista',
-            'id' => $entrevista['id'],
-            'attributes' => array(
-                'id_entrevistado' => $entrevista['id_entrevistado'],
-                'id_tipo_entrevista' => $entrevista['id_tipo_entrevista'],
-                'fecha_entrevista' =>  $entrevista['fecha_entrevista']
-            )
+        //Si entrevista no existe
+        if (empty($entrevista)) {
+            $payload['data'] = array();
+        } else {
+            //Preparar respuesta
+            $payload['data'] = array(
+                'type' => 'entrevista',
+                'id' => $entrevista['id'],
+                'attributes' => array(
+                    'id_entrevistado' => $entrevista['id_entrevistado'],
+                    'id_tipo_entrevista' => $entrevista['id_tipo_entrevista'],
+                    'fecha_entrevista' =>  $entrevista['fecha_entrevista']
+                )
 
-        );
+            );
+        }
     } else {
         $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server connection problem', 'A connection problem ocurred with database');
         $response = $response->withStatus(500);
@@ -340,7 +345,7 @@ $app->delete('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', fun
         $eliminar = $object->eliminar($conn);
 
         if ($eliminar) {
-            
+
             $response = $response->withStatus(200);
             $payload['data'] = array();
         } //Error de eliminacion
