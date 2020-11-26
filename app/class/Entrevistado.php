@@ -291,7 +291,7 @@ class Entrevistado
                 eo.update_time,
                 i.nombre As nombre_investigador,
                 i.apellido AS apellido_investigador,
-                (SELECT COUNT(*) FROM entrevista WHERE id_entrevistado = eo.id) AS n_entrevistas
+                (SELECT COUNT(*) FROM entrevista WHERE id_entrevistado = eo.id AND visible=1) AS n_entrevistas
             FROM
                 entrevistado eo
             INNER JOIN investigador i
