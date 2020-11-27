@@ -241,7 +241,7 @@ class Entrevistado
                 id_profesion,
                 create_time,
                 update_time,
-                (SELECT COUNT(*) FROM entrevista WHERE id_entrevistado = ?) AS n_entrevistas
+                (SELECT COUNT(*) FROM entrevista WHERE id_entrevistado = ? AND visible=1) AS n_entrevistas
             FROM
                 entrevistado
             WHERE
@@ -338,7 +338,7 @@ class Entrevistado
                 eo.id_profesion,
                 eo.create_time,
                 eo.update_time,
-                (SELECT COUNT(*) FROM entrevista WHERE id_entrevistado = eo.id) AS n_entrevistas
+                (SELECT COUNT(*) FROM entrevista WHERE id_entrevistado = eo.id AND visible=1) AS n_entrevistas
             FROM
                 entrevistado eo
             WHERE 
@@ -424,7 +424,7 @@ class Entrevistado
                     $this->id
                 )
             );
-            
+
             if ($stmt->rowCount() == 0) {
                 return false;
             } else if ($stmt->rowCount() == 1) {
