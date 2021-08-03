@@ -6,6 +6,7 @@
         "phpmailer/phpmailer": "^6.1",
         "lcobucci/jwt": "^3.3",
         "kreait/firebase-php": "4.35",
-        "slim/php-view": "^2.2"
+        "slim/php-view": "^2.2",
+        "league/flysystem": "^1.1.4"
     }
 }
