@@ -132,7 +132,7 @@ $app->post('/investigadores', function ($request, $response, $args) {
 
             //Insert error
             if (!$lastid) {
-                $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Create problem', 'Create a new object has fail');
+                $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Create problem', 'Create a new researcher has fail');
                 $response = $response->withStatus(500);
             } else {
 
