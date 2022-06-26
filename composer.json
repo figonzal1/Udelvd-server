@@ -1,12 +1,18 @@
 {
-    "require": {
-        "slim/slim": "^4.0",
-        "slim/psr7": "^1.0",
-        "vlucas/phpdotenv": "^3.6",
-        "phpmailer/phpmailer": "^6.1",
-        "lcobucci/jwt": "^3.3",
-        "kreait/firebase-php": "4.35",
-        "slim/php-view": "^2.2",
-        "league/flysystem": "^1.1.4"
-    }
+  "require": {
+    "php": "^8.0",
+    "kreait/firebase-php": "^6.0",
+    "slim/slim": "^4.0",
+    "slim/psr7": "^1.0",
+    "vlucas/phpdotenv": "^5.0",
+    "phpmailer/phpmailer": "^6.1",
+    "lcobucci/jwt": "^4.0",
+    "slim/php-view": "^2.2",
+    "league/flysystem": "^1.1.4",
+    "ext-pdo": "*",
+    "ext-fileinfo": "*"
+  },
+  "require-dev": {
+    "roave/security-advisories": "dev-latest"
+  }
 }

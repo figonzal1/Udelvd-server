@@ -22,36 +22,36 @@ class JwtMiddleware
         /**
          * Procesar token vacio
          */
-        if (!isset($authorization_header) || empty($authorization_header)) {
+        if (empty($authorization_header)) {
 
             $payload = [];
             $payload = ErrorJsonHandler::lanzarError($payload, 403, 'Auth problem', 'Token auth is empty');
-            $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+            try {
+                $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            } catch (JsonException $e) {
+                error_log("JSON Exception: " . $e->getMessage(), 0);
+            }
 
             $response = new Response();
             $response->getBody()->write($payload);
-            $response = $response->withStatus(403);
-            return $response;
-        }
+            return $response->withStatus(403);
 
-        /**
-         * Procesar token invalido
-         */
-        else if (!$jwt->validarToken($authorization_header)) {
+        } else if (!$jwt->validarToken($authorization_header)) {
+
             $payload = [];
             $payload = ErrorJsonHandler::lanzarError($payload, 403, 'Auth problem', 'Token invalid');
-            $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+            try {
+                $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            } catch (JsonException $e) {
+                error_log("JSON Exception: " . $e->getMessage(), 0);
+            }
 
             $response = new Response();
             $response->getBody()->write($payload);
-            $response = $response->withStatus(403);
-            return $response;
-        }
-
-        /**
-         * Procesar token valido
-         */
-        else if ($jwt->validarToken($authorization_header)) {
+            return $response->withStatus(403);
+        } else if ($jwt->validarToken($authorization_header)) {
             return $response;
         }
     }

@@ -11,9 +11,6 @@ header("Content-Security-Policy: frame-ancestors 'none'; default-src 'none'; scr
 header("Referrer-Policy: no-referrer");
 header("Feature-Policy: camera 'none'; fullscreen 'none'; geolocation 'none'; microphone 'none';");
 
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Factory\AppFactory;
 
 require '../vendor/autoload.php';
@@ -26,8 +23,8 @@ require_once("../app/config/MysqlAdapter.php");
 /**
  * CLASES
  */
-require_once("../app/class/Accion.php");
-require_once("../app/class/Emoticon.php");
+require_once("../app/class/Acciones.php");
+require_once("../app/class/Emoticones.php");
 require_once("../app/class/Entrevista.php");
 require_once("../app/class/Evento.php");
 require_once("../app/class/Investigador.php");

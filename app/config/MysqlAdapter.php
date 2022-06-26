@@ -1,62 +1,59 @@
 <?php
 
-//require '../../vendor/autoload.php';
+use Dotenv\Dotenv;
+
+date_default_timezone_set('America/Santiago');
+
 /**
  * Adaptador mysql para conexion a BD
  */
 class MysqlAdapter
 {
-    private $conn;
-    private $db;
-    private $hostname;
-    private $username;
-    private $password;
-    private $options;
+    private ?object $conn;
+    private string $db;
+    private string $hostname;
+    private string $username;
+    private string $password;
 
     /**
      * Constructor de clase
      */
-    function __construct()
+    public function __construct()
     {
-
-        $dotenv = Dotenv\Dotenv::create(__DIR__ . "../../../");
+        $dotenv = Dotenv::createImmutable(__DIR__ . "../../../");
         $dotenv->load();
 
-        $this->db = getenv('MYSQL_DATABASE');
-        $this->hostname = getenv('MYSQL_HOSTNAME');
-        $this->username = getenv('MYSQL_USER');
-        $this->password = getenv('MYSQL_PASSWORD');
-        $this->options = array(
+        $this->hostname = $_ENV['MYSQL_HOSTNAME'];
+        $this->db = $_ENV['MYSQL_DATABASE'];
+        $this->username = $_ENV['MYSQL_USER'];
+        $this->password = $_ENV['MYSQL_ROOT_PASSWORD'];
+
+        /*$this->options = array(
             PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'",
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             //? COMENTAR PARA LOCALHOST
-            PDO::MYSQL_ATTR_SSL_KEY    => '../../mysql-files/client-key-usm.pem',
+            PDO::MYSQL_ATTR_SSL_KEY => '../../mysql-files/client-key-usm.pem',
             PDO::MYSQL_ATTR_SSL_CERT => '../../mysql-files/client-cert-usm.pem',
-            PDO::MYSQL_ATTR_SSL_CA    => '../../mysql-files/ca-usm.pem',
+            PDO::MYSQL_ATTR_SSL_CA => '../../mysql-files/ca-usm.pem',
             PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false
 
-        );
-
-        /*$this->db = getenv('DB_DATABASE');
-        $this->hostname = getenv('DB_HOSTNAME');
-        $this->username = getenv('DB_USERNAME');
-        $this->password = getenv('DB_PASSWORD');*/
+        );*/
     }
 
     /**
      * Conexion da base de datos
+     * @noinspection ForgottenDebugOutputInspection
      */
-    function connect()
+    public function connect(): ?object
     {
 
         try {
             $this->conn = new PDO(
-                "mysql:host=" . $this->hostname . ";dbname=" . $this->db . "",
+                "mysql:host=" . $this->hostname . ";dbname=" . $this->db,
                 $this->username,
                 $this->password,
-                $this->options
+                array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'", PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
             );
-            //echo "Connectado" . "\n";
             return $this->conn;
         } catch (PDOException $e) {
             error_log("Connection failed: " . $e->getMessage(), 0);
@@ -67,11 +64,9 @@ class MysqlAdapter
     /**
      * Desconectar bd;
      */
-    function disconnect()
+    public function disconnect(): ?object
     {
         $this->conn = null;
+        return $this->conn;
     }
 }
-
-//$hola = new MysqlAdapter();
-//$hola ->connect();

@@ -3,11 +3,16 @@
 #require '../../vendor/autoload.php';
 date_default_timezone_set('America/Santiago');
 
-use Lcobucci\JWT\Builder;
-use Lcobucci\JWT\ValidationData;
-use Lcobucci\JWT\Parser;
-use Lcobucci\JWT\Signer\Key;
+use Dotenv\Dotenv;
+use Lcobucci\Clock\SystemClock;
+use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
+use Lcobucci\JWT\Signer\Key\InMemory;
+use Lcobucci\JWT\Validation\Constraint\IdentifiedBy;
+use Lcobucci\JWT\Validation\Constraint\IssuedBy;
+use Lcobucci\JWT\Validation\Constraint\PermittedFor;
+use Lcobucci\JWT\Validation\Constraint\SignedWith;
+use Lcobucci\JWT\Validation\Constraint\StrictValidAt;
 
 /**
  * Clase para manejar Tokens JWT
@@ -15,106 +20,73 @@ use Lcobucci\JWT\Signer\Hmac\Sha256;
 class Jwt
 {
 
-    function __construct()
+    private Configuration $configuration;
+
+    public function __construct()
     {
-        $dotenv = Dotenv\Dotenv::create(__DIR__ . "../../../");
+
+        $dotenv = Dotenv::createImmutable(__DIR__ . "../../../");
         $dotenv->load();
+
+        $this->configuration = Configuration::forSymmetricSigner(
+            new Sha256(),
+            InMemory::base64Encoded($_ENV["JWT_ENCODER"])
+        );
+
+        //Set validations
+        $this->configuration->setValidationConstraints(
+            new IssuedBy('https://undiaenlavidade.cl'),
+            new PermittedFor("android"),
+            new IdentifiedBy($_ENV['JWT_JTI']),
+            new SignedWith($this->configuration->signer(), $this->configuration->signingKey()),
+            new StrictValidAt(new SystemClock(new DateTimeZone('America/Santiago')))
+        );
     }
 
-    public function generarToken($id_investigador)
+    public function generarToken($id_investigador): string
     {
-        $signer = new Sha256();
 
-        $time = time();
-        $expiration_date = strtotime("next sunday 01:00");  //Sunday 01:00 AM
-        $token = (new Builder())
+        $now = new DateTimeImmutable();
+        $token = $this->configuration->builder()
             ->issuedBy('https://undiaenlavidade.cl') // Configures the issuer (iss claim)
             ->permittedFor('android') // Configures the audience (aud claim)
-            ->identifiedBy(getenv("JWT_JTI")) // Configures the id (jti claim), replicating as a header item
-            ->issuedAt($time) // Configures the time that the token was issue (iat claim)
-            ->canOnlyBeUsedAfter($time - 10) // Configures the time that the token can be used (nbf claim)
-            ->expiresAt($expiration_date) // Configures the expiration time of the token (exp claim)
+            ->identifiedBy($_ENV["JWT_JTI"]) // Configures the id (jti claim), replicating as a header item
+            ->issuedAt($now) // Configures the time that the token was issue (iat claim)
+            ->canOnlyBeUsedAfter($now->modify("-1 minute")) // Configures the time that the token can be used (nbf claim)
+            ->expiresAt($now->modify("+7 days")) // Configures the expiration time of the token (exp claim)
             ->withClaim('uid', $id_investigador) // Configures a new claim, called "uid"
-            ->getToken($signer, new Key(getenv("HMAC_KEY")));
-        //->getToken($signer, new ); // Retrieves the generated token
+            ->getToken($this->configuration->signer(), $this->configuration->signingKey());
 
-        //$token->getHeaders(); // Retrieves the token headers
-        //$token->getClaims(); // Retrieves the token claims
-
-        //echo $token->getHeader('jti'); // will print "4f1g23a12aa"
-        //echo $token->getClaim('iss'); // will print "http://example.com"
-        //echo $token->getClaim('uid'); // will print "1"
-        //echo $token;
-
-        return $token->__toString();
+        return $token->toString();
     }
 
     /**
      * Verifica validez de token (PAYLOAD)
      */
-    public function validarToken($autorization_header)
+    public function validarToken($autorizationHeader): bool
     {
 
-        $string_token = $this->getBearerToken($autorization_header[0]);
+        $string_token = $this->getBearerToken($autorizationHeader[0]);
+        $parsedToken = $this->configuration->parser()->parse($string_token);
+        $constraints = $this->configuration->validationConstraints();
 
-        //Parseo de token a object
-        try {
-            $token = (new Parser())->parse((string) $string_token);
-        } catch (Exception $e) {
-            error_log("Fail to parse token " . $e->getMessage(), 0);
+        if (!$this->configuration->validator()->validate($parsedToken, ...$constraints)) {
+            /** @noinspection ForgottenDebugOutputInspection */
+            error_log("Fail to validate token", 0);
             return false;
         }
-
-        //Si el token no es verificable 
-        if (!$this->verificarToken($token)) {
-            return false;
-        }
-
-        //Si el token es veridico
-        else {
-
-            //Datos para valicacion
-            $data = new ValidationData();
-            $data->setIssuer("https://undiaenlavidade.cl");
-            $data->setAudience("android");
-            $data->setId(getenv("JWT_JTI"));
-
-            try {
-                $status = $token->validate($data);
-            } catch (Exception $e) {
-                //echo "Fail to validate token" . $e->getMessage();
-                error_log("Fail to validate token" . $e->getMessage(), 0);
-            }
-
-            return $status;
-        }
-    }
-
-    /**
-     * Verifica que JWT no ha sido modificado (SHA256)
-     */
-    private function verificarToken($token)
-    {
-        try {
-            $signer = new Sha256();
-            //$status = $token->verify($signer, 'Test');
-            $status = $token->verify($signer, new Key(getenv("HMAC_KEY")));
-        } catch (Exception $e) {
-            error_log("Fail to verify token " . $e->getMessage(), 0);
-        }
-        return $status;
+        echo "Validated";
+        return true;
     }
 
     /**
      * Obtener token desde bearer
      */
-    private function getBearerToken($autorization_header)
+    private function getBearerToken($autorizationHeader)
     {
         // HEADER: Get the access token from the header
-        if (!empty($autorization_header)) {
-            if (preg_match('/Bearer\s(\S+)/', $autorization_header, $matches)) {
-                return $matches[1];
-            }
+        if (!empty($autorizationHeader) && preg_match('/Bearer\s(\S+)/', $autorizationHeader, $matches)) {
+            return $matches[1];
         }
         return null;
     }
