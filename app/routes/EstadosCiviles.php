@@ -16,7 +16,7 @@ $app->get("/estadosCiviles/idioma/{idioma}", function ($request, $response, $arg
         'data' => array()
     );
 
-    if ($conn != null) {
+    if ($conn !== null) {
 
         //Buscar estados civiles
         $object = new EstadoCivil();
@@ -25,20 +25,17 @@ $app->get("/estadosCiviles/idioma/{idioma}", function ($request, $response, $arg
         //Preparar respuesta
         foreach ($listado as $key => $value) {
 
-            if ($idioma == "es") {
+            if ($idioma === "es") {
                 $nombre = $value['nombre_es'];
-            } else if ($idioma == "en") {
+            } else {
                 $nombre = $value['nombre_en'];
             }
 
-            array_push(
-                $payload['data'],
-                array(
-                    'type' => 'estadosCiviles',
-                    'id' => $value['id'],
-                    'attributes' => array(
-                        'nombre' => $nombre
-                    )
+            $payload['data'][] = array(
+                'type' => 'estadosCiviles',
+                'id' => $value['id'],
+                'attributes' => array(
+                    'nombre' => $nombre
                 )
             );
         }
@@ -48,7 +45,7 @@ $app->get("/estadosCiviles/idioma/{idioma}", function ($request, $response, $arg
     }
 
     //Encodear resultado
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
     $response->getBody()->write($payload);
 
