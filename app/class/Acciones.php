@@ -1,18 +1,17 @@
-<?php
+<?php /** @noinspection ForgottenDebugOutputInspection */
 
 /**
- * Objecto accion
+ * Objeto accion
  */
-
 class Acciones
 {
 
-    private $id;
-    private $nombre_es;
-    private $nombre_en;
+    private string $id;
+    private string $nombreES;
+    private string $nombreEN;
 
 
-    function agregar($conn)
+    public function agregar($conn)
     {
         $sql = "INSERT INTO accion (nombre_es,nombre_en) VALUES (?,?)";
         try {
@@ -20,8 +19,8 @@ class Acciones
 
             $stmt->execute(
                 array(
-                    $this->nombre_es,
-                    $this->nombre_en
+                    $this->nombreES,
+                    $this->nombreEN
                 )
             );
 
@@ -30,12 +29,12 @@ class Acciones
             $lastId = $stmt->fetch(PDO::FETCH_ASSOC);
             return $lastId['id'];
         } catch (PDOException $e) {
-            error_log("Fail insert accion: " . $e->getMessage(), 0);
+            error_log("Fail insert accion: " . $e->getMessage());
             return false;
         }
     }
 
-    function actualizar($conn)
+    public function actualizar($conn): bool
     {
         $sql = "UPDATE accion SET nombre_es=?,nombre_en=? WHERE id=?";
 
@@ -43,23 +42,18 @@ class Acciones
             $stmt = $conn->prepare($sql);
 
             $stmt->execute(array(
-                $this->nombre_es,
-                $this->nombre_en,
+                $this->nombreES,
+                $this->nombreEN,
                 $this->id
             ));
-
-            if ($stmt->rowCount() == 0) {
-                return "iguales";
-            } else if ($stmt->rowCount() == 1) {
-                return true;
-            }
+            return $stmt->rowCount() === 1;
         } catch (PDOException $e) {
-            error_log("Fail update accion: " . $e->getMessage(), 0);
+            error_log("Fail update accion: " . $e->getMessage());
             return false;
         }
     }
 
-    function buscarAccion($conn)
+    public function buscarAccion($conn)
     {
         try {
             $stmt = $conn->prepare(
@@ -67,47 +61,36 @@ class Acciones
             );
             $stmt->execute(array($this->id));
 
-            $accion = $stmt->fetch(PDO::FETCH_ASSOC);
-            return $accion;
+            return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Fail search accion: " . $e->getMessage(), 0);
+            error_log("Fail search accion: " . $e->getMessage());
             return false;
         }
     }
 
-    function buscarTodos($conn)
+    public function buscarTodos($conn)
     {
         try {
 
-            $stmt = $conn->query(
-                "SELECT * FROM accion"
-            );
-            $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            return $listado;
+            return $conn->query("SELECT * FROM accion")->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Fail search lista acciones: " . $e->getMessage(), 0);
+            error_log("Fail search lista acciones: " . $e->getMessage());
             return false;
         }
     }
 
-    function buscarTodosPorIdioma($conn, $idioma)
+    public function buscarTodosPorIdioma($conn, $idioma)
     {
         try {
 
-            $stmt = $conn->query(
-                "SELECT * FROM accion ORDER BY nombre_" . $idioma
-            );
-            $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            return $listado;
+            return $conn->query("SELECT * FROM accion ORDER BY nombre_" . $idioma)->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Fail search lista acciones por idioma: " . $e->getMessage(), 0);
+            error_log("Fail search lista acciones por idioma: " . $e->getMessage());
             return false;
         }
     }
 
-    function eliminar($conn)
+    public function eliminar(object $conn, string $id_accion): bool
     {
 
         try {
@@ -115,42 +98,30 @@ class Acciones
                 "DELETE FROM accion WHERE id=?"
             );
 
-            $stmt->execute(array($this->id));
-            if ($stmt->rowCount() == 0) {
-                return false;
-            } else if ($stmt->rowCount() == 1) {
-                return true;
-            }
+            $stmt->execute(array($id_accion));
+            return $stmt->rowCount() === 1;
         } catch (PDOException $e) {
-            error_log("Fail delete accion: " . $e->getMessage(), 0);
+            error_log("Fail delete accion: " . $e->getMessage());
             return false;
         }
     }
 
-    /**
-     * GETTERS & SETTERS
-     */
-    function getNombreEs()
-    {
-        return $this->nombre_es;
-    }
-    function getNombreEn()
-    {
-        return $this->nombre_en;
-    }
-    function getId()
+    public function getId(): string
     {
         return $this->id;
     }
-    function setNombreEs($nombre_es)
+
+    public function setNombreES($nombreES): void
     {
-        $this->nombre_es = $nombre_es;
+        $this->nombreES = $nombreES;
     }
-    function setNombreEn($nombre_en)
+
+    public function setNombreEN($nombreEN): void
     {
-        $this->nombre_en = $nombre_en;
+        $this->nombreEN = $nombreEN;
     }
-    function setId($id)
+
+    public function setId($id): void
     {
         $this->id = $id;
     }

@@ -16,30 +16,25 @@ $app->get('/acciones/idioma/{idioma}', function ($request, $response, $args) {
         'data' => array()
     );
 
-    if ($conn != null) {
+    if ($conn !== null) {
 
         //Buscar acciones
         $object = new Acciones();
-        $listado = $object->buscarTodosPorIdioma($conn,$idioma);
+        $listado = $object->buscarTodosPorIdioma($conn, $idioma);
 
         //Preparar respuesta
-        foreach ($listado as $key => $value) {
+        foreach ($listado as $value) {
 
-            if ($idioma == "es") {
+            if ($idioma === "es") {
                 $nombre = $value['nombre_es'];
-            } else if ($idioma == "en") {
+            } else {
                 $nombre = $value['nombre_en'];
             }
 
-            array_push(
-                $payload['data'],
-                array(
-                    'type' => 'acciones',
-                    'id' => $value['id'],
-                    'attributes' => array(
-                        'nombre' => $nombre
-                    )
-                )
+            $payload['data'][] = array(
+                'type' => 'acciones',
+                'id' => $value['id'],
+                'attributes' => array('nombre' => $nombre)
             );
         }
     } else {
@@ -48,7 +43,7 @@ $app->get('/acciones/idioma/{idioma}', function ($request, $response, $args) {
     }
 
     //Encodear resultado
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
     $response->getBody()->write($payload);
 
@@ -70,24 +65,21 @@ $app->get('/acciones', function ($request, $response, $args) {
         'data' => array()
     );
 
-    if ($conn != null) {
-        
+    if ($conn !== null) {
+
         //Buscar acciones
         $object = new Acciones();
         $listado = $object->buscarTodos($conn);
 
         //Preparar respuesta
-        foreach ($listado as $key => $value) {
+        foreach ($listado as $value) {
 
-            array_push(
-                $payload['data'],
-                array(
-                    'type' => 'acciones',
-                    'id' => $value['id'],
-                    'attributes' => array(
-                        'nombre_es' => $value['nombre_es'],
-                        'nombre_en' => $value['nombre_en']
-                    )
+            $payload['data'][] = array(
+                'type' => 'acciones',
+                'id' => $value['id'],
+                'attributes' => array(
+                    'nombre_es' => $value['nombre_es'],
+                    'nombre_en' => $value['nombre_en']
                 )
             );
         }
@@ -97,7 +89,7 @@ $app->get('/acciones', function ($request, $response, $args) {
     }
 
     //Encodear resultado
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
     $response->getBody()->write($payload);
 
@@ -126,14 +118,14 @@ $app->post('/acciones', function ($request, $response, $args) {
     /**
      * VALIDACION PARAMETROS
      */
-    if (!isset($data['nombre_es']) || empty($data['nombre_es'])) {
+    if (empty($data['nombre_es'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre_es is empty');
         $response = $response->withStatus(400);
     }
-    if (!isset($data['nombre_en']) || empty($data['nombre_en'])) {
+    if (empty($data['nombre_en'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre_en is empty');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
 
         //Agregar accion
 
@@ -141,14 +133,14 @@ $app->post('/acciones', function ($request, $response, $args) {
         $object->setNombreEs(htmlspecialchars($data['nombre_es']));
         $object->setNombreEn(htmlspecialchars($data['nombre_en']));
 
-        $lastid = $object->agregar($conn);
+        $lastId = $object->agregar($conn);
 
         //Insert error
-        if (!$lastid) {
+        if (!$lastId) {
             $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Create problem', 'Create a new object has fail');
             $response = $response->withStatus(500);
         } else {
-            $object->setId($lastid);
+            $object->setId($lastId);
             $accion = $object->buscarAccion($conn);
 
             //Formatear respuesta
@@ -164,15 +156,13 @@ $app->post('/acciones', function ($request, $response, $args) {
 
             $response = $response->withStatus(201);
         }
-    }
-
-    //Connection error
+    } //Connection error
     else {
         $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server problem', 'A connection problem ocurred with database');
         $response = $response->withStatus(500);
     }
 
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
     //Desconectar mysql
@@ -202,20 +192,20 @@ $app->put('/acciones/{id_accion}', function ($request, $response, $args) {
     $mysql_adapter = new MysqlAdapter();
     $conn = $mysql_adapter->connect();
 
-    if (!isset($putdata['nombre_es']) || empty($putdata['nombre_es'])) {
+    if (empty($putdata['nombre_es'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre_es is empty');
         $response = $response->withStatus(400);
     }
-    if (!isset($putdata['nombre_en']) || empty($putdata['nombre_en'])) {
+    if (empty($putdata['nombre_en'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre_en is empty');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
 
         //Agregar accion
         $object = new Acciones();
         $object->setId(htmlspecialchars($id_accion));
-        $object->setNombreEs(htmlspecialchars($putdata['nombre_es']));
-        $object->setNombreEn(htmlspecialchars($putdata['nombre_en']));
+        $object->setNombreES(htmlspecialchars($putdata['nombre_es']));
+        $object->setNombreEN(htmlspecialchars($putdata['nombre_en']));
 
         //Actualizar investigador
         $actualizar = $object->actualizar($conn);
@@ -241,15 +231,13 @@ $app->put('/acciones/{id_accion}', function ($request, $response, $args) {
 
             $response = $response->withStatus(201);
         }
-    }
-
-    //Connection error
+    } //Connection error
     else {
         $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server problem', 'A connection problem ocurred with database');
         $response = $response->withStatus(500);
     }
 
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
     //Desconectar mysql
@@ -276,23 +264,21 @@ $app->delete('/acciones/{id_accion}', function ($request, $response, $args) {
     if (!is_numeric($id_accion)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
 
         $object = new Acciones();
-        $object->setId($id_accion);
-        $eliminar = $object->eliminar($conn);
+        $eliminar = $object->eliminar($conn, $id_accion);
 
         if ($eliminar) {
             $response = $response->withStatus(200);
             $payload['data'] = array();
-        }
-        //Error de eliminacion
+        } //Error de eliminacion
         else {
             $payload = ErrorJsonHandler::lanzarError($payload, 404, 'Delete problem', 'Delete object has fail');
             $response = $response->withStatus(404);
         }
     }
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
     //Desconectar mysql
