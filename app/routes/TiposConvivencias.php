@@ -16,29 +16,27 @@ $app->get("/tiposConvivencias/idioma/{idioma}", function ($request, $response, $
         'data' => array()
     );
 
-    if ($conn != null) {
+    if ($conn !== null) {
 
         //Buscar estados civiles
         $object = new TipoConvivencia();
+
         $listado = $object->buscarTodos($conn);
 
         //Preparar respuesta
-        foreach ($listado as $key => $value) {
+        foreach ($listado as $value) {
 
-            if ($idioma == "es") {
-                $nombre_idioma = $value['nombre_es'];
-            } else if ($idioma == "en") {
-                $nombre_idioma = $value['nombre_en'];
+            if ($idioma === "es") {
+                $nombre = $value['nombre_es'];
+            } else {
+                $nombre = $value['nombre_en'];
             }
 
-            array_push(
-                $payload['data'],
-                array(
-                    'type' => 'tiposConvivencias',
-                    'id' => $value['id'],
-                    'attributes' => array(
-                        'nombre' => $nombre_idioma
-                    )
+            $payload['data'][] = array(
+                'type' => 'tiposConvivencias',
+                'id' => $value['id'],
+                'attributes' => array(
+                    'nombre' => $nombre
                 )
             );
         }
@@ -48,7 +46,7 @@ $app->get("/tiposConvivencias/idioma/{idioma}", function ($request, $response, $
     }
 
     //Encodear resultado
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
     $response->getBody()->write($payload);
 

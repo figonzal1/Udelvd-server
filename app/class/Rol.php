@@ -1,15 +1,13 @@
-<?php
+<?php /** @noinspection ForgottenDebugOutputInspection */
 
 
 class Rol
 {
 
-    private $id;
-    private $nombre;
+    private string $id;
+    private string $nombre;
 
-
-
-    function buscarRolPorNombre($conn)
+    public function buscarRolPorNombre($conn)
     {
 
         try {
@@ -20,9 +18,7 @@ class Rol
 
             $stmt->execute(array($this->nombre));
 
-            $rol = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            return $rol;
+            return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("Fail search rol:" . $e->getMessage(), 0);
             return false;
@@ -30,25 +26,18 @@ class Rol
     }
 
     /**
-     * GETTERS & SETTERS
+     * @param string $id
      */
-    function setId($id)
+    public function setId(string $id): void
     {
         $this->id = $id;
     }
 
-    function setNombre($nombre)
+    /**
+     * @param string $nombre
+     */
+    public function setNombre(string $nombre): void
     {
         $this->nombre = $nombre;
-    }
-
-    function getId()
-    {
-        return $this->id;
-    }
-
-    function getNombre()
-    {
-        return $this->nombre;
     }
 }
