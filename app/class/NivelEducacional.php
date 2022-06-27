@@ -1,42 +1,19 @@
-<?php
+<?php /** @noinspection ForgottenDebugOutputInspection */
 
 /**
  * Objeto nivel educacional
  */
-class NivelEducacional{
+class NivelEducacional
+{
+    public function buscarTodos($conn)
+    {
 
-    private $id;
-    private $nombre;
+        try {
 
-    function buscarTodos($conn){
-
-        try{
-
-            $stmt = $conn ->query(
-                "SELECT * FROM nivel_educacional"
-            );
-            $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            return $listado;
-        }catch (PDOException $e) {
+            return $conn->query("SELECT * FROM nivel_educacional")->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
             error_log("Fail search lista niveles educacionales: " . $e->getMessage(), 0);
             return false;
         }
-    }
-
-    /**
-     * GETTERS & SETTERS
-     */
-    function getId(){
-        return $this->id;
-    }
-    function getNombre(){
-        return $this->nombre;
-    }
-
-    function setId($id){
-        return $this->id = $id;
-    }
-    function setNombre($nombre){
-        return $this->nombre = $nombre;
     }
 }
