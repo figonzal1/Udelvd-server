@@ -15,29 +15,27 @@ $app->get("/tiposEntrevistas/idioma/{idioma}", function ($request, $response, $a
         'data' => array()
     );
 
-    if ($conn != null) {
+    if ($conn !== null) {
 
         //Buscar tipos de entrevista
         $object = new TipoEntrevista();
+
         $listado = $object->buscarTodos($conn);
 
         //Preparar respuesta
-        foreach ($listado as $key => $value) {
+        foreach ($listado as $value) {
 
-            if ($idioma == "es") {
+            if ($idioma === "es") {
                 $nombre_idioma = $value['nombre_es'];
-            } else if ($idioma == "en") {
+            } else {
                 $nombre_idioma = $value['nombre_en'];
             }
 
-            array_push(
-                $payload['data'],
-                array(
-                    'type' => 'tiposEntrevistas',
-                    'id' => $value['id'],
-                    'attributes' => array(
-                        'nombre' => $nombre_idioma
-                    )
+            $payload['data'][] = array(
+                'type' => 'tiposEntrevistas',
+                'id' => $value['id'],
+                'attributes' => array(
+                    'nombre' => $nombre_idioma
                 )
             );
         }
@@ -47,7 +45,7 @@ $app->get("/tiposEntrevistas/idioma/{idioma}", function ($request, $response, $a
     }
 
     //Encodear resultado
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
     $response->getBody()->write($payload);
 
