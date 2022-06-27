@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection ForgottenDebugOutputInspection */
 
 
 /**
@@ -7,22 +7,24 @@
 class Emoticones
 {
 
-    private $id;
-    private $url;
-    private $descripcion;
+    private string $id;
+    private string $url;
+    private string $descripcionES;
+    private string $descripcionEN;
 
     //! CARACTERISTICAS FUTURAS
-    function agregar($conn)
+    public function agregar($conn)
     {
         try {
             $stmt = $conn->prepare(
-                "INSERT INTO emoticon (url,descripcion) VALUES (?,?)"
+                "INSERT INTO emoticon (url,descripcion_es,descripcion_en) VALUES (?,?,?)"
             );
 
             $stmt->execute(
                 array(
                     $this->url,
-                    $this->descripcion
+                    $this->descripcionES,
+                    $this->descripcionEN
                 )
             );
 
@@ -37,31 +39,28 @@ class Emoticones
     }
 
     //! CARACTERISTICAS FUTURAS
-    function actualizar($conn)
+    public function actualizar($conn): bool
     {
         try {
             $stmt = $conn->prepare(
-                "UPDATE emoticon SET url=?,descripcion=? WHERE id=?"
+                "UPDATE emoticon SET url=?,descripcion_es=?,descripcion_en=? WHERE id=?"
             );
 
             $stmt->execute(array(
                 $this->url,
-                $this->descripcion,
+                $this->descripcionES,
+                $this->descripcionEN,
                 $this->id
             ));
 
-            if ($stmt->rowCount() == 0) {
-                return "iguales";
-            } else if ($stmt->rowCount() == 1) {
-                return true;
-            }
+            return $stmt->rowCount() === 1;
         } catch (PDOException $e) {
             error_log("Fail update: " . $e->getMessage(), 0);
             return false;
         }
     }
 
-    function buscarEmoticon($conn)
+    public function buscarEmoticon($conn)
     {
         try {
             $stmt = $conn->prepare(
@@ -69,25 +68,18 @@ class Emoticones
             );
             $stmt->execute(array($this->id));
 
-            $emoticon = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            return $emoticon;
+            return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("Fail search emoticon: " . $e->getMessage(), 0);
             return false;
         }
     }
 
-    function buscarTodos($conn)
+    public function buscarTodos($conn)
     {
         try {
 
-            $stmt = $conn->query(
-                "SELECT * FROM emoticon"
-            );
-            $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            return $listado;
+            return $conn->query("SELECT * FROM emoticon")->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("Fail search lista emoticones: " . $e->getMessage(), 0);
             return false;
@@ -95,7 +87,7 @@ class Emoticones
     }
 
     //! CARACTERISTICAS FUTURAS
-    function eliminar($conn)
+    public function eliminar($conn): bool
     {
         try {
             $stmt = $conn->prepare(
@@ -103,40 +95,74 @@ class Emoticones
             );
 
             $stmt->execute(array($this->id));
-            if ($stmt->rowCount() == 0) {
-                return false;
-            } else if ($stmt->rowCount() == 1) {
-                return true;
-            }
+            return $stmt->rowCount() === 1;
         } catch (PDOException $e) {
-            error_log("Fail delete emoticon: ".$e->getMessage(),0);
+            error_log("Fail delete emoticon: " . $e->getMessage(), 0);
             return false;
         }
     }
 
-
-    function getId()
+    /**
+     * @return string
+     */
+    public function getId(): string
     {
         return $this->id;
     }
-    function getUrl()
-    {
-        return $this->url;
-    }
-    function getDescripcion()
-    {
-        return $this->descripcion;
-    }
-    function setId($id)
+
+    /**
+     * @param string $id
+     */
+    public function setId(string $id): void
     {
         $this->id = $id;
     }
-    function setUrl($url)
+
+    /**
+     * @return string
+     */
+    public function getUrl(): string
+    {
+        return $this->url;
+    }
+
+    /**
+     * @param string $url
+     */
+    public function setUrl(string $url): void
     {
         $this->url = $url;
     }
-    function setDescripcion($descripcion)
+
+    /**
+     * @return string
+     */
+    public function getDescripcionES(): string
     {
-        $this->descripcion = $descripcion;
+        return $this->descripcionES;
+    }
+
+    /**
+     * @param string $descripcionES
+     */
+    public function setDescripcionES(string $descripcionES): void
+    {
+        $this->descripcionES = $descripcionES;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescripcionEN(): string
+    {
+        return $this->descripcionEN;
+    }
+
+    /**
+     * @param string $descripcionEN
+     */
+    public function setDescripcionEN(string $descripcionEN): void
+    {
+        $this->descripcionEN = $descripcionEN;
     }
 }

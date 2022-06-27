@@ -16,29 +16,26 @@ $app->get('/emoticones/idioma/{idioma}', function ($request, $response, $args) {
         'data' => array()
     );
 
-    if ($conn != null) {
+    if ($conn !== null) {
         //Buscar emoticones
         $object = new Emoticones();
         $listado = $object->buscarTodos($conn);
 
         //Preparar respuesta
-        foreach ($listado as $key => $value) {
+        foreach ($listado as $value) {
 
-            if ($idioma == 'es') {
+            if ($idioma === 'es') {
                 $descripcion = $value['descripcion_es'];
-            } else if ($idioma == 'en') {
+            } else {
                 $descripcion = $value['descripcion_en'];
             }
 
-            array_push(
-                $payload['data'],
-                array(
-                    'type' => 'emoticones',
-                    'id' => $value['id'],
-                    'attributes' => array(
-                        'url' => $value['url'],
-                        'descripcion' => $descripcion
-                    )
+            $payload['data'][] = array(
+                'type' => 'emoticones',
+                'id' => $value['id'],
+                'attributes' => array(
+                    'url' => $value['url'],
+                    'descripcion' => $descripcion
                 )
             );
         }
@@ -47,7 +44,7 @@ $app->get('/emoticones/idioma/{idioma}', function ($request, $response, $args) {
         $response = $response->withStatus(500);
     }
     //Encodear resultado
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
     $response->getBody()->write($payload);
 
@@ -143,58 +140,58 @@ $app->get('/emoticones/idioma/{idioma}', function ($request, $response, $args) {
     /**
      * VALIDACION PARAMETROS
      */
-    /*if (!isset($data['url']) || empty($data['url'])) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Url is empty');
-        $response = $response->withStatus(400);
-    } else if (!isset($data['descripcion']) || empty($data['descripcion'])) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Descripcion is empty');
-        $response = $response->withStatus(400);
-    } else if ($conn != null) {
+/*if (!isset($data['url']) || empty($data['url'])) {
+    $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Url is empty');
+    $response = $response->withStatus(400);
+} else if (!isset($data['descripcion']) || empty($data['descripcion'])) {
+    $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Descripcion is empty');
+    $response = $response->withStatus(400);
+} else if ($conn != null) {
 
-        //Agregar emoticon
-        $object = new Emoticones();
-        $object->setUrl(htmlspecialchars($data['url']));
-        $object->setDescripcion(htmlentities($data['descripcion']));
+    //Agregar emoticon
+    $object = new Emoticones();
+    $object->setUrl(htmlspecialchars($data['url']));
+    $object->setDescripcion(htmlentities($data['descripcion']));
 
-        //insertar emoticon
-        $lastid = $object->agregar($conn);
+    //insertar emoticon
+    $lastid = $object->agregar($conn);
 
-        //Insert error
-        if (!$lastid) {
-            $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Create problem', 'Create a new object has fail');
-            $response = $response->withStatus(500);
-        } else {
-
-            $object->setId($lastid);
-            $emoticon = $object->buscarEmoticon($conn);
-
-            //Formatear respuesta
-            $payload['data'] = array(
-                'type' => 'emoticones',
-                'id' => $emoticon['id'],
-                'attributes' => array(
-                    'url' => $emoticon['url'],
-                    'descripcion' => $emoticon['descripcion']
-                )
-            );
-
-            $response = $response->withStatus(201);
-        }
-    }
-
-    //Connection error
-    else {
-        $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server problem', 'A connection problem ocurred with database');
+    //Insert error
+    if (!$lastid) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Create problem', 'Create a new object has fail');
         $response = $response->withStatus(500);
+    } else {
+
+        $object->setId($lastid);
+        $emoticon = $object->buscarEmoticon($conn);
+
+        //Formatear respuesta
+        $payload['data'] = array(
+            'type' => 'emoticones',
+            'id' => $emoticon['id'],
+            'attributes' => array(
+                'url' => $emoticon['url'],
+                'descripcion' => $emoticon['descripcion']
+            )
+        );
+
+        $response = $response->withStatus(201);
     }
+}
 
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    $response->getBody()->write($payload);
+//Connection error
+else {
+    $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server problem', 'A connection problem ocurred with database');
+    $response = $response->withStatus(500);
+}
 
-    //Desconectar mysql
-    $mysql_adapter->disconnect();
+$payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+$response->getBody()->write($payload);
 
-    return $response;
+//Desconectar mysql
+$mysql_adapter->disconnect();
+
+return $response;
 });*/
 
 //! CARACTERISTICAS FUTURAS
@@ -222,61 +219,61 @@ $app->get('/emoticones/idioma/{idioma}', function ($request, $response, $args) {
     /**
      * VALIDACION PARAMETROS
      */
-    /*if (!isset($id_emoticon) || empty($id_emoticon) || !is_numeric($id_emoticon)) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
-        $response = $response->withStatus(400);
-    } else if (!isset($putdata['url']) || empty($putdata['url'])) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Url is empty');
-        $response = $response->withStatus(400);
-    } else if (!isset($putdata['descripcion']) || empty($putdata['descripcion'])) {
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Descripcion is empty');
-        $response = $response->withStatus(400);
-    } else if ($conn != null) {
+/*if (!isset($id_emoticon) || empty($id_emoticon) || !is_numeric($id_emoticon)) {
+    $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
+    $response = $response->withStatus(400);
+} else if (!isset($putdata['url']) || empty($putdata['url'])) {
+    $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Url is empty');
+    $response = $response->withStatus(400);
+} else if (!isset($putdata['descripcion']) || empty($putdata['descripcion'])) {
+    $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Descripcion is empty');
+    $response = $response->withStatus(400);
+} else if ($conn != null) {
 
-        //Agregar emoticon
-        $object = new Emoticones();
-        $object->setId(htmlentities($id_emoticon));
-        $object->setUrl(htmlentities($putdata['url']));
-        $object->setDescripcion(htmlentities($putdata['descripcion']));
+    //Agregar emoticon
+    $object = new Emoticones();
+    $object->setId(htmlentities($id_emoticon));
+    $object->setUrl(htmlentities($putdata['url']));
+    $object->setDescripcion(htmlentities($putdata['descripcion']));
 
-        //Actualizar emoticon
-        $actualizar = $object->actualizar($conn);
+    //Actualizar emoticon
+    $actualizar = $object->actualizar($conn);
 
-        //UPDATE error
-        if (!$actualizar) {
-            $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Update problem', 'Update a object has fail');
-            $response = $response->withStatus(500);
-        } else {
-
-            $emoticon = $object->buscarEmoticon($conn);
-
-            //Formatear respuesta
-            $payload['data'] = array(
-                'type' => 'emoticones',
-                'id' => $emoticon['id'],
-                'attributes' => array(
-                    'url' => $emoticon['url'],
-                    'descripcion' => $emoticon['descripcion']
-                )
-            );
-
-            $response = $response->withStatus(201);
-        }
-    }
-
-    //Connection error
-    else {
-        $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server problem', 'A connection problem ocurred with database');
+    //UPDATE error
+    if (!$actualizar) {
+        $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Update problem', 'Update a object has fail');
         $response = $response->withStatus(500);
+    } else {
+
+        $emoticon = $object->buscarEmoticon($conn);
+
+        //Formatear respuesta
+        $payload['data'] = array(
+            'type' => 'emoticones',
+            'id' => $emoticon['id'],
+            'attributes' => array(
+                'url' => $emoticon['url'],
+                'descripcion' => $emoticon['descripcion']
+            )
+        );
+
+        $response = $response->withStatus(201);
     }
+}
 
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    $response->getBody()->write($payload);
+//Connection error
+else {
+    $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server problem', 'A connection problem ocurred with database');
+    $response = $response->withStatus(500);
+}
 
-    //Desconectar mysql
-    $mysql_adapter->disconnect();
+$payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+$response->getBody()->write($payload);
 
-    return $response;
+//Desconectar mysql
+$mysql_adapter->disconnect();
+
+return $response;
 });*/
 
 //! CARACTERISTICAS FUTURAS
