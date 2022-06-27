@@ -14,23 +14,20 @@ $app->get("/profesiones", function ($request, $response, $args) {
         'data' => array()
     );
 
-    if ($conn != null) {
+    if ($conn !== null) {
 
         //Buscar acciones
         $object = new Profesion();
         $listado = $object->buscarTodos($conn);
 
         //Preparar respuesta
-        foreach ($listado as $key => $value) {
+        foreach ($listado as $value) {
 
-            array_push(
-                $payload['data'],
-                array(
-                    'type' => 'profesiones',
-                    'id' => $value['id'],
-                    'attributes' => array(
-                        'nombre' => $value['nombre']
-                    )
+            $payload['data'][] = array(
+                'type' => 'profesiones',
+                'id' => $value['id'],
+                'attributes' => array(
+                    'nombre' => $value['nombre']
                 )
             );
         }
@@ -40,7 +37,7 @@ $app->get("/profesiones", function ($request, $response, $args) {
     }
 
     //Encodear resultado
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
     $response->getBody()->write($payload);
 

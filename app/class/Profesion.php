@@ -1,19 +1,16 @@
-<?php
+<?php /** @noinspection ForgottenDebugOutputInspection */
 
 
 /**
  * CLASE PROFESION
  */
-
 class Profesion
 {
 
-
-    private $id;
-    private $nombre;
+    private string $nombre;
 
 
-    function agregar($conn)
+    public function agregar($conn)
     {
         try {
 
@@ -33,7 +30,7 @@ class Profesion
         }
     }
 
-    function buscarProfesionPorNombre($conn)
+    public function buscarProfesionPorNombre($conn)
     {
 
         try {
@@ -44,25 +41,18 @@ class Profesion
 
             $stmt->execute(array($this->nombre));
 
-            $profesion = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            return $profesion;
+            return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("Fail search profesion: " . $e->getMessage());
             return false;
         }
     }
 
-    function buscarTodos($conn)
+    public function buscarTodos($conn)
     {
         try {
 
-            $stmt = $conn->query(
-                "SELECT * FROM profesion"
-            );
-
-            $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            return $listado;
+            return $conn->query("SELECT * FROM profesion")->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("Fail search lista profesiones: " . $e->getMessage());
             return false;
@@ -70,21 +60,9 @@ class Profesion
     }
 
     /**
-     * GETTERS & SETTERS
+     * @param string $nombre
      */
-    function getId()
-    {
-        return $this->id;
-    }
-    function getNombre()
-    {
-        return $this->nombre;
-    }
-    function setId($id)
-    {
-        $this->id = $id;
-    }
-    function setNombre($nombre)
+    public function setNombre(string $nombre): void
     {
         $this->nombre = $nombre;
     }
