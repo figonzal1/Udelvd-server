@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection ForgottenDebugOutputInspection */
 
 
 /**
@@ -7,15 +7,15 @@
 class Evento
 {
 
-    private $id;
-    private $id_entrevista;
-    private $id_accion;
-    private $id_emoticon;
-    private $justificacion;
-    private $hora_evento;
+    private string $id;
+    private string $idEntrevista;
+    private string $idAccion;
+    private string $idEmoticon;
+    private string $justificacion;
+    private string $horaEvento;
 
 
-    function agregar($conn)
+    public function agregar($conn)
     {
         try {
 
@@ -25,11 +25,11 @@ class Evento
 
             $stmt->execute(
                 array(
-                    $this->id_entrevista,
-                    $this->id_accion,
-                    $this->id_emoticon,
+                    $this->idEntrevista,
+                    $this->idAccion,
+                    $this->idEmoticon,
                     $this->justificacion,
-                    $this->hora_evento
+                    $this->horaEvento
                 )
             );
 
@@ -39,12 +39,12 @@ class Evento
 
             return $lastId['id'];
         } catch (PDOException $e) {
-            error_log("Fail insert: " . $e->getMessage(), 0);
+            error_log("Fail insert: " . $e->getMessage());
             return false;
         }
     }
 
-    function actualizar($conn)
+    public function actualizar($conn): bool
     {
         try {
 
@@ -53,27 +53,23 @@ class Evento
             $stmt = $conn->prepare($sql);
 
             $stmt->execute(array(
-                $this->id_entrevista,
-                $this->id_accion,
-                $this->id_emoticon,
+                $this->idEntrevista,
+                $this->idAccion,
+                $this->idEmoticon,
                 $this->justificacion,
-                $this->hora_evento,
+                $this->horaEvento,
                 $this->id
             ));
 
-            if ($stmt->rowCount() == 0) {
-                return "iguales";
-            } else if ($stmt->rowCount() == 1) {
-                return true;
-            }
+            return $stmt->rowCount() === 1;
         } catch (PDOException $e) {
-            error_log("Fail update: " . $e->getMessage(), 0);
+            error_log("Fail update: " . $e->getMessage());
             return false;
         }
     }
 
     //*Buscar evento por id
-    function buscarEvento($conn)
+    public function buscarEvento($conn)
     {
         try {
 
@@ -83,20 +79,18 @@ class Evento
 
             $stmt->execute(array(
                 $this->id,
-                $this->id_entrevista
+                $this->idEntrevista
             ));
 
-            $evento = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            return $evento;
+            return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Fail search evento: " . $e->getMessage(), 0);
+            error_log("Fail search evento: " . $e->getMessage());
             return false;
         }
     }
 
     //*Buscar evento de entrevista
-    function buscarEventosEntrevista($conn, $idioma)
+    public function buscarEventosEntrevista($conn, $idioma)
     {
         try {
 
@@ -125,17 +119,16 @@ class Evento
             ORDER BY e.hora_evento ASC";
 
             $stmt = $conn->prepare($sql);
-            $stmt->execute(array($this->id_entrevista));
+            $stmt->execute(array($this->idEntrevista));
 
-            $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            return $listado;
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Fail search lista eventos: " . $e->getMessage(), 0);
+            error_log("Fail search lista eventos: " . $e->getMessage());
             return false;
         }
     }
 
-    function eliminar($conn)
+    public function eliminar($conn): bool
     {
 
         try {
@@ -154,67 +147,58 @@ class Evento
                     $this->id
                 )
             );
-
-            if ($stmt->rowCount() == 0) {
-                return false;
-            } else if ($stmt->rowCount() == 1) {
-                return true;
-            }
+            return $stmt->rowCount() === 1;
         } catch (PDOException $e) {
-            error_log("Fail delete evento: " . $e->getMessage(), 0);
+            error_log("Fail delete evento: " . $e->getMessage());
             return false;
         }
     }
 
     /**
-     * GETTERS & SETTERS
+     * @param string $id
      */
-    function getId()
-    {
-        return $this->id;
-    }
-    function getIdEntrevista()
-    {
-        return $this->id_entrevista;
-    }
-    function getIdAccion()
-    {
-        return $this->id_accion;
-    }
-    function getIdEmoticon()
-    {
-        return $this->id_emoticon;
-    }
-    function getJustificacion()
-    {
-        return $this->justificacion;
-    }
-    function getHoraEvento()
-    {
-        return $this->hora_evento;
-    }
-    function setId($id)
+    public function setId(string $id): void
     {
         $this->id = $id;
     }
-    function setIdEntrevista($id_entrevista)
+
+    /**
+     * @param string $idEntrevista
+     */
+    public function setIdEntrevista(string $idEntrevista): void
     {
-        $this->id_entrevista = $id_entrevista;
+        $this->idEntrevista = $idEntrevista;
     }
-    function setIdAccion($id_accion)
+
+    /**
+     * @param string $idAccion
+     */
+    public function setIdAccion(string $idAccion): void
     {
-        $this->id_accion = $id_accion;
+        $this->idAccion = $idAccion;
     }
-    function setIdEmoticon($id_emoticon)
+
+    /**
+     * @param string $idEmoticon
+     */
+    public function setIdEmoticon(string $idEmoticon): void
     {
-        $this->id_emoticon = $id_emoticon;
+        $this->idEmoticon = $idEmoticon;
     }
-    function setJustificacion($justificacion)
+
+    /**
+     * @param string $justificacion
+     */
+    public function setJustificacion(string $justificacion): void
     {
         $this->justificacion = $justificacion;
     }
-    function setHoraEvento($hora_evento)
+
+    /**
+     * @param string $horaEvento
+     */
+    public function setHoraEvento(string $horaEvento): void
     {
-        $this->hora_evento = $hora_evento;
+        $this->horaEvento = $horaEvento;
     }
 }

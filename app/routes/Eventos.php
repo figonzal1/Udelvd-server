@@ -3,11 +3,11 @@
 //* Agregar evento
 $app->post('/entrevistas/{id_entrevista}/eventos', function ($request, $response, $args) {
 
-    $id_entrevista = $args['id_entrevista'];
+    $idEntrevista = $args['id_entrevista'];
 
     $payload = array(
         'links' => array(
-            'self' => '/entrevistas/' . $id_entrevista . "/eventos"
+            'self' => '/entrevistas/' . $idEntrevista . "/eventos"
         )
     );
 
@@ -18,46 +18,46 @@ $app->post('/entrevistas/{id_entrevista}/eventos', function ($request, $response
     $mysql_adapter = new MysqlAdapter();
     $conn = $mysql_adapter->connect();
 
-    if (!isset($id_entrevista) || empty($id_entrevista)) {
+    if (empty($idEntrevista)) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevista is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($data['id_accion']) || empty($data['id_accion'])) {
+    } else if (empty($data['id_accion'])) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_accion is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($data['id_emoticon']) || empty($data['id_emoticon'])) {
+    } else if (empty($data['id_emoticon'])) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_emoticon is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($data['justificacion']) || empty($data['justificacion'])) {
+    } else if (empty($data['justificacion'])) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Justificacion is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($data['hora_evento']) || empty($data['hora_evento'])) {
+    } else if (empty($data['hora_evento'])) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Hora_evento is empty');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
 
         //Agregar eventos
         $object = new Evento();
-        $object->setIdEntrevista($id_entrevista);
+        $object->setIdEntrevista($idEntrevista);
         $object->setIdAccion($data['id_accion']);
         $object->setIdEmoticon($data['id_emoticon']);
         $object->setJustificacion($data['justificacion']);
         $object->setHoraEvento($data['hora_evento']);
 
-        $lastid = $object->agregar($conn);
+        $lastId = $object->agregar($conn);
 
         //Insert error
-        if (!$lastid) {
+        if (!$lastId) {
 
             $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Create problem', 'Create a new object has fail');
             $response = $response->withStatus(500);
         } else {
 
-            $object->setId($lastid);
+            $object->setId($lastId);
             $evento = $object->buscarEvento($conn);
 
             //Formatar respuesta
@@ -76,15 +76,13 @@ $app->post('/entrevistas/{id_entrevista}/eventos', function ($request, $response
 
             $response = $response->withStatus(201);
         }
-    }
-
-    //Connection error
+    } //Connection error
     else {
         $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server problem', 'A connection problem ocurred with database');
         $response = $response->withStatus(500);
     }
 
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
     //Desconectar mysql
@@ -96,8 +94,8 @@ $app->post('/entrevistas/{id_entrevista}/eventos', function ($request, $response
 //* Obtener evento especifico de una entrevista
 $app->get('/entrevistas/{id_entrevista}/eventos/{id_evento}', function ($request, $response, $args) {
 
-    $id_entrevista = $args['id_entrevista'];
-    $id_evento = $args['id_evento'];
+    $idEntrevista = $args['id_entrevista'];
+    $idEvento = $args['id_evento'];
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -105,25 +103,25 @@ $app->get('/entrevistas/{id_entrevista}/eventos/{id_evento}', function ($request
 
     $payload = array(
         'links' => array(
-            'self' => "/entrevistas/" . $id_entrevista . "/eventos" . $id_evento
+            'self' => "/entrevistas/" . $idEntrevista . "/eventos" . $idEvento
         ),
         'data' => array()
     );
-    if (!isset($id_entrevista) || empty($id_entrevista) || !is_numeric($id_entrevista)) {
+    if (empty($idEntrevista) || !is_numeric($idEntrevista)) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevista must be integer');
         $response = $response->withStatus(400);
     }
-    if (!isset($id_evento) || empty($id_evento) || !is_numeric($id_evento)) {
+    if (empty($idEvento) || !is_numeric($idEvento)) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_evento must be integer');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
 
         //Buscar eventos de entrevista
         $object = new Evento();
-        $object->setIdEntrevista($id_entrevista);
-        $object->setId($id_evento);
+        $object->setIdEntrevista($idEntrevista);
+        $object->setId($idEvento);
 
         $evento = $object->buscarEvento($conn);
 
@@ -133,26 +131,24 @@ $app->get('/entrevistas/{id_entrevista}/eventos/{id_evento}', function ($request
         } else {
 
             //Preparar respuesta
-            $payload['data'] =
-                array(
-                    'type' => 'eventos',
-                    'id' => $evento['id'],
-                    'attributes' => array(
-                        'id_entrevista' => $evento['id_entrevista'],
-                        'id_accion' => $evento['id_accion'],
-                        'id_emoticon' => $evento['id_emoticon'],
-                        'justificacion' => $evento['justificacion'],
-                        'hora_evento' => $evento['hora_evento']
-
-                    )
-                );
+            $payload['data'] = array(
+                'type' => 'eventos',
+                'id' => $evento['id'],
+                'attributes' => array(
+                    'id_entrevista' => $evento['id_entrevista'],
+                    'id_accion' => $evento['id_accion'],
+                    'id_emoticon' => $evento['id_emoticon'],
+                    'justificacion' => $evento['justificacion'],
+                    'hora_evento' => $evento['hora_evento']
+                )
+            );
         }
     } else {
         $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server connection problem', 'A connection problem ocurred with database');
         $response = $response->withStatus(500);
     }
 
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
     //Desconectar mysql
@@ -164,19 +160,19 @@ $app->get('/entrevistas/{id_entrevista}/eventos/{id_evento}', function ($request
 //* Editar un evento
 $app->put('/entrevistas/{id_entrevista}/eventos/{id_evento}', function ($request, $response, $args) {
 
-    $id_entrevista = $args['id_entrevista'];
-    $id_evento = $args['id_evento'];
+    $idEntrevista = $args['id_entrevista'];
+    $idEvento = $args['id_evento'];
 
     $payload = array(
         'links' => array(
-            'self' => "/entrevistas/" . $id_entrevista . "/eventos/" . $id_evento
+            'self' => "/entrevistas/" . $idEntrevista . "/eventos/" . $idEvento
         )
     );
 
     //Obtener parametros put
     $data = $request->getBody()->getContents();
-    $putdata = array();
-    parse_str($data, $putdata);
+    $putData = array();
+    parse_str($data, $putData);
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -185,40 +181,40 @@ $app->put('/entrevistas/{id_entrevista}/eventos/{id_evento}', function ($request
     /**
      * VALIDACION PARAMETROS
      */
-    if (!is_numeric($id_entrevista)) {
+    if (!is_numeric($idEntrevista)) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevista must be integer');
         $response = $response->withStatus(400);
-    } else if (!is_numeric($id_evento)) {
+    } else if (!is_numeric($idEvento)) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_evento must be integer');
         $response = $response->withStatus(400);
-    } else if (!isset($putdata['id_accion']) || empty($putdata['id_accion'])) {
+    } else if (empty($putData['id_accion'])) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_accion is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($putdata['id_emoticon']) || empty($putdata['id_emoticon'])) {
+    } else if (empty($putData['id_emoticon'])) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_emoticon is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($putdata['justificacion']) || empty($putdata['justificacion'])) {
+    } else if (empty($putData['justificacion'])) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Justificacion is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($putdata['hora_evento']) || empty($putdata['hora_evento'])) {
+    } else if (empty($putData['hora_evento'])) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Hora_evento is empty');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
 
         //Actualizar evento
-        $object  = new Evento();
-        $object->setId($id_evento);
-        $object->setIdEntrevista($id_entrevista);
-        $object->setJustificacion($putdata['justificacion']);
-        $object->setIdAccion($putdata['id_accion']);
-        $object->setIdEmoticon($putdata['id_emoticon']);
-        $object->setHoraEvento($putdata['hora_evento']);
+        $object = new Evento();
+        $object->setId($idEvento);
+        $object->setIdEntrevista($idEntrevista);
+        $object->setJustificacion($putData['justificacion']);
+        $object->setIdAccion($putData['id_accion']);
+        $object->setIdEmoticon($putData['id_emoticon']);
+        $object->setHoraEvento($putData['hora_evento']);
 
         $actualizar = $object->actualizar($conn);
 
@@ -246,15 +242,13 @@ $app->put('/entrevistas/{id_entrevista}/eventos/{id_evento}', function ($request
 
             $response = $response->withStatus(201);
         }
-    }
-
-    //Connection error
+    } //Connection error
     else {
         $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server problem', 'A connection problem ocurred with database');
         $response = $response->withStatus(500);
     }
 
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
     //Desconectar mysql
@@ -266,8 +260,8 @@ $app->put('/entrevistas/{id_entrevista}/eventos/{id_evento}', function ($request
 //* Eliminar un evento de entrevista
 $app->delete('/entrevistas/{id_entrevista}/eventos/{id_evento}', function ($request, $response, $args) {
 
-    $id_entrevista = $args['id_entrevista'];
-    $id_evento = $args['id_evento'];
+    $idEntrevista = $args['id_entrevista'];
+    $idEvento = $args['id_evento'];
 
     //Conectar bd
     $mysql_adapter = new MysqlAdapter();
@@ -275,23 +269,23 @@ $app->delete('/entrevistas/{id_entrevista}/eventos/{id_evento}', function ($requ
 
     $payload = array(
         'links' => array(
-            'self' => "/entrevistas/" . $id_entrevista . "/eventos/" . $id_evento
+            'self' => "/entrevistas/" . $idEntrevista . "/eventos/" . $idEvento
         )
     );
-    if (!isset($id_entrevista) || empty($id_entrevista) || !is_numeric($id_entrevista)) {
+    if (empty($idEntrevista) || !is_numeric($idEntrevista)) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevista must be integer');
         $response = $response->withStatus(400);
-    } else if (!isset($id_evento) || empty($id_evento) || !is_numeric($id_evento)) {
+    } else if (empty($idEvento) || !is_numeric($idEvento)) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_evento must be integer');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
 
         //Eliminar eventos
         $object = new Evento();
-        $object->setId($id_evento);
-        $object->setIdEntrevista($id_entrevista);
+        $object->setId($idEvento);
+        $object->setIdEntrevista($idEntrevista);
 
         $eliminar = $object->eliminar($conn);
 
@@ -305,7 +299,7 @@ $app->delete('/entrevistas/{id_entrevista}/eventos/{id_evento}', function ($requ
         }
     }
 
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
     //Desconectar mysql
@@ -319,7 +313,7 @@ $app->get('/entrevistas/{id_entrevista}/eventos/idioma/{idioma}', function ($req
 
     $idioma = $args['idioma'];
 
-    $id_entrevista = $args['id_entrevista'];
+    $idEntrevista = $args['id_entrevista'];
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -327,50 +321,47 @@ $app->get('/entrevistas/{id_entrevista}/eventos/idioma/{idioma}', function ($req
 
     $payload = array(
         'links' => array(
-            'self' => "/entrevistas/" . $id_entrevista . "/eventos/" . $idioma
+            'self' => "/entrevistas/" . $idEntrevista . "/eventos/" . $idioma
         ),
         'data' => array()
     );
-    if (!isset($id_entrevista) || empty($id_entrevista) || !is_numeric($id_entrevista)) {
+    if (empty($idEntrevista) || !is_numeric($idEntrevista)) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevista must be integer');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
 
         //Buscar eventos de entrevista
         $object = new Evento();
-        $object->setIdEntrevista($id_entrevista);
+        $object->setIdEntrevista($idEntrevista);
 
         $listado = $object->buscarEventosEntrevista($conn, $idioma);
 
         //Preparar respuesta
         foreach ($listado as $key => $value) {
 
-            array_push(
-                $payload['data'],
-                array(
-                    'type' => 'eventos',
-                    'id' => $value['id'],
-                    'attributes' => array(
-                        'id_entrevista' => $value['id_entrevista'],
-                        'id_accion' => $value['id_accion'],
-                        'id_emoticon' => $value['id_emoticon'],
-                        'justificacion' => $value['justificacion'],
-                        'hora_evento' => $value['hora_evento']
+            $payload['data'][] = array(
+                'type' => 'eventos',
+                'id' => $value['id'],
+                'attributes' => array(
+                    'id_entrevista' => $value['id_entrevista'],
+                    'id_accion' => $value['id_accion'],
+                    'id_emoticon' => $value['id_emoticon'],
+                    'justificacion' => $value['justificacion'],
+                    'hora_evento' => $value['hora_evento']
+                ),
+                'relationships' => array(
+                    'accion' => array(
+                        'data' => array(
+                            'id' => $value['id_accion_a'],
+                            'nombre' => $value['nombre_accion']
+                        )
                     ),
-                    'relationships' => array(
-                        'accion' => array(
-                            'data' => array(
-                                'id' => $value['id_accion_a'],
-                                'nombre' => $value['nombre_accion']
-                            )
-                        ),
-                        'emoticon' => array(
-                            'data' => array(
-                                'id' => $value['id_emoticon_e'],
-                                'url' => $value['url_emoticon'],
-                                'descripcion' => $value['descripcion_emoticon']
-                            )
+                    'emoticon' => array(
+                        'data' => array(
+                            'id' => $value['id_emoticon_e'],
+                            'url' => $value['url_emoticon'],
+                            'descripcion' => $value['descripcion_emoticon']
                         )
                     )
                 )
@@ -381,7 +372,7 @@ $app->get('/entrevistas/{id_entrevista}/eventos/idioma/{idioma}', function ($req
         $response = $response->withStatus(500);
     }
 
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
     //Desconectar mysql
