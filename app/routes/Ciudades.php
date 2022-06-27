@@ -1,7 +1,7 @@
 <?php
 
 //* Listado de acciones del sistema
- $app->get('/ciudades',function($request,$response,$args){
+$app->get('/ciudades', function ($request, $response, $args) {
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -14,7 +14,7 @@
         'data' => array()
     );
 
-    if ($conn != null) {
+    if ($conn !== null) {
 
         //Buscar acciones
         $object = new Ciudad();
@@ -23,14 +23,11 @@
         //Preparar respuesta
         foreach ($listado as $key => $value) {
 
-            array_push(
-                $payload['data'],
-                array(
-                    'type' => 'ciudades',
-                    'id' => $value['id'],
-                    'attributes' => array(
-                        'nombre' => $value['nombre']
-                    )
+            $payload['data'][] = array(
+                'type' => 'ciudades',
+                'id' => $value['id'],
+                'attributes' => array(
+                    'nombre' => $value['nombre']
                 )
             );
         }
@@ -47,4 +44,4 @@
     //Desconectar mysql
     $mysql_adapter->disconnect();
     return $response;
- })->add(new JwtMiddleware());
+})->add(new JwtMiddleware());

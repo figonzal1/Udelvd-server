@@ -1,16 +1,16 @@
 <?php
+/** @noinspection ForgottenDebugOutputInspection */
 
 /**
  * Objeto ciudad
  */
-
 class Ciudad
 {
 
-    private $id;
-    private $nombre;
+    private string $id;
+    private string $nombre;
 
-    function agregar($conn)
+    public function agregar($conn)
     {
         try {
 
@@ -34,7 +34,7 @@ class Ciudad
         }
     }
 
-    function buscarCiudadPorNombre($conn)
+    public function buscarCiudadPorNombre($conn)
     {
         try {
             $stmt = $conn->prepare(
@@ -42,23 +42,17 @@ class Ciudad
             );
             $stmt->execute(array($this->nombre));
 
-            $ciudad = $stmt->fetch(PDO::FETCH_ASSOC);
-            return $ciudad;
+            return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("Fail search ciudad: " . $e->getMessage(), 0);
             return false;
         }
     }
 
-    function buscarTodos($conn)
+    public function buscarTodos($conn)
     {
         try {
-            $stmt = $conn->query(
-                "SELECT * from ciudad"
-            );
-
-            $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            return $listado;
+            return $conn->query("SELECT * from ciudad")->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("Fail search lista ciudades: " . $e->getMessage(), 0);
             return false;
@@ -68,19 +62,17 @@ class Ciudad
     /**
      * GETTERS & SETTERS
      */
-    function getId()
+    public function getId(): string
     {
         return $this->id;
     }
-    function getNombre()
-    {
-        return $this->nombre;
-    }
-    function setId($id)
+
+    public function setId($id): void
     {
         $this->id = $id;
     }
-    function setNombre($nombre)
+
+    public function setNombre($nombre): void
     {
         $this->nombre = $nombre;
     }
