@@ -1,19 +1,16 @@
-<?php
+<?php /** @noinspection ForgottenDebugOutputInspection */
 
 /**
  * Objeto entrevista
  */
-
 class Entrevista
 {
+    private string $id;
+    private string $idEntrevistado;
+    private string $idTipoEntrevista;
+    private string $fechaEntrevista;
 
-
-    private $id;
-    private $id_entrevistado;
-    private $id_tipo_entrevista;
-    private $fecha_entrevista;
-
-    function agregar($conn)
+    public function agregar($conn)
     {
         try {
 
@@ -23,9 +20,9 @@ class Entrevista
 
             $stmt->execute(
                 array(
-                    $this->id_entrevistado,
-                    $this->id_tipo_entrevista,
-                    $this->fecha_entrevista
+                    $this->idEntrevistado,
+                    $this->idTipoEntrevista,
+                    $this->fechaEntrevista
                 )
             );
 
@@ -35,12 +32,12 @@ class Entrevista
 
             return $lastId['id'];
         } catch (PDOException $e) {
-            error_log("Fail insert entrevista: " . $e->getMessage(), 0);
+            error_log("Fail insert entrevista: " . $e->getMessage());
             return false;
         }
     }
 
-    function actualizar($conn)
+    public function actualizar($conn): bool
     {
         try {
 
@@ -49,25 +46,21 @@ class Entrevista
             $stmt = $conn->prepare($sql);
 
             $stmt->execute(array(
-                $this->id_entrevistado,
-                $this->id_tipo_entrevista,
-                $this->fecha_entrevista,
+                $this->idEntrevistado,
+                $this->idTipoEntrevista,
+                $this->fechaEntrevista,
                 $this->id
             ));
 
-            if ($stmt->rowCount() == 0) {
-                return "iguales";
-            } else if ($stmt->rowCount() == 1) {
-                return true;
-            }
+            return $stmt->rowCount() === 1;
         } catch (PDOException $e) {
-            error_log("Fail update entrevista: " . $e->getMessage(), 0);
+            error_log("Fail update entrevista: " . $e->getMessage());
             return false;
         }
     }
 
     //* Buscar entrevista por ID
-    function buscarEntrevista($conn)
+    public function buscarEntrevista($conn)
     {
         try {
 
@@ -81,17 +74,15 @@ class Entrevista
                 )
             );
 
-            $entrevista = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            return $entrevista;
+            return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Fail search entrevista: " . $e->getMessage(), 0);
+            error_log("Fail search entrevista: " . $e->getMessage());
             return false;
         }
     }
 
     //* Buscar entrevistas de una persona
-    function buscarEntrevistasPersonales($conn, $idioma)
+    public function buscarEntrevistasPersonales($conn, $idioma)
     {
         try {
 
@@ -118,21 +109,19 @@ class Entrevista
 
             $stmt->execute(
                 array(
-                    $this->id_entrevistado
+                    $this->idEntrevistado
                 )
             );
 
-            $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            return $listado;
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Fail search entrevistas usuarios: " . $e->getMessage(), 0);
+            error_log("Fail search entrevistas usuarios: " . $e->getMessage());
             return false;
         }
     }
 
     //* Buscar una entrevista de una persona
-    function buscarEntrevistaPersonal($conn)
+    public function buscarEntrevistaPersonal($conn)
     {
         try {
 
@@ -143,37 +132,31 @@ class Entrevista
             $stmt->execute(
                 array(
                     $this->id,
-                    $this->id_entrevistado
+                    $this->idEntrevistado
                 )
             );
 
-            $entrevista = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            return $entrevista;
+            return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Fail search entrevista: " . $e->getMessage(), 0);
+            error_log("Fail search entrevista: " . $e->getMessage());
             return false;
         }
     }
 
-    function buscarTodos($conn)
+    public function buscarTodos($conn)
     {
         try {
 
             $sql = "SELECT * FROM entrevista WHERE visible=1 ORDER BY fecha_entrevista";
 
-            $stmt = $conn->query($sql);
-
-            $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            return $listado;
+            return $conn->query($sql)->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Fail search lista entrevistas: " . $e->getMessage(), 0);
+            error_log("Fail search lista entrevistas: " . $e->getMessage());
             return false;
         }
     }
 
-    function eliminar($conn)
+    public function eliminar($conn): bool
     {
 
         try {
@@ -192,54 +175,46 @@ class Entrevista
             $stmt->execute(
                 array(
                     $this->id,
-                    $this->id_entrevistado
+                    $this->idEntrevistado
                 )
             );
-            
-            if ($stmt->rowCount() == 0) {
-                return false;
-            } else if ($stmt->rowCount() == 1) {
-                return true;
-            }
+
+            return $stmt->rowCount() === 1;
         } catch (PDOException $e) {
-            error_log("Fail delete entrevista: " . $e->getMessage(), 0);
+            error_log("Fail delete entrevista: " . $e->getMessage());
             return false;
         }
     }
 
     /**
-     * GETTERS & SETTERS
+     * @param string $id
      */
-    function getId()
-    {
-        return $this->id;
-    }
-    function getIdEntrevistado()
-    {
-        return $this->id_entrevistado;
-    }
-    function getIdTipoEntrevista()
-    {
-        return $this->id_tipo_entrevista;
-    }
-    function getFechaEntrevista()
-    {
-        return $this->fecha_entrevista;
-    }
-    function setId($id)
+    public function setId(string $id): void
     {
         $this->id = $id;
     }
-    function setIdEntrevistado($id_entrevistado)
+
+    /**
+     * @param string $idEntrevistado
+     */
+    public function setIdEntrevistado(string $idEntrevistado): void
     {
-        $this->id_entrevistado = $id_entrevistado;
+        $this->idEntrevistado = $idEntrevistado;
     }
-    function setIdTipoEntrevista($id_tipo_entrevista)
+
+    /**
+     * @param string $idTipoEntrevista
+     */
+    public function setIdTipoEntrevista(string $idTipoEntrevista): void
     {
-        $this->id_tipo_entrevista = $id_tipo_entrevista;
+        $this->idTipoEntrevista = $idTipoEntrevista;
     }
-    function setFechaEntrevista($fecha_entrevista)
+
+    /**
+     * @param string $fechaEntrevista
+     */
+    public function setFechaEntrevista(string $fechaEntrevista): void
     {
-        $this->fecha_entrevista = $fecha_entrevista;
+        $this->fechaEntrevista = $fechaEntrevista;
     }
 }

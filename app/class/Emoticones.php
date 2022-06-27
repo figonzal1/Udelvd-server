@@ -126,43 +126,4 @@ class Emoticones
         return $this->url;
     }
 
-    /**
-     * @param string $url
-     */
-    public function setUrl(string $url): void
-    {
-        $this->url = $url;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDescripcionES(): string
-    {
-        return $this->descripcionES;
-    }
-
-    /**
-     * @param string $descripcionES
-     */
-    public function setDescripcionES(string $descripcionES): void
-    {
-        $this->descripcionES = $descripcionES;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDescripcionEN(): string
-    {
-        return $this->descripcionEN;
-    }
-
-    /**
-     * @param string $descripcionEN
-     */
-    public function setDescripcionEN(string $descripcionEN): void
-    {
-        $this->descripcionEN = $descripcionEN;
-    }
 }

@@ -5,7 +5,7 @@ $app->get('/entrevistados/{id_entrevistado}/entrevistas/idioma/{idioma}', functi
 
     $idioma = $args['idioma'];
 
-    $id_entrevistado = $args['id_entrevistado'];
+    $idEntrevistado = $args['id_entrevistado'];
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -13,43 +13,40 @@ $app->get('/entrevistados/{id_entrevistado}/entrevistas/idioma/{idioma}', functi
 
     $payload = array(
         'links' => array(
-            'self' => "/entrevistados/" . $id_entrevistado . "/entrevistas/idioma/" . $idioma
+            'self' => "/entrevistados/" . $idEntrevistado . "/entrevistas/idioma/" . $idioma
         ),
         'data' => array()
     );
 
 
-    if (!isset($id_entrevistado) || empty($id_entrevistado) || !is_numeric($id_entrevistado)) {
+    if (empty($idEntrevistado) || !is_numeric($idEntrevistado)) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevistado must be integer');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
 
         //Buscar entrevistas de usuarios
         $object = new Entrevista();
-        $object->setIdEntrevistado($id_entrevistado);
+        $object->setIdEntrevistado($idEntrevistado);
 
         $listado = $object->buscarEntrevistasPersonales($conn, $idioma);
 
         //Preparar respuesta
-        foreach ($listado as $key => $value) {
+        foreach ($listado as $value) {
 
-            array_push(
-                $payload['data'],
-                array(
-                    'type' => 'entrevistas',
-                    'id' => $value['id'],
-                    'attributes' => array(
-                        'id_entrevistado' => $value['id_entrevistado'],
-                        'id_tipo_entrevista' => $value['id_tipo_entrevista'],
-                        'fecha_entrevista' =>  $value['fecha_entrevista']
-                    ),
-                    'relationships' => array(
-                        'tipoEntrevista' => array(
-                            'data' => array(
-                                'id' => $value['id_tipo_entrevista'],
-                                'nombre' => $value['nombre_tipo_entrevista']
-                            )
+            $payload['data'][] = array(
+                'type' => 'entrevistas',
+                'id' => $value['id'],
+                'attributes' => array(
+                    'id_entrevistado' => $value['id_entrevistado'],
+                    'id_tipo_entrevista' => $value['id_tipo_entrevista'],
+                    'fecha_entrevista' => $value['fecha_entrevista']
+                ),
+                'relationships' => array(
+                    'tipoEntrevista' => array(
+                        'data' => array(
+                            'id' => $value['id_tipo_entrevista'],
+                            'nombre' => $value['nombre_tipo_entrevista']
                         )
                     )
                 )
@@ -60,7 +57,7 @@ $app->get('/entrevistados/{id_entrevistado}/entrevistas/idioma/{idioma}', functi
         $response = $response->withStatus(500);
     }
 
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
     //Desconectar mysql
@@ -72,8 +69,8 @@ $app->get('/entrevistados/{id_entrevistado}/entrevistas/idioma/{idioma}', functi
 //* Obtener una entrevista de una persona especifica
 $app->get('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', function ($request, $response, $args) {
 
-    $id_entrevistado = $args['id_entrevistado'];
-    $id_entrevista = $args['id_entrevista'];
+    $idEntrevistado = $args['id_entrevistado'];
+    $idEntrevista = $args['id_entrevista'];
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -81,27 +78,27 @@ $app->get('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', functi
 
     $payload = array(
         'links' => array(
-            'self' => "/entrevistados/" . $id_entrevistado . "/entrevistas/" . $id_entrevista
+            'self' => "/entrevistados/" . $idEntrevistado . "/entrevistas/" . $idEntrevista
         ),
         'data' => array()
     );
 
 
-    if (!isset($id_entrevistado) || empty($id_entrevistado) || !is_numeric($id_entrevistado)) {
+    if (empty($idEntrevistado) || !is_numeric($idEntrevistado)) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevistado must be integer');
         $response = $response->withStatus(400);
     }
-    if (!isset($id_entrevista) || empty($id_entrevista) || !is_numeric($id_entrevista)) {
+    if (empty($idEntrevista) || !is_numeric($idEntrevista)) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevista must be integer');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
 
         //Buscar entrevistas de usuarios
         $object = new Entrevista();
-        $object->setIdEntrevistado($id_entrevistado);
-        $object->setId($id_entrevista);
+        $object->setIdEntrevistado($idEntrevistado);
+        $object->setId($idEntrevista);
 
         $entrevista = $object->buscarEntrevistaPersonal($conn);
 
@@ -116,7 +113,7 @@ $app->get('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', functi
                 'attributes' => array(
                     'id_entrevistado' => $entrevista['id_entrevistado'],
                     'id_tipo_entrevista' => $entrevista['id_tipo_entrevista'],
-                    'fecha_entrevista' =>  $entrevista['fecha_entrevista']
+                    'fecha_entrevista' => $entrevista['fecha_entrevista']
                 )
 
             );
@@ -126,7 +123,7 @@ $app->get('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', functi
         $response = $response->withStatus(500);
     }
 
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
     //Desconectar mysql
@@ -138,11 +135,11 @@ $app->get('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', functi
 //* Crear una entrevista
 $app->post('/entrevistados/{id_entrevistado}/entrevistas', function ($request, $response, $args) {
 
-    $id_entrevista = $args['id_entrevistado'];
+    $idEntrevistado = $args['id_entrevistado'];
 
     $payload = array(
         'links' => array(
-            'self' => '/entrevistados/' . $id_entrevista . '/entrevistas'
+            'self' => '/entrevistados/' . $idEntrevistado . '/entrevistas'
         )
     );
 
@@ -156,38 +153,38 @@ $app->post('/entrevistados/{id_entrevistado}/entrevistas', function ($request, $
     /**
      * Validacion de parametros
      */
-    if (!isset($id_entrevista) || empty($id_entrevista)) {
+    if (empty($idEntrevistado)) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevista is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($data['id_tipo_entrevista']) || empty($data['id_tipo_entrevista'])) {
+    } else if (empty($data['id_tipo_entrevista'])) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_tipo_entrevista is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($data['fecha_entrevista']) || empty($data['fecha_entrevista'])) {
+    } else if (empty($data['fecha_entrevista'])) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Fecha entrevista is empty');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
 
         //Agregar entrevista
         $object = new Entrevista();
-        $object->setIdEntrevistado($id_entrevista);
+        $object->setIdEntrevistado($idEntrevistado);
         $object->setFechaEntrevista($data['fecha_entrevista']);
         $object->setIdTipoEntrevista($data['id_tipo_entrevista']);
 
         //Insertar entrevista
-        $lastid = $object->agregar($conn);
+        $lastId = $object->agregar($conn);
 
         //Insert error
-        if (!$lastid) {
+        if (!$lastId) {
 
             $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Create problem', 'Create a new object has fail');
             $response = $response->withStatus(500);
         } else {
 
             //Buscar entrevista por id
-            $object->setId($lastid);
+            $object->setId($lastId);
             $entrevista = $object->buscarEntrevista($conn);
 
             //Formatear respuesta
@@ -205,14 +202,13 @@ $app->post('/entrevistados/{id_entrevistado}/entrevistas', function ($request, $
 
             $response = $response->withStatus(201);
         }
-    }
-    //Connection error
+    } //Connection error
     else {
         $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server problem', 'A connection problem ocurred with database');
         $response = $response->withStatus(500);
     }
 
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
     //Desconectar mysql
@@ -235,8 +231,8 @@ $app->put('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', functi
 
     //Obtener parametros put
     $data = $request->getBody()->getContents();
-    $putdata = array();
-    parse_str($data, $putdata);
+    $putData = array();
+    parse_str($data, $putData);
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -253,24 +249,24 @@ $app->put('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', functi
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevista must be integer');
         $response = $response->withStatus(400);
-    } else if (!isset($putdata['fecha_entrevista']) || empty($putdata['fecha_entrevista'])) {
+    } else if (empty($putData['fecha_entrevista'])) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'fecha_entrevista is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($putdata['id_tipo_entrevista']) || empty($putdata['id_tipo_entrevista'])) {
+    } else if (empty($putData['id_tipo_entrevista'])) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_tipo_entrevista is empty');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
 
         //Actualzar entrevista
         $object = new Entrevista();
         $object->setIdEntrevistado($id_entrevistado);
         $object->setId($id_entrevista);
-        $object->setFechaEntrevista($putdata['fecha_entrevista']);
-        $object->setIdTipoEntrevista($putdata['id_tipo_entrevista']);
+        $object->setFechaEntrevista($putData['fecha_entrevista']);
+        $object->setIdTipoEntrevista($putData['id_tipo_entrevista']);
 
-        //Actualizar enrevista
+        //Actualizar entrevista
         $actualizar = $object->actualizar($conn);
 
         if (!$actualizar) {
@@ -295,15 +291,13 @@ $app->put('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', functi
 
             $response = $response->withStatus(201);
         }
-    }
-
-    //Connection error
+    } //Connection error
     else {
         $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server problem', 'A connection problem ocurred with database');
         $response = $response->withStatus(500);
     }
 
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
     //Desconectar mysql
@@ -315,8 +309,8 @@ $app->put('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', functi
 //* Eliminar una entrevista
 $app->delete('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', function ($request, $response, $args) {
 
-    $id_entrevistado = $args['id_entrevistado'];
-    $id_entrevista = $args['id_entrevista'];
+    $idEntrevistado = $args['id_entrevistado'];
+    $idEntrevista = $args['id_entrevista'];
 
     //Conectar bd
     $mysql_adapter = new MysqlAdapter();
@@ -324,24 +318,25 @@ $app->delete('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', fun
 
     $payload = array(
         'links' => array(
-            'self' => "/entrevistados/" . $id_entrevistado . "/entrevistas/" . $id_entrevista
+            'self' => "/entrevistados/" . $idEntrevistado . "/entrevistas/" . $idEntrevista
         )
     );
 
-    if (!isset($id_entrevistado) || empty($id_entrevistado) || !is_numeric($id_entrevistado)) {
+    if (empty($idEntrevistado) || !is_numeric($idEntrevistado)) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevistado must be integer');
         $response = $response->withStatus(400);
-    } else if (!isset($id_entrevista) || empty($id_entrevista) || !is_numeric($id_entrevista)) {
+    } else if (empty($idEntrevista) || !is_numeric($idEntrevista)) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_entrevista must be integer');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
 
         //Eliminar entrevistas
-        $object  = new Entrevista();
-        $object->setId($id_entrevista);
-        $object->setIdEntrevistado($id_entrevistado);
+        $object = new Entrevista();
+        $object->setId($idEntrevista);
+        $object->setIdEntrevistado($idEntrevistado);
+
         $eliminar = $object->eliminar($conn);
 
         if ($eliminar) {
@@ -355,7 +350,7 @@ $app->delete('/entrevistados/{id_entrevistado}/entrevistas/{id_entrevista}', fun
         }
     }
 
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
     //Desconectar mysql
