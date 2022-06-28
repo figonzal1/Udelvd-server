@@ -118,11 +118,11 @@ $app->post('/acciones', function ($request, $response, $args) {
     /**
      * VALIDACION PARAMETROS
      */
-    if (empty($data['nombre_es'])) {
+    if (!array_key_exists('nombre_es', $data) || $data['nombre_es'] === "") {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre_es is empty');
         $response = $response->withStatus(400);
     }
-    if (empty($data['nombre_en'])) {
+    if (!array_key_exists('nombre_en', $data) || $data['nombre_en'] === "") {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre_en is empty');
         $response = $response->withStatus(400);
     } else if ($conn !== null) {
@@ -174,38 +174,38 @@ $app->post('/acciones', function ($request, $response, $args) {
 //* Editar o actualizar una accion
 $app->put('/acciones/{id_accion}', function ($request, $response, $args) {
 
-    $id_accion = $args['id_accion'];
+    $idAccion = $args['id_accion'];
 
     //Seccion link self
     $payload = array(
         'links' => array(
-            'self' => "/acciones/" . $id_accion
+            'self' => "/acciones/" . $idAccion
         )
     );
 
     //Obtener parametros put
     $data = $request->getBody()->getContents();
-    $putdata = array();
-    parse_str($data, $putdata);
+    $putData = array();
+    parse_str($data, $putData);
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
     $conn = $mysql_adapter->connect();
 
-    if (empty($putdata['nombre_es'])) {
+    if (!array_key_exists('nombre_es', $putData) || $putData['nombre_es'] === "") {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre_es is empty');
         $response = $response->withStatus(400);
     }
-    if (empty($putdata['nombre_en'])) {
+    if (!array_key_exists('nombre_en', $putData) || $putData['nombre_en'] === "") {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre_en is empty');
         $response = $response->withStatus(400);
     } else if ($conn !== null) {
 
         //Agregar accion
         $object = new Acciones();
-        $object->setId(htmlspecialchars($id_accion));
-        $object->setNombreES(htmlspecialchars($putdata['nombre_es']));
-        $object->setNombreEN(htmlspecialchars($putdata['nombre_en']));
+        $object->setId(htmlspecialchars($idAccion));
+        $object->setNombreES(htmlspecialchars($putData['nombre_es']));
+        $object->setNombreEN(htmlspecialchars($putData['nombre_en']));
 
         //Actualizar investigador
         $actualizar = $object->actualizar($conn);
@@ -249,7 +249,7 @@ $app->put('/acciones/{id_accion}', function ($request, $response, $args) {
 //* Eliminar una accion
 $app->delete('/acciones/{id_accion}', function ($request, $response, $args) {
 
-    $id_accion = $args['id_accion'];
+    $idAccion = $args['id_accion'];
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -257,17 +257,17 @@ $app->delete('/acciones/{id_accion}', function ($request, $response, $args) {
 
     $payload = array(
         'links' => array(
-            'self' => "/acciones/" . $id_accion
+            'self' => "/acciones/" . $idAccion
         )
     );
 
-    if (!is_numeric($id_accion)) {
+    if (!is_numeric($idAccion)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
     } else if ($conn !== null) {
 
         $object = new Acciones();
-        $eliminar = $object->eliminar($conn, $id_accion);
+        $eliminar = $object->eliminar($conn, $idAccion);
 
         if ($eliminar) {
             $response = $response->withStatus(200);

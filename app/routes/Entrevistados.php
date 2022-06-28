@@ -181,17 +181,17 @@ $app->get('/entrevistados/pagina/{n_pag}', function ($request, $response, $args)
         'data' => array()
     );
 
-    if ($conn != null) {
+    if ($conn !== null) {
 
         //Buscar entrevistados
         $object = new Entrevistado();
 
         $listado = $object->buscarTodosConPagina($conn, $n_pag);
 
-        $conteo = $object->contarTodos($conn, true);
+        $conteo = $object->contarTodos($conn);
 
         //Preparar respuesta
-        foreach ($listado as $key => $value) {
+        foreach ($listado as $value) {
 
             $payload['data'][] = array(
                 'type' => 'entrevistados',
@@ -241,7 +241,7 @@ $app->get('/entrevistados/pagina/{n_pag}', function ($request, $response, $args)
         $response = $response->withStatus(500);
     }
     //Encodear resultado
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
     $response->getBody()->write($payload);
 
@@ -271,7 +271,7 @@ $app->get('/entrevistados/pagina/{n_pag}/investigador/{id_investigador}', functi
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_investigador must be integer');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
 
         //Buscar entrevistados
         $object = new Entrevistado();
@@ -279,10 +279,10 @@ $app->get('/entrevistados/pagina/{n_pag}/investigador/{id_investigador}', functi
 
         $listado = $object->buscarEntrevistadosInvestigadorPorPagina($conn, $n_pag);
 
-        $conteo = $object->contarEntrevistadosDeInvestigador($conn, false);
+        $conteo = $object->contarEntrevistadosDeInvestigador($conn);
 
         //Preparar respuesta
-        foreach ($listado as $key => $value) {
+        foreach ($listado as $value) {
 
             $payload['data'][] = array(
                 'type' => 'entrevistados',
@@ -324,7 +324,7 @@ $app->get('/entrevistados/pagina/{n_pag}/investigador/{id_investigador}', functi
         $response = $response->withStatus(500);
     }
     //Encodear resultado
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
     $response->getBody()->write($payload);
 
@@ -352,7 +352,7 @@ $app->get('/entrevistados/{id}', function ($request, $response, $args) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
 
         //Buscar usuario
         $object = new Entrevistado();
@@ -393,7 +393,7 @@ $app->get('/entrevistados/{id}', function ($request, $response, $args) {
         $response = $response->withStatus(500);
     }
 
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
     //Desconectar mysql
