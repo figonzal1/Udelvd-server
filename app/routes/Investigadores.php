@@ -1,6 +1,8 @@
 <?php
 
 //* Listado de investigadores del sistema
+use Dotenv\Dotenv;
+
 $app->get('/investigadores', function ($request, $response, $args) {
 
     //Conectar BD
@@ -14,32 +16,30 @@ $app->get('/investigadores', function ($request, $response, $args) {
         'data' => array()
     );
 
-    if ($conn != null) {
+    if ($conn !== null) {
         //Buscar investigadores
         $object = new Investigador();
+
         $listado = $object->buscarTodos($conn);
 
         //Preparar respuesta
-        foreach ($listado as $key => $value) {
+        foreach ($listado as $value) {
 
-            array_push(
-                $payload['data'],
-                array(
-                    'type' => 'investigadores',
-                    'id' => $value['id'],
-                    'attributes' => array(
-                        'nombre' => $value['nombre'],
-                        'apellido' => $value['apellido'],
-                        'email' => $value['email'],
-                        'id_rol' => $value['id_rol'],
-                        'activado' => $value['activado']
-                    ),
-                    'relationships' => array(
-                        'rol' => array(
-                            'data' => array(
-                                'id' => $value['id_rol'],
-                                'nombre' => $value['nombre_rol']
-                            )
+            $payload['data'][] = array(
+                'type' => 'investigadores',
+                'id' => $value['id'],
+                'attributes' => array(
+                    'nombre' => $value['nombre'],
+                    'apellido' => $value['apellido'],
+                    'email' => $value['email'],
+                    'id_rol' => $value['id_rol'],
+                    'activado' => $value['activado']
+                ),
+                'relationships' => array(
+                    'rol' => array(
+                        'data' => array(
+                            'id' => $value['id_rol'],
+                            'nombre' => $value['nombre_rol']
                         )
                     )
                 )
@@ -52,7 +52,7 @@ $app->get('/investigadores', function ($request, $response, $args) {
         $response = $response->withStatus(500);
     }
     //Encodear resultado
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
     $response->getBody()->write($payload);
 
@@ -61,17 +61,20 @@ $app->get('/investigadores', function ($request, $response, $args) {
     return $response;
 })->add(new JwtMiddleware());
 
-//* REGISTRO INVSTIGADOR
+//* REGISTRO INVESTIGADOR
 $app->post('/investigadores', function ($request, $response, $args) {
 
-    //? CONFIGURACION DE ACTIVACION AUTOMATICA
-    $activacion_env = getenv("auto_activacion"); //true | false
-    //$activacion_env = 'true'; //true | false
 
-    if ($activacion_env == 'true') {
-        $activacion_automatica = 1;
-    } else if ($activacion_env == 'false') {
-        $activacion_automatica = 0;
+    $dotenv = Dotenv::createImmutable(__DIR__ . "../../../");
+    $dotenv->load();
+
+    //? CONFIGURACION DE ACTIVACION AUTOMATICA
+    $activacionEnv = $_ENV["AUTO_ACTIVACION"]; //true | false
+
+    if ($activacionEnv === 'true') {
+        $autoActivacion = 1;
+    } else {
+        $autoActivacion = 0;
     }
 
     //Seccion link self
@@ -91,38 +94,39 @@ $app->post('/investigadores', function ($request, $response, $args) {
     /**
      * VALIDACION PARAMETROS
      */
-    if (!isset($data['nombre']) || empty($data['nombre'])) {
+    if (empty($data['nombre'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($data['apellido']) || empty($data['apellido'])) {
+    } else if (empty($data['apellido'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Apellido is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($data['email']) || empty($data['email'])) {
+    } else if (empty($data['email'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Email is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($data['nombre_rol']) || empty($data['nombre_rol'])) {
+    } else if (empty($data['nombre_rol'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre_rol is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($data['password']) || empty($data['password'])) {
+    } else if (empty($data['password'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Password is empty');
         $response = $response->withStatus(400);
     } else if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Email is malformed');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
 
         //Agregar investigador
         $object = new Investigador();
+
         $object->setNombre(htmlspecialchars(ucfirst($data['nombre'])));
         $object->setApellido(htmlspecialchars(ucfirst($data['apellido'])));
         $object->setEmail(htmlspecialchars(strtolower($data['email'])));
         $object->setNombreRol(htmlspecialchars(ucfirst($data['nombre_rol'])));
         $object->setPassword($data['password']);
-        $object->setActivado($activacion_automatica);
+        $object->setActivado($autoActivacion);
 
         $investigador = $object->buscarInvestigadorPorEmail($conn);
 
-        if ($investigador != null) {
+        if ($investigador !== null) {
             //Lanzar error de email
             $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Email problem', 'Email already exists');
             $response = $response->withStatus(500);
@@ -139,7 +143,8 @@ $app->post('/investigadores', function ($request, $response, $args) {
                 $object->setId($lastid);
                 $investigador = $object->buscarInvestigadorPorId($conn);
 
-                if ($activacion_env == "false") {
+                //FCM NOTIFICATION
+                if ($activacionEnv === "false") {
                     enviarNotificacion($investigador);
                 }
 
@@ -167,15 +172,13 @@ $app->post('/investigadores', function ($request, $response, $args) {
                 $response = $response->withStatus(201);
             }
         }
-    }
-
-    //Connection error
+    } //Connection error
     else {
         $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server problem', 'A connection problem ocurred with database');
         $response = $response->withStatus(500);
     }
 
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
     //Desconectar mysql
@@ -197,27 +200,27 @@ $app->put('/investigadores/resetear', function ($request, $response, $args) {
 
     //Obtener parametros put
     $data = $request->getBody()->getContents();
-    $patchdata = array();
-    parse_str($data, $patchdata);
+    $patchData = array();
+    parse_str($data, $patchData);
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
     $conn = $mysql_adapter->connect();
 
-    if (!isset($patchdata['email']) || empty($patchdata['email'])) {
+    if (empty($patchData['email'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Email is empty');
         $response = $response->withStatus(400);
-    } else if (!filter_var($patchdata['email'], FILTER_VALIDATE_EMAIL)) {
+    } else if (!filter_var($patchData['email'], FILTER_VALIDATE_EMAIL)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Enter valid Email');
         $response = $response->withStatus(400);
-    } else if (!isset($patchdata['password']) || empty($patchdata['password'])) {
+    } else if (empty($patchData['password'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Password is empty');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
         //Buscar investigador por email
 
         $object = new Investigador();
-        $object->setEmail(htmlspecialchars($patchdata['email']));
+        $object->setEmail(htmlspecialchars($patchData['email']));
         $investigador = $object->buscarInvestigadorPorEmail($conn);
 
         //Si investigador no existe
@@ -227,8 +230,8 @@ $app->put('/investigadores/resetear', function ($request, $response, $args) {
             $response = $response->withStatus(400);
         } else {
             $object = new Investigador();
-            $object->setPassword($patchdata['password']);
-            $object->setEmail($patchdata['email']);
+            $object->setPassword($patchData['password']);
+            $object->setEmail($patchData['email']);
 
             $reset = $object->resetPassword($conn);
 
@@ -244,15 +247,13 @@ $app->put('/investigadores/resetear', function ($request, $response, $args) {
                 $response = $response->withStatus(201);
             }
         }
-    }
-
-    //Connection error
+    } //Connection error
     else {
         $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server problem', 'A connection problem ocurred with database');
         $response = $response->withStatus(500);
     }
 
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
     //Desconectar mysql
@@ -280,13 +281,13 @@ $app->post('/investigadores/login', function ($request, $response, $args) {
     /**
      * Validaciond parametros
      */
-    if (!isset($data['email']) || empty($data['email'])) {
+    if (empty($data['email'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Email is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($data['password']) || empty($data['password'])) {
+    } else if (empty($data['password'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Password is empty');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
 
         //Realizar login
         $object = new Investigador();
@@ -300,14 +301,12 @@ $app->post('/investigadores/login', function ($request, $response, $args) {
             //Lanzar error de email
             $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Email problem', 'Email does not exist');
             $response = $response->withStatus(500);
-        }
-        //Si el usuario no esta activado
-        else if($investigador['activado']==0){
+        } //Si el usuario no esta activado
+        else if ($investigador['activado'] === 0) {
             //Lanzar error de activacion
             $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Account problem', 'Account deactivated');
             $response = $response->withStatus(500);
-        }
-        //Si el correo existe
+        } //Si el correo existe
         else {
 
             //Hacer login
@@ -355,15 +354,13 @@ $app->post('/investigadores/login', function ($request, $response, $args) {
                 $response = $response->withStatus(200);
             }
         }
-    }
-
-    //Connection error
+    } //Connection error
     else {
         $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server problem', 'A connection problem ocurred with database');
         $response = $response->withStatus(500);
     }
 
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
     //Desconectar mysql
@@ -375,8 +372,8 @@ $app->post('/investigadores/login', function ($request, $response, $args) {
 //* Obtener listado de investigadores para admin
 $app->get('/investigadores/pagina/{n_pag}/id_admin/{id_admin}', function ($request, $response, $args) {
 
-    $id_admin = $args['id_admin'];
-    $n_pag = $args['n_pag'];
+    $idAdmin = $args['id_admin'];
+    $nPag = $args['n_pag'];
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -384,44 +381,43 @@ $app->get('/investigadores/pagina/{n_pag}/id_admin/{id_admin}', function ($reque
 
     $payload = array(
         'links' => array(
-            'self' => "/investigadores/pagina/" . $n_pag . "/id_admin/" . $id_admin
+            'self' => "/investigadores/pagina/" . $nPag . "/id_admin/" . $idAdmin
         ),
         'data' => array()
     );
 
-    if (!isset($id_admin) || empty($id_admin) || !is_numeric($id_admin)) {
+    if (empty($idAdmin) || !is_numeric($idAdmin)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'id admin must be integer');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
+
         //Buscar investigadores
         $object = new Investigador();
-        $object->setId($id_admin);
-        $listado = $object->buscarPagina($conn, $n_pag);
+        $object->setId($idAdmin);
+
+        $listado = $object->buscarPagina($conn, $nPag);
 
         $conteo = $object->contarInvestigadores($conn);
 
         //Preparar respuesta
-        foreach ($listado as $key => $value) {
+        foreach ($listado as $value) {
 
-            array_push(
-                $payload['data'],
-                array(
-                    'type' => 'investigadores',
-                    'id' => $value['id'],
-                    'attributes' => array(
-                        'nombre' => $value['nombre'],
-                        'apellido' => $value['apellido'],
-                        'email' => $value['email'],
-                        'id_rol' => $value['id_rol'],
-                        'activado' => $value['activado'],
-                        'create_time' => $value['create_time']
-                    ),
-                    'relationships' => array(
-                        'rol' => array(
-                            'data' => array(
-                                'id' => $value['id_rol'],
-                                'nombre' => $value['nombre_rol']
-                            )
+            $payload['data'][] = array(
+                'type' => 'investigadores',
+                'id' => $value['id'],
+                'attributes' => array(
+                    'nombre' => $value['nombre'],
+                    'apellido' => $value['apellido'],
+                    'email' => $value['email'],
+                    'id_rol' => $value['id_rol'],
+                    'activado' => $value['activado'],
+                    'create_time' => $value['create_time']
+                ),
+                'relationships' => array(
+                    'rol' => array(
+                        'data' => array(
+                            'id' => $value['id_rol'],
+                            'nombre' => $value['nombre_rol']
                         )
                     )
                 )
@@ -441,7 +437,7 @@ $app->get('/investigadores/pagina/{n_pag}/id_admin/{id_admin}', function ($reque
     }
 
     //Encodear resultado
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
     $response->getBody()->write($payload);
 
@@ -465,10 +461,10 @@ $app->get('/investigadores/{id}', function ($request, $response, $args) {
         )
     );
 
-    if (!isset($id_investigador) || empty($id_investigador) || !is_numeric($id_investigador)) {
+    if (empty($id_investigador) || !is_numeric($id_investigador)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
 
         //Buscar investigadores
         $object = new Investigador();
@@ -478,9 +474,7 @@ $app->get('/investigadores/{id}', function ($request, $response, $args) {
         //Si investigador no existe
         if (empty($investigador)) {
             $payload['data'] = array();
-        }
-
-        //Si el investigador existe
+        } //Si el investigador existe
         else {
             //Formatear respuesta
             $payload['data'] = array(
@@ -510,7 +504,7 @@ $app->get('/investigadores/{id}', function ($request, $response, $args) {
         $response = $response->withStatus(500);
     }
 
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
     //Desconectar mysql
@@ -533,8 +527,8 @@ $app->put('/investigadores/{id}', function ($request, $response, $args) {
 
     //Obtener parametros put
     $data = $request->getBody()->getContents();
-    $putdata = array();
-    parse_str($data, $putdata);
+    $putData = array();
+    parse_str($data, $putData);
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -546,34 +540,34 @@ $app->put('/investigadores/{id}', function ($request, $response, $args) {
     if (!is_numeric($id_investigador)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
-    } else if (!filter_var($putdata['email'], FILTER_VALIDATE_EMAIL)) {
+    } else if (!filter_var($putData['email'], FILTER_VALIDATE_EMAIL)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Email is malformed');
         $response = $response->withStatus(400);
-    } else if (!isset($putdata['nombre']) || empty($putdata['nombre'])) {
+    } else if (empty($putData['nombre'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($putdata['apellido']) || empty($putdata['apellido'])) {
+    } else if (empty($putData['apellido'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Apellido is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($putdata['id_rol']) || empty($putdata['id_rol'])) {
+    } else if (empty($putData['id_rol'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_rol is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($putdata['password']) || empty($putdata['password'])) {
+    } else if (empty($putData['password'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Password is empty');
         $response = $response->withStatus(400);
-    } else if (!is_numeric($putdata['id_rol'])) {
+    } else if (!is_numeric($putData['id_rol'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_rol must be integer');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
 
         //Agregar investigador
         $object = new Investigador();
         $object->setId(htmlspecialchars($id_investigador));
-        $object->setNombre(htmlspecialchars($putdata['nombre']));
-        $object->setApellido(htmlspecialchars($putdata['apellido']));
-        $object->setEmail(htmlspecialchars($putdata['email']));
-        $object->setIdRol(htmlspecialchars($putdata['id_rol']));
-        $object->setPassword($putdata['password']);
+        $object->setNombre(htmlspecialchars($putData['nombre']));
+        $object->setApellido(htmlspecialchars($putData['apellido']));
+        $object->setEmail(htmlspecialchars($putData['email']));
+        $object->setIdRol(htmlspecialchars($putData['id_rol']));
+        $object->setPassword($putData['password']);
 
         //Actualizar investigador
         $actualizar = $object->actualizar($conn);
@@ -611,15 +605,13 @@ $app->put('/investigadores/{id}', function ($request, $response, $args) {
 
             $response = $response->withStatus(201);
         }
-    }
-
-    //Connection error
+    } //Connection error
     else {
         $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server problem', 'A connection problem ocurred with database');
         $response = $response->withStatus(500);
     }
 
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
     //Desconectar mysql
@@ -644,13 +636,13 @@ $app->post('/investigadores/recuperar/{email}/idioma/{idioma}', function ($reque
         )
     );
 
-    if (!isset($email) || empty($email)) {
+    if (empty($email)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Email is empty');
         $response = $response->withStatus(400);
     } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Enter valid Email');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
         //Buscar investigador por email
 
         $object = new Investigador();
@@ -675,7 +667,7 @@ $app->post('/investigadores/recuperar/{email}/idioma/{idioma}', function ($reque
 
             $dynamicLink = crearDynamicLink();
 
-            if ($dynamicLink != false) {
+            if ($dynamicLink) {
                 $email = new Email();
                 $status = $email->sendEmailRecuperar($investigador, $dynamicLink, $idioma);
 
@@ -701,7 +693,7 @@ $app->post('/investigadores/recuperar/{email}/idioma/{idioma}', function ($reque
         $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server connection problem', 'A connection problem ocurred with database');
         $response = $response->withStatus(500);
     }
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
     //Desconectar mysql
@@ -713,36 +705,36 @@ $app->post('/investigadores/recuperar/{email}/idioma/{idioma}', function ($reque
 //* Activar - Desactivar Cuenta 
 $app->patch('/investigadores/{id}/activar', function ($request, $response, $args) {
 
-    $id_investigador = $args['id'];
+    $idInvestigador = $args['id'];
 
     //Seccion link self
     $payload = array(
         'links' => array(
-            'self' => "/investigadores/" . $id_investigador . "/activar"
+            'self' => "/investigadores/" . $idInvestigador . "/activar"
         )
     );
 
     //Obtener parametros put
     $data = $request->getBody()->getContents();
-    $patchdata = array();
-    parse_str($data, $patchdata);
+    $patchData = array();
+    parse_str($data, $patchData);
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
     $conn = $mysql_adapter->connect();
 
-    if (!isset($patchdata['activado'])) {
+    if (!isset($patchData['activado'])) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Activado is empty');
         $response = $response->withStatus(400);
-    } else if ($patchdata['activado'] != 0 && $patchdata['activado'] != 1) {
+    } else if ($patchData['activado'] !== 0 && $patchData['activado'] !== 1) {
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Activado must be 1 or 0');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
 
         //Agregar investigador
         $object = new Investigador();
-        $object->setId($id_investigador);
-        $object->setActivado(htmlspecialchars($patchdata['activado']));
+        $object->setId($idInvestigador);
+        $object->setActivado(htmlspecialchars($patchData['activado']));
 
         //insertar investigador
         $activado = $object->activar($conn);
@@ -755,7 +747,7 @@ $app->patch('/investigadores/{id}/activar', function ($request, $response, $args
 
             $investigador = $object->buscarInvestigadorPorId($conn);
 
-            if ($patchdata['activado'] == 1) {
+            if ($patchData['activado'] === 1) {
                 $email = new Email();
                 $email->sendEmailActivation($investigador);
             }
@@ -774,15 +766,13 @@ $app->patch('/investigadores/{id}/activar', function ($request, $response, $args
 
             $response = $response->withStatus(201);
         }
-    }
-
-    //Connection error
+    } //Connection error
     else {
         $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server problem', 'A connection problem ocurred with database');
         $response = $response->withStatus(500);
     }
 
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
     //Desconectar mysql

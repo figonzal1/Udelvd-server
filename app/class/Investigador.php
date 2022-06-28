@@ -1,33 +1,34 @@
-<?php
+<?php /** @noinspection ForgottenDebugOutputInspection */
 
 require_once("Rol.php");
+
 /**
  * Objeto investigador
  */
-
 class Investigador
 {
 
-    private $id;
-    private $nombre;
-    private $apellido;
-    private $email;
-    private $passwordHashed;
-    private $passwordRaw;
+    private string $id;
+    private string $nombre;
+    private string $apellido;
+    private string $email;
+    private string $passwordHashed;
+    private string $passwordRaw;
 
-    private $nombreRol; //Usado para crear investigadores
+    private string $nombreRol; //Usado para crear investigadores
 
-    private $idRol;
-    private $activado;
+    private string $idRol;
+    private string $activado;
 
-    private $limite = 10;
+    private int $limite = 10;
 
-    function agregar($conn)
+    public function agregar($conn)
     {
         try {
             //Buscar id rol por nombre
             $rol = new Rol();
             $rol->setNombre($this->nombreRol);
+
             $rol = $rol->buscarRolPorNombre($conn);
             $this->idRol = $rol['id'];
 
@@ -52,12 +53,12 @@ class Investigador
             $lastId = $stmt->fetch(PDO::FETCH_ASSOC);
             return $lastId['id'];
         } catch (PDOException $e) {
-            error_log("Fail insert: " . $e->getMessage(), 0);
+            error_log("Fail insert: " . $e->getMessage());
             return false;
         }
     }
 
-    function actualizar($conn)
+    public function actualizar($conn): bool
     {
         try {
             $stmt = $conn->prepare(
@@ -73,19 +74,15 @@ class Investigador
                 $this->id
             ));
 
-            if ($stmt->rowCount() == 0) {
-                return "iguales";
-            } else if ($stmt->rowCount() == 1) {
-                return true;
-            }
+            return $stmt->rowCount() === 1;
         } catch (PDOException $e) {
-            error_log("Fail update investigador: " . $e->getMessage(), 0);
+            error_log("Fail update investigador: " . $e->getMessage());
             return false;
         }
     }
 
 
-    function buscarInvestigadorPorId($conn)
+    public function buscarInvestigadorPorId($conn)
     {
         $sql = "SELECT
             i.id,
@@ -109,52 +106,52 @@ class Investigador
             $stmt = $conn->prepare($sql);
             $stmt->execute(array($this->id));
 
-            $investigador = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            return $investigador;
+            return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Fail search investigador: " . $e->getMessage(), 0);
+            error_log("Fail search investigador: " . $e->getMessage());
             return false;
         }
     }
 
-    function buscarInvestigadorPorEmail($conn)
+    public function buscarInvestigadorPorEmail($conn)
     {
-        $sql = "SELECT
-            i.id,
-            i.nombre,
-            i.apellido,
-            i.email,
-            i.id_rol,
-            i.activado,
-            i.create_time,
-            i.update_time,
-            r.nombre AS nombre_rol
-        FROM
-            investigador i
-        INNER JOIN rol r ON
-            i.id_rol = r.id
-        WHERE
-            i.email = ?";
 
         try {
-            $stmt = $conn->prepare($sql);
+            $stmt = $conn->prepare(
+                "SELECT
+                i.id,
+                i.nombre,
+                i.apellido,
+                i.email,
+                i.id_rol,
+                i.activado,
+                i.create_time,
+                i.update_time,
+                r.nombre AS nombre_rol
+            FROM
+                investigador i
+            INNER JOIN rol r ON
+                i.id_rol = r.id
+            WHERE
+                i.email = ?"
+            );
+
             $stmt->execute(array($this->email));
 
             $investigador = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($stmt->rowCount() == 1) {
+            if ($stmt->rowCount() === 1) {
                 return $investigador;
-            } else if ($stmt->rowCount() == 0) {
-                return null;
             }
+
+            return null;
         } catch (PDOException $e) {
-            error_log("Fail search investigador: " . $e->getMessage(), 0);
+            error_log("Fail search investigador: " . $e->getMessage());
             return false;
         }
     }
 
-    function buscarPagina($conn, $pagina)
+    public function buscarPagina($conn, $pagina)
     {
         try {
             $stmt = $conn->prepare(
@@ -184,16 +181,14 @@ class Investigador
             $stmt->bindValue(':offset', ($pagina - 1) * $this->limite, PDO::PARAM_INT);
             $stmt->execute();
 
-            $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            return $listado;
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Fail search lista investigadores: " . $e->getMessage(), 0);
+            error_log("Fail search lista investigadores: " . $e->getMessage());
             return false;
         }
     }
 
-    function contarInvestigadores($conn)
+    public function contarInvestigadores($conn)
     {
         try {
             $stmt = $conn->prepare(
@@ -210,22 +205,20 @@ class Investigador
                 $this->id
             ));
 
-            $conteo = $stmt->fetchColumn();
-
-            return $conteo;
+            return $stmt->fetchColumn();
         } catch (PDOException $e) {
-            error_log("Fail conteo investigadores: " . $e->getMessage(), 0);
+            error_log("Fail conteo investigadores: " . $e->getMessage());
             return false;
         }
     }
 
-    function buscarTodos($conn)
+    public function buscarTodos($conn)
     {
 
         try {
 
             //*FLUJO IF PARA LISTADO DE INVESTIGADORES SIN ADMIN Y SIN PROPIO USUARIO
-            if ($this->id != null) {
+            if ($this->id !== null) {
                 $sql =
                     "SELECT
                         i.id,
@@ -248,8 +241,7 @@ class Investigador
 
                 $stmt = $conn->prepare($sql);
                 $stmt->execute(array($this->id));
-            }
-            //*LISTADO GENERICO
+            } //*LISTADO GENERICO
             else {
                 $sql =
                     "SELECT
@@ -268,17 +260,15 @@ class Investigador
 
                 $stmt = $conn->query($sql);
             }
-            $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            return $listado;
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Fail search lista investigadores: " . $e->getMessage(), 0);
+            error_log("Fail search lista investigadores: " . $e->getMessage());
             return false;
         }
     }
 
     //! Probablemente no será implementado
-    function eliminar($conn)
+    public function eliminar($conn): bool
     {
 
         try {
@@ -287,18 +277,14 @@ class Investigador
             );
 
             $stmt->execute(array($this->id));
-            if ($stmt->rowCount() == 0) {
-                return false;
-            } else if ($stmt->rowCount() == 1) {
-                return true;
-            }
+            return $stmt->rowCount() === 1;
         } catch (PDOException $e) {
-            error_log("Fail delete investigador: " . $e->getMessage(), 0);
+            error_log("Fail delete investigador: " . $e->getMessage());
             return false;
         }
     }
 
-    function activar($conn)
+    public function activar($conn): bool
     {
         try {
 
@@ -311,18 +297,14 @@ class Investigador
                 $this->id
             ));
 
-            if ($stmt->rowCount() == 0) {
-                return "iguales";
-            } else if ($stmt->rowCount() == 1) {
-                return true;
-            }
+            return $stmt->rowCount() === 1;
         } catch (PDOException $e) {
-            error_log("Fail to activate investigador: " . $e->getMessage(), 0);
+            error_log("Fail to activate investigador: " . $e->getMessage());
             return false;
         }
     }
 
-    function login($conn)
+    public function login($conn): bool
     {
 
         try {
@@ -337,17 +319,16 @@ class Investigador
 
             if (password_verify($this->passwordRaw, $passwordHash['password'])) {
                 return true;
-            } else {
-                return false;
             }
+            return false;
         } catch (PDOException $e) {
-            error_log("Fail to find hash: " . $e->getMessage(), 0);
+            error_log("Fail to find hash: " . $e->getMessage());
             return false;
         }
     }
 
 
-    function resetPassword($conn)
+    public function resetPassword($conn): bool
     {
         try {
 
@@ -360,87 +341,55 @@ class Investigador
                 $this->email
             ));
 
-            if ($stmt->rowCount() == 0) {
-                return "iguales";
-            } else if ($stmt->rowCount() == 1) {
-                return true;
-            }
+            return $stmt->rowCount() === 1;
         } catch (PDOException $e) {
-            error_log("Fail to reset pass investigador: " . $e->getMessage(), 0);
+            error_log("Fail to reset pass investigador: " . $e->getMessage());
             return false;
         }
     }
 
-    /**
-     * GETTERS & SETTERS
-     */
-    function getId()
-    {
-        return $this->id;
-    }
 
-    function getNombre()
-    {
-        return $this->nombre;
-    }
-
-    function getApellido()
-    {
-        return $this->apellido;
-    }
-    function getPassword()
-    {
-        return $this->passwordHash;
-    }
-    function getEmail()
-    {
-        return $this->email;
-    }
-    function getIdRol()
-    {
-        return $this->idRol;
-    }
-    function getActivado()
-    {
-        return $this->activado;
-    }
-    function getNombreRol()
-    {
-        return $this->nombreRol;
-    }
-    function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
-    function setNombre($nombre)
+
+    public function setNombre($nombre): void
     {
         $this->nombre = $nombre;
     }
-    function setApellido($apellido)
+
+    public function setApellido($apellido): void
     {
         $this->apellido = $apellido;
     }
-    function setPassword($password)
+
+    public function setPassword($password): void
     {
         $this->passwordHashed = password_hash($password, PASSWORD_DEFAULT);
     }
-    function setEmail($email)
+
+    public function setEmail($email): void
     {
         $this->email = $email;
     }
-    function setIdRol($idRol)
+
+    public function setIdRol($idRol): void
     {
         $this->idRol = $idRol;
     }
-    function setActivado($activado)
+
+    public function setActivado($activado): void
     {
         $this->activado = $activado;
     }
-    function setPasswordRaw($passwordRaw)
+
+    public function setPasswordRaw($passwordRaw): void
     {
         $this->passwordRaw = $passwordRaw;
     }
-    function setNombreRol($nombreRol)
+
+    public function setNombreRol($nombreRol): void
     {
         $this->nombreRol = $nombreRol;
     }
