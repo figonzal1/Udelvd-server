@@ -1,42 +1,42 @@
-<?php
+<?php /** @noinspection ForgottenDebugOutputInspection */
 
 /**
  * Objecto entrevistado
  */
-
 class Entrevistado
 {
-    private $id;
-    private $nombre;
-    private $apellido;
-    private $sexo;
-    private $fecha_nac;
-    private $jubilado_legal;
-    private $caidas;
-    private $n_caidas;  //Opcional
-    private $n_convivientes_3_meses;
+    private string $id;
+    private string $nombre;
+    private string $apellido;
+    private string $sexo;
+    private string $fechaNac;
+    private string $jubiladoLegal;
+    private string $caidas;
+    private string $nCaidas;  //Opcional
+    private string $nConvivientes3meses;
 
     //Foreneas
-    private $id_investigador;
-    private $id_ciudad;
-    private $nombre_ciudad;
-    private $id_nivel_educacional; //Opcional
-    private $id_estado_civil;
-    private $id_tipo_convivencia;    //Opcional
-    private $id_profesion;     //Opcional
-    private $nombre_profesion;
+    private string $idInvestigador;
+    private string $idCiudad;
+    private string $nombreCiudad;
+    private string $idNivelEducacional; //Opcional
+    private string $idEstadoCivil;
+    private string $idTipoConvivencia;    //Opcional
+    private string $idProfesion;     //Opcional
+    private string $nombreProfesion;
 
-    private $limite = 10;
+    private int $limite = 10;
 
-    function agregar($conn)
+    public function agregar($conn)
     {
         try {
 
             //Intentar agregar profesion
-            if ($this->nombre_profesion != NULL) {
+            if ($this->nombreProfesion !== NULL) {
 
                 $profesion = new Profesion();
-                $profesion->setNombre($this->nombre_profesion);
+                $profesion->setNombre($this->nombreProfesion);
+
                 $existente = $profesion->buscarProfesionPorNombre($conn);
 
                 //Si no existe, agrega nuevo
@@ -45,17 +45,17 @@ class Entrevistado
                 }
                 //Si existe asignar id
                 else {
-                    $this->id_profesion = $existente['id'];
+                    $this->idProfesion = $existente['id'];
                 }
             } else {
-                $this->id_profesion = NULL;
+                $this->idProfesion = NULL;
             }
 
             //Intentar agregar ciudad
-            if ($this->nombre_ciudad != NULL) {
+            if ($this->nombreCiudad !== NULL) {
 
                 $ciudad = new Ciudad();
-                $ciudad->setNombre($this->nombre_ciudad);
+                $ciudad->setNombre($this->nombreCiudad);
                 $existente = $ciudad->buscarCiudadPorNombre($conn);
 
                 //Si no existe, agrega nuevo
@@ -65,10 +65,10 @@ class Entrevistado
 
                 //Si existe asignar id
                 else {
-                    $this->id_ciudad = $existente['id'];
+                    $this->idCiudad = $existente['id'];
                 }
             } else {
-                $this->id_ciudad = NULL;
+                $this->idCiudad = NULL;
             }
 
             $sql = "INSERT 
@@ -97,17 +97,17 @@ class Entrevistado
                     $this->nombre,
                     $this->apellido,
                     $this->sexo,
-                    $this->fecha_nac,
-                    $this->jubilado_legal,
+                    $this->fechaNac,
+                    $this->jubiladoLegal,
                     $this->caidas,
-                    $this->n_caidas,
-                    $this->n_convivientes_3_meses,
-                    $this->id_investigador,
-                    $this->id_ciudad,
-                    $this->id_nivel_educacional,
-                    $this->id_estado_civil,
-                    $this->id_tipo_convivencia,
-                    $this->id_profesion,
+                    $this->nCaidas,
+                    $this->nConvivientes3meses,
+                    $this->idInvestigador,
+                    $this->idCiudad,
+                    $this->idNivelEducacional,
+                    $this->idEstadoCivil,
+                    $this->idTipoConvivencia,
+                    $this->idProfesion,
                 )
             );
 
@@ -117,21 +117,22 @@ class Entrevistado
 
             return $lastId['id'];
         } catch (PDOException $e) {
-            error_log("Fail insert: " . $e->getMessage(), 0);
+            error_log("Fail insert: " . $e->getMessage());
             return false;
         }
     }
 
-    function actualizar($conn)
+    public function actualizar($conn): bool
     {
 
         try {
 
             //Intentar agregar profesion
-            if ($this->nombre_profesion != NULL) {
+            if ($this->nombreProfesion !== NULL) {
 
                 $profesion = new Profesion();
-                $profesion->setNombre($this->nombre_profesion);
+                $profesion->setNombre($this->nombreProfesion);
+
                 $existente = $profesion->buscarProfesionPorNombre($conn);
 
                 //Si no existe, agrega nuevo
@@ -140,17 +141,17 @@ class Entrevistado
                 }
                 //Si existe asignar id
                 else {
-                    $this->id_profesion = $existente['id'];
+                    $this->idProfesion = $existente['id'];
                 }
             } else {
-                $this->id_profesion = NULL;
+                $this->idProfesion = NULL;
             }
 
             //Intentar agregar ciudad
-            if ($this->nombre_ciudad != NULL) {
+            if ($this->nombreCiudad !== NULL) {
 
                 $ciudad = new Ciudad();
-                $ciudad->setNombre($this->nombre_ciudad);
+                $ciudad->setNombre($this->nombreCiudad);
                 $existente = $ciudad->buscarCiudadPorNombre($conn);
 
                 //Si no existe, agrega nuevo
@@ -160,10 +161,10 @@ class Entrevistado
 
                 //Si existe asignar id
                 else {
-                    $this->id_ciudad = $existente['id'];
+                    $this->idCiudad = $existente['id'];
                 }
             } else {
-                $this->id_ciudad = NULL;
+                $this->idCiudad = NULL;
             }
 
             $sql = "UPDATE 
@@ -193,33 +194,29 @@ class Entrevistado
                     $this->nombre,
                     $this->apellido,
                     $this->sexo,
-                    $this->fecha_nac,
-                    $this->jubilado_legal,
+                    $this->fechaNac,
+                    $this->jubiladoLegal,
                     $this->caidas,
-                    $this->n_caidas,
-                    $this->n_convivientes_3_meses,
-                    $this->id_investigador,
-                    $this->id_ciudad,
-                    $this->id_nivel_educacional,
-                    $this->id_estado_civil,
-                    $this->id_tipo_convivencia,
-                    $this->id_profesion,
+                    $this->nCaidas,
+                    $this->nConvivientes3meses,
+                    $this->idInvestigador,
+                    $this->idCiudad,
+                    $this->idNivelEducacional,
+                    $this->idEstadoCivil,
+                    $this->idTipoConvivencia,
+                    $this->idProfesion,
                     $this->id
                 )
             );
 
-            if ($stmt->rowCount() == 0) {
-                return "iguales";
-            } else if ($stmt->rowCount() == 1) {
-                return true;
-            }
+            return $stmt->rowCount() === 1;
         } catch (PDOException $e) {
-            error_log("Fail update: " . $e->getMessage(), 0);
+            error_log("Fail update: " . $e->getMessage());
             return false;
         }
     }
 
-    function buscarEntrevistado($conn)
+    public function buscarEntrevistado($conn)
     {
         try {
 
@@ -258,16 +255,14 @@ class Entrevistado
                 )
             );
 
-            $entrevistado = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            return $entrevistado;
+            return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Fail search entrevistado: " . $e->getMessage(), 0);
+            error_log("Fail search entrevistado: " . $e->getMessage());
             return false;
         }
     }
 
-    function buscarTodosConPagina($conn, $pagina)
+    public function buscarTodosConPagina($conn, $pagina)
     {
         try {
 
@@ -307,16 +302,14 @@ class Entrevistado
             $stmt->bindValue(':offset', ($pagina - 1) * $this->limite, PDO::PARAM_INT);
             $stmt->execute();
 
-            $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            return $listado;
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Fail search lista entrevistados totales: " . $e->getMessage(), 0);
+            error_log("Fail search lista entrevistados totales: " . $e->getMessage());
             return false;
         }
     }
 
-    function buscarEntrevistadosInvestigadorPorPagina($conn, $pagina)
+    public function buscarEntrevistadosInvestigadorPorPagina($conn, $pagina)
     {
         try {
 
@@ -350,22 +343,20 @@ class Entrevistado
 
             $stmt = $conn->prepare($sql);
 
-            $stmt->bindValue(':id_investigador', $this->id_investigador);
+            $stmt->bindValue(':id_investigador', $this->idInvestigador);
             $stmt->bindValue(':limite', $this->limite, PDO::PARAM_INT);
             $stmt->bindValue(':offset', ($pagina - 1) * $this->limite, PDO::PARAM_INT);
             $stmt->execute();
 
-            $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            return $listado;
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Fail search lista entrevistados de investigador: " . $e->getMessage(), 0);
+            error_log("Fail search lista entrevistados de investigador: " . $e->getMessage());
             return false;
         }
     }
 
     //Funcion encargada de contar todos los entrevistados
-    function contarTodos($conn)
+    public function contarTodos($conn)
     {
         try {
 
@@ -374,17 +365,15 @@ class Entrevistado
             $stmt = $conn->prepare($sql);
             $stmt->execute();
 
-            $conteo = $stmt->fetchColumn();
-
-            return $conteo;
+            return $stmt->fetchColumn();
         } catch (PDOException $e) {
-            error_log("Fail conteo entrevistados totales: " . $e->getMessage(), 0);
+            error_log("Fail conteo entrevistados totales: " . $e->getMessage());
             return false;
         }
     }
 
     //Funcion encargada contar todos los entrevistados de un investigador especifico
-    function contarEntrevistadosDeInvestigador($conn)
+    public function contarEntrevistadosDeInvestigador($conn)
     {
         try {
 
@@ -392,19 +381,17 @@ class Entrevistado
             $stmt = $conn->prepare($sql);
 
             $stmt->execute(array(
-                $this->id_investigador
+                $this->idInvestigador
             ));
 
-            $conteo = $stmt->fetchColumn();
-
-            return $conteo;
+            return $stmt->fetchColumn();
         } catch (PDOException $e) {
-            error_log("Fail conteo entrevistados totales del investigador: " . $e->getMessage(), 0);
+            error_log("Fail conteo entrevistados totales del investigador: " . $e->getMessage());
             return false;
         }
     }
 
-    function eliminar($conn)
+    public function eliminar($conn): bool
     {
 
         try {
@@ -419,99 +406,16 @@ class Entrevistado
 
             $stmt = $conn->prepare($sql);
 
-            $stmt->execute(
-                array(
-                    $this->id
-                )
-            );
+            $stmt->execute(array($this->id));
 
-            if ($stmt->rowCount() == 0) {
-                return false;
-            } else if ($stmt->rowCount() == 1) {
-                return true;
-            }
+            return $stmt->rowCount() === 1;
         } catch (PDOException $e) {
-            error_log("Fail delete entrevistado: " . $e->getMessage(), 0);
+            error_log("Fail delete entrevistado: " . $e->getMessage());
             return false;
         }
     }
 
-    /**
-     * GETERS & SETTERS
-     */
-    function getId()
-    {
-        return $this->id;
-    }
-    function getNombre()
-    {
-        return $this->nombre;
-    }
-    function getApellido()
-    {
-        return $this->apellido;
-    }
-    function getSexo()
-    {
-        return $this->sexo;
-    }
-    function getFechaNac()
-    {
-        return $this->fecha_nac;
-    }
-    function getNombreCiudad()
-    {
-        return $this->nombre_ciudad;
-    }
-    function getJubiladoLegal()
-    {
-        $this->jubilado_legal;
-    }
-    function getCaidas()
-    {
-        return $this->caidas;
-    }
-    function getNCaidas()
-    {
-        return $this->n_caidas;
-    }
-    function getNConvivientes()
-    {
-        return $this->n_convivientes_3_meses;
-    }
-    function getIdInvestigador()
-    {
-        return $this->id_investigador;
-    }
-    function getIdCiudad()
-    {
-        return $this->id_ciudad;
-    }
-    function getIdNivelEducacional()
-    {
-        return $this->id_nivel_educacional;
-    }
-    function getIdEstadoCivil()
-    {
-        return $this->id_estado_civil;
-    }
-    function getIdEnfermedad()
-    {
-        return $this->id_enfermedad;
-    }
-    function getIdTipoConvivencia()
-    {
-        return $this->id_tipo_convivencia;
-    }
-    function getIdProfesion()
-    {
-        return $this->id_profesion;
-    }
-    function getNombreProfesion()
-    {
-        return $this->nombre_profesion;
-    }
-    function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
@@ -529,15 +433,15 @@ class Entrevistado
     }
     function setFechaNac($fecha_nac)
     {
-        $this->fecha_nac = $fecha_nac;
+        $this->fechaNac = $fechaNac;
     }
     function setNombreCiudad($nombre_ciudad)
     {
-        $this->nombre_ciudad = $nombre_ciudad;
+        $this->nombreCiudad = $nombreCiudad;
     }
     function setJubiladoLegal($jubilado_legal)
     {
-        $this->jubilado_legal = $jubilado_legal;
+        $this->jubiladoLegal = $jubiladoLegal;
     }
     function setCaidas($caidas)
     {
@@ -545,27 +449,25 @@ class Entrevistado
     }
     function setNCaidas($n_caidas)
     {
-        $this->n_caidas = $n_caidas;
+        $this->nCaidas = $nCaidas;
     }
     function setNConvivientes($n_convivientes_3_meses)
     {
-        $this->n_convivientes_3_meses = $n_convivientes_3_meses;
+        $this->nConvivientes3meses = $n_convivientes_3_meses;
     }
     function setIdInvestigador($id_investigador)
     {
-        $this->id_investigador = $id_investigador;
+        $this->idInvestigador = $idInvestigador;
     }
-    function setIdCiudad($id_ciudad)
+
+
+    public function setIdNivelEducacional($idNivelEducacional): void
     {
-        $this->id_ciudad = $id_ciudad;
-    }
-    function setIdNivelEducacional($id_nivel_educacional)
-    {
-        $this->id_nivel_educacional = $id_nivel_educacional;
+        $this->idNivelEducacional = $idNivelEducacional;
     }
     function setIdEstadoCivil($id_estado_civil)
     {
-        $this->id_estado_civil = $id_estado_civil;
+        $this->idEstadoCivil = $idEstadoCivil;
     }
     function setIdEnfermedad($id_enfermedad)
     {
@@ -573,14 +475,11 @@ class Entrevistado
     }
     function setIdTipoConvivencia($id_tipo_convivencia)
     {
-        $this->id_tipo_convivencia = $id_tipo_convivencia;
+        $this->idTipoConvivencia = $idTipoConvivencia;
     }
-    function setIdProfesion($id_profesion)
+
+    public function setNombreProfesion($nombreProfesion): void
     {
-        $this->id_profesion = $id_profesion;
-    }
-    function setNombreProfesion($nombre_profesion)
-    {
-        $this->nombre_profesion = $nombre_profesion;
+        $this->nombreProfesion = $nombreProfesion;
     }
 }

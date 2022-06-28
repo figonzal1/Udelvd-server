@@ -197,41 +197,38 @@ $app->get('/entrevistados/pagina/{n_pag}', function ($request, $response, $args)
         //Preparar respuesta
         foreach ($listado as $key => $value) {
 
-            array_push(
-                $payload['data'],
-                array(
-                    'type' => 'entrevistados',
-                    'id' => $value['id'],
-                    'attributes' => array(
-                        'nombre' => $value['nombre'],
-                        'apellido' => $value['apellido'],
-                        'sexo' => $value['sexo'],
-                        'fecha_nacimiento' => $value['fecha_nacimiento'],
-                        'jubilado_legal' => $value['jubilado_legal'],
-                        'caidas' => $value['caidas'],
-                        'n_caidas' => $value['n_caidas'],
-                        'n_convivientes_3_meses' => $value['n_convivientes_3_meses'],
-                        'id_investigador' => $value['id_investigador'],
-                        'id_ciudad' => $value['id_ciudad'],
-                        'id_nivel_educacional' => $value['id_nivel_educacional'],
-                        'id_estado_civil' => $value['id_estado_civil'],
-                        'id_tipo_convivencia' => $value['id_tipo_convivencia'],
-                        'id_profesion' => $value['id_profesion']
-                    ),
-                    'relationships' => array(
-                        'entrevistas' => array(
-                            'data' => array(
-                                'n_entrevistas' => $value['n_entrevistas']
-                            )
-                        ),
-                        'investigadores' => array(
-                            'data' => array(
-                                'nombre' => $value['nombre_investigador'],
-                                'apellido' => $value['apellido_investigador']
-                            )
+            $payload['data'][] = array(
+                'type' => 'entrevistados',
+                'id' => $value['id'],
+                'attributes' => array(
+                    'nombre' => $value['nombre'],
+                    'apellido' => $value['apellido'],
+                    'sexo' => $value['sexo'],
+                    'fecha_nacimiento' => $value['fecha_nacimiento'],
+                    'jubilado_legal' => $value['jubilado_legal'],
+                    'caidas' => $value['caidas'],
+                    'n_caidas' => $value['n_caidas'],
+                    'n_convivientes_3_meses' => $value['n_convivientes_3_meses'],
+                    'id_investigador' => $value['id_investigador'],
+                    'id_ciudad' => $value['id_ciudad'],
+                    'id_nivel_educacional' => $value['id_nivel_educacional'],
+                    'id_estado_civil' => $value['id_estado_civil'],
+                    'id_tipo_convivencia' => $value['id_tipo_convivencia'],
+                    'id_profesion' => $value['id_profesion']
+                ),
+                'relationships' => array(
+                    'entrevistas' => array(
+                        'data' => array(
+                            'n_entrevistas' => $value['n_entrevistas']
                         )
-
+                    ),
+                    'investigadores' => array(
+                        'data' => array(
+                            'nombre' => $value['nombre_investigador'],
+                            'apellido' => $value['apellido_investigador']
+                        )
                     )
+
                 )
             );
         }
@@ -291,32 +288,29 @@ $app->get('/entrevistados/pagina/{n_pag}/investigador/{id_investigador}', functi
         //Preparar respuesta
         foreach ($listado as $key => $value) {
 
-            array_push(
-                $payload['data'],
-                array(
-                    'type' => 'entrevistados',
-                    'id' => $value['id'],
-                    'attributes' => array(
-                        'nombre' => $value['nombre'],
-                        'apellido' => $value['apellido'],
-                        'sexo' => $value['sexo'],
-                        'fecha_nacimiento' => $value['fecha_nacimiento'],
-                        'jubilado_legal' => $value['jubilado_legal'],
-                        'caidas' => $value['caidas'],
-                        'n_caidas' => $value['n_caidas'],
-                        'n_convivientes_3_meses' => $value['n_convivientes_3_meses'],
-                        'id_investigador' => $value['id_investigador'],
-                        'id_ciudad' => $value['id_ciudad'],
-                        'id_nivel_educacional' => $value['id_nivel_educacional'],
-                        'id_estado_civil' => $value['id_estado_civil'],
-                        'id_tipo_convivencia' => $value['id_tipo_convivencia'],
-                        'id_profesion' => $value['id_profesion']
-                    ),
-                    'relationships' => array(
-                        'entrevistas' => array(
-                            'data' => array(
-                                'n_entrevistas' => $value['n_entrevistas']
-                            )
+            $payload['data'][] = array(
+                'type' => 'entrevistados',
+                'id' => $value['id'],
+                'attributes' => array(
+                    'nombre' => $value['nombre'],
+                    'apellido' => $value['apellido'],
+                    'sexo' => $value['sexo'],
+                    'fecha_nacimiento' => $value['fecha_nacimiento'],
+                    'jubilado_legal' => $value['jubilado_legal'],
+                    'caidas' => $value['caidas'],
+                    'n_caidas' => $value['n_caidas'],
+                    'n_convivientes_3_meses' => $value['n_convivientes_3_meses'],
+                    'id_investigador' => $value['id_investigador'],
+                    'id_ciudad' => $value['id_ciudad'],
+                    'id_nivel_educacional' => $value['id_nivel_educacional'],
+                    'id_estado_civil' => $value['id_estado_civil'],
+                    'id_tipo_convivencia' => $value['id_tipo_convivencia'],
+                    'id_profesion' => $value['id_profesion']
+                ),
+                'relationships' => array(
+                    'entrevistas' => array(
+                        'data' => array(
+                            'n_entrevistas' => $value['n_entrevistas']
                         )
                     )
                 )
