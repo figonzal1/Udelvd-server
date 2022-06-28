@@ -106,11 +106,6 @@ class Acciones
         }
     }
 
-    public function getId(): string
-    {
-        return $this->id;
-    }
-
     public function setNombreES($nombreES): void
     {
         $this->nombreES = $nombreES;

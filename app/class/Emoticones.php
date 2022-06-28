@@ -33,7 +33,7 @@ class Emoticones
             $lastId = $stmt->fetch(PDO::FETCH_ASSOC);
             return $lastId['id'];
         } catch (PDOException $e) {
-            error_log("Fail insert: " . $e->getMessage(), 0);
+            error_log("Fail insert: " . $e->getMessage());
             return false;
         }
     }
@@ -55,11 +55,12 @@ class Emoticones
 
             return $stmt->rowCount() === 1;
         } catch (PDOException $e) {
-            error_log("Fail update: " . $e->getMessage(), 0);
+            error_log("Fail update: " . $e->getMessage());
             return false;
         }
     }
 
+    /** @noinspection PhpUnused */
     public function buscarEmoticon($conn)
     {
         try {
@@ -70,7 +71,7 @@ class Emoticones
 
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Fail search emoticon: " . $e->getMessage(), 0);
+            error_log("Fail search emoticon: " . $e->getMessage());
             return false;
         }
     }
@@ -81,7 +82,7 @@ class Emoticones
 
             return $conn->query("SELECT * FROM emoticon")->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Fail search lista emoticones: " . $e->getMessage(), 0);
+            error_log("Fail search lista emoticones: " . $e->getMessage());
             return false;
         }
     }
@@ -97,17 +98,9 @@ class Emoticones
             $stmt->execute(array($this->id));
             return $stmt->rowCount() === 1;
         } catch (PDOException $e) {
-            error_log("Fail delete emoticon: " . $e->getMessage(), 0);
+            error_log("Fail delete emoticon: " . $e->getMessage());
             return false;
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getId(): string
-    {
-        return $this->id;
     }
 
     /**

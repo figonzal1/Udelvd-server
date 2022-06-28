@@ -20,7 +20,7 @@ class Rol
 
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Fail search rol:" . $e->getMessage(), 0);
+            error_log("Fail search rol:" . $e->getMessage());
             return false;
         }
     }

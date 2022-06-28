@@ -14,7 +14,7 @@ class TipoEntrevista
             );
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Fail search lista tipos entrevistas: " . $e->getMessage(), 0);
+            error_log("Fail search lista tipos entrevistas: " . $e->getMessage());
             return false;
         }
     }

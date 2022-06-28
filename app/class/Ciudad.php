@@ -44,7 +44,7 @@ class Ciudad
 
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Fail search ciudad: " . $e->getMessage(), 0);
+            error_log("Fail search ciudad: " . $e->getMessage());
             return false;
         }
     }
@@ -54,17 +54,9 @@ class Ciudad
         try {
             return $conn->query("SELECT * from ciudad")->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Fail search lista ciudades: " . $e->getMessage(), 0);
+            error_log("Fail search lista ciudades: " . $e->getMessage());
             return false;
         }
-    }
-
-    /**
-     * GETTERS & SETTERS
-     */
-    public function getId(): string
-    {
-        return $this->id;
     }
 
     public function setId($id): void

@@ -22,10 +22,11 @@ class Profesion
 
             //Consultar ultimo id
             $stmt = $conn->query("SELECT MAX(id) as id from profesion");
+
             $lastId = $stmt->fetch(PDO::FETCH_ASSOC);
             return $lastId['id'];
         } catch (PDOException $e) {
-            error_log("Fail insert profesion: " . $e->getMessage(), 0);
+            error_log("Fail insert profesion: " . $e->getMessage());
             return false;
         }
     }

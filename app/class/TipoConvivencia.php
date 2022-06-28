@@ -14,7 +14,7 @@ class TipoConvivencia
             );
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Fail search lista tipos convivencia: " . $e->getMessage(), 0);
+            error_log("Fail search lista tipos convivencia: " . $e->getMessage());
             return false;
         }
     }
