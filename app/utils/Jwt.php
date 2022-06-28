@@ -1,6 +1,5 @@
-<?php
+<?php /** @noinspection ForgottenDebugOutputInspection */
 
-#require '../../vendor/autoload.php';
 date_default_timezone_set('America/Santiago');
 
 use Dotenv\Dotenv;
@@ -71,11 +70,9 @@ class Jwt
         $constraints = $this->configuration->validationConstraints();
 
         if (!$this->configuration->validator()->validate($parsedToken, ...$constraints)) {
-            /** @noinspection ForgottenDebugOutputInspection */
-            error_log("Fail to validate token", 0);
+            error_log("Fail to validate token");
             return false;
         }
-        echo "Validated";
         return true;
     }
 

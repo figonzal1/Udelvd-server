@@ -14,4 +14,3 @@ class ErrorJsonHandler {
         return $payload;
     }
 }
-?>

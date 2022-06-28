@@ -1,42 +1,44 @@
-<?php
+<?php /** @noinspection ForgottenDebugOutputInspection */
 
 #require '../../vendor/autoload.php';
 
 // Import PHPMailer classes into the global namespace
 // These must be at the top of your script, not inside a function
+use Dotenv\Dotenv;
+use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
 
 
-class Email
+class EmailService
 {
 
-    private $dotenv;
-    private $mail;
+    private Dotenv $dotenv;
+    private PHPMailer $mail;
 
     public function __construct()
     {
-        $this->dotenv = Dotenv\Dotenv::create(__DIR__ . "../../../");
+        /** @noinspection UnusedConstructorDependenciesInspection */
+        $this->dotenv = Dotenv::createImmutable(__DIR__ . "../../../");
         $this->dotenv->load();
 
         $this->mail = new PHPMailer(true);
         //Server settings
         $this->mail->SMTPDebug = SMTP::DEBUG_OFF;                      // Enable verbose debug output
         $this->mail->isSMTP();                                            // Send using SMTP
-        $this->mail->Host       = 'smtp.gmail.com';                       // Set the SMTP server to send through
-        $this->mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-        $this->mail->Username   = 'undiaenlavidade.cl@gmail.com';   // SMTP username
-        $this->mail->Password   = getenv('GOOGLE_PASSWORD_EMAIL');        // SMTP password
+        $this->mail->Host = 'smtp.gmail.com';                       // Set the SMTP server to send through
+        $this->mail->SMTPAuth = true;                                   // Enable SMTP authentication
+        $this->mail->Username = 'undiaenlavidade.cl@gmail.com';   // SMTP username
+        $this->mail->Password = $_ENV['GOOGLE_PASSWORD_EMAIL'];        // SMTP password
         $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` also accepted
-        $this->mail->Port       = 587;                                    // TCP port to connect to
+        $this->mail->Port = 587;                                    // TCP port to connect to
 
         //Recipients
         $this->mail->setFrom('undiaenlavidade.cl@gmail.com', 'App - UDELVD');
     }
 
 
-    function sendEmailRecuperar($investigador, $dynamicLink, $idioma)
+    public function sendEmailRecuperar($investigador, $dynamicLink, $idioma): bool
     {
         try {
             $this->mail->addAddress($investigador['email']);
@@ -45,14 +47,14 @@ class Email
             $this->mail->isHTML(true);
             $this->mail->CharSet = 'UTF-8';                              // Set email format to HTML
 
-            if ($idioma == "es") {
+            if ($idioma === "es") {
                 $titulo = "Recuperación de cuenta";
                 $saludo = "¡Hola " . $investigador['nombre'] . " " . $investigador['apellido'] . "!";
                 $mensaje = "Parece que has olvidado tu contraseña. Para reestablecerla, haz click en el botón de abajo desde el celular.";
                 $footer = "Gracias,<br>
             Administración, App - Un Día en la Vida de ...";
                 $boton = "Reestablecer contraseña";
-            } else if ($idioma == "en") {
+            } else {
                 $titulo = "Account recovery";
                 $saludo = "Hello " . $investigador['nombre'] . " " . $investigador['apellido'] . "!";
                 $mensaje = "You seem to have forgotten your password. To reset it, click the button below from your phone.";
@@ -66,16 +68,15 @@ class Email
 
 
             $this->mail->send();
-            error_log("Email sended to: " . $investigador['email'], 0);
+            error_log("Email sended to: " . $investigador['email']);
             return true;
         } catch (Exception $e) {
-            error_log("Failed to send email: " . $e->getMessage(), 0);
-            //echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+            error_log("Failed to send email: " . $e->getMessage());
             return false;
         }
     }
 
-    function sendEmailActivation($investigador)
+    public function sendEmailActivation($investigador): bool
     {
         try {
             $this->mail->addAddress($investigador['email']);
@@ -93,11 +94,10 @@ class Email
             $this->buildBody("activation", $saludo, $mensaje, $footer, null, null);
 
             $this->mail->send();
-            error_log("Email sended to: " . $investigador['email'], 0);
+            error_log("Email sended to: " . $investigador['email']);
             return true;
         } catch (Exception $e) {
-            error_log("Failed to send email: " . $e->getMessage(), 0);
-            //echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+            error_log("Failed to send email: " . $e->getMessage());
             return false;
         }
     }
@@ -105,9 +105,9 @@ class Email
     /**
      * Configurar body del email
      */
-    function buildBody($tipo, $saludo, $mensaje, $footer, $link, $boton)
+    public function buildBody($tipo, $saludo, $mensaje, $footer, $link, $boton): void
     {
-        if ($tipo == "recover") {
+        if ($tipo === "recover") {
             $this->mail->Body = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
             <html xmlns="http://www.w3.org/1999/xhtml">
             <head>
@@ -240,7 +240,7 @@ class Email
             </table>
               </body>
             </html>';
-        } else if ($tipo == "activation") {
+        } else if ($tipo === "activation") {
             $this->mail->Body = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
             <html xmlns="http://www.w3.org/1999/xhtml">
             

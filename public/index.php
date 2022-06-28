@@ -43,7 +43,7 @@ require_once("../app/class/Estadisticas.php");
  */
 require_once("../app/utils/Jwt.php");
 require_once("../app/utils/DynamicLink.php");
-require_once("../app/utils/Mail.php");
+require_once("../app/utils/EmailService.php");
 require_once("../app/utils/Notificacion.php");
 
 /**

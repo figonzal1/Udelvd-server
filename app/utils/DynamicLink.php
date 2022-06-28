@@ -1,16 +1,14 @@
-<?php
-#require '../../vendor/autoload.php';
+<?php /** @noinspection ForgottenDebugOutputInspection */
 
-use Kreait\Firebase;
-use Kreait\Firebase\DynamicLink\CreateDynamicLink\FailedToCreateDynamicLink;
-use Kreait\Firebase\DynamicLink\CreateDynamicLink;
+
 use Kreait\Firebase\DynamicLink\AndroidInfo;
+use Kreait\Firebase\DynamicLink\CreateDynamicLink;
+use Kreait\Firebase\DynamicLink\CreateDynamicLink\FailedToCreateDynamicLink;
+use Kreait\Firebase\Factory;
 
-function crearDynamicLink()
+function crearDynamicLink(): bool|string
 {
-    $factory = (new Firebase\Factory())
-        ->withServiceAccount('../udelvd-server-credentials.json');
-
+    $factory = (new Factory)->withServiceAccount('../udelvd-server-credentials.json');
 
     $dynamicLinksDomain = 'https://undiaenlavidade.page.link';
     $dynamicLinks = $factory->createDynamicLinksService($dynamicLinksDomain);
@@ -27,11 +25,11 @@ function crearDynamicLink()
 
         $link = $dynamicLinks->createDynamicLink($action);
 
-        $uriString = (string) $link;
-        error_log("Create dynamic link:" . $uriString, 0);
+        $uriString = (string)$link;
+        error_log("Create dynamic link:" . $uriString);
         return $uriString;
     } catch (FailedToCreateDynamicLink $e) {
-        error_log("Failed to create dynamic link:" . $e->getMessage(), 0);
+        error_log("Failed to create dynamic link:" . $e->getMessage());
         return false;
     }
 }

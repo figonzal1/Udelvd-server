@@ -1,16 +1,14 @@
-<?php
+<?php /** @noinspection ForgottenDebugOutputInspection */
 
-//require '../../vendor/autoload.php';
-
-use Kreait\Firebase;
-use Kreait\Firebase\Messaging\CloudMessage;
-use Kreait\Firebase\Messaging\MessageToRegistrationToken;
+use Kreait\Firebase\Exception\FirebaseException;
+use Kreait\Firebase\Exception\MessagingException;
+use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\AndroidConfig;
-use Kreait\Firebase\Exception\Messaging\InvalidMessage;
+use Kreait\Firebase\Messaging\CloudMessage;
 
-function enviarNotificacion($investigador)
+function enviarNotificacion($investigador): void
 {
-    $factory = (new Firebase\Factory())
+    $factory = (new Factory)
         ->withServiceAccount('../udelvd-server-credentials.json');
 
     $messaging = $factory->createMessaging();
@@ -19,7 +17,7 @@ function enviarNotificacion($investigador)
     $config = AndroidConfig::fromArray([
         'ttl' => '7200s',   // 2 horas de expiracion si el dispositiv no se conecta a internet
         'priority' => 'HIGH'  //Prioridad HIGH
-    ]);
+    ])->withNormalMessagePriority();
 
     //Configuracion de data
     $data = [
@@ -40,8 +38,8 @@ function enviarNotificacion($investigador)
         $messaging->validate($message);
         $messaging->send($message);
 
-        error_log("Enviando notificacion", 0);
-    } catch (InvalidMessage $e) {
-        error_log("Fail to send notification: " . $e->errors(), 0);
+        error_log("Enviando notificacion");
+    } catch (MessagingException|FirebaseException $e) {
+        error_log("Fail to send notification: " . $e->errors());
     }
 }

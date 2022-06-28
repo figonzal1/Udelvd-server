@@ -668,7 +668,7 @@ $app->post('/investigadores/recuperar/{email}/idioma/{idioma}', function ($reque
             $dynamicLink = crearDynamicLink();
 
             if ($dynamicLink) {
-                $email = new Email();
+                $email = new EmailService();
                 $status = $email->sendEmailRecuperar($investigador, $dynamicLink, $idioma);
 
                 if (!$status) {
@@ -748,7 +748,7 @@ $app->patch('/investigadores/{id}/activar', function ($request, $response, $args
             $investigador = $object->buscarInvestigadorPorId($conn);
 
             if ($patchData['activado'] === 1) {
-                $email = new Email();
+                $email = new EmailService();
                 $email->sendEmailActivation($investigador);
             }
 
