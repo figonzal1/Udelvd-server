@@ -128,7 +128,7 @@ class Entrevistado
         try {
 
             //Intentar agregar profesion
-            if ($this->nombreProfesion !== NULL) {
+            if (!empty($this->nombreProfesion)) {
 
                 $profesion = new Profesion();
                 $profesion->setNombre($this->nombreProfesion);
@@ -147,7 +147,7 @@ class Entrevistado
             }
 
             //Intentar agregar ciudad
-            if ($this->nombreCiudad !== NULL) {
+            if (!empty($this->nombreCiudad)) {
 
                 $ciudad = new Ciudad();
                 $ciudad->setNombre($this->nombreCiudad);
@@ -164,27 +164,27 @@ class Entrevistado
                 $this->idCiudad = NULL;
             }
 
-            $sql = "UPDATE 
-                entrevistado 
-            SET 
-                nombre=?,
-                apellido=?,
-                sexo=?,
-                fecha_nacimiento=?,
-                jubilado_legal=?,
-                caidas=?,
-                n_caidas=?,
-                n_convivientes_3_meses=?,
-                id_investigador=?,
-                id_ciudad=?,
-                id_nivel_educacional=?,
-                id_estado_civil=?,
-                id_tipo_convivencia=?,
-                id_profesion=? 
-            WHERE
-                id=?";
-
-            $stmt = $conn->prepare($sql);
+            $stmt = $conn->prepare(
+                "UPDATE 
+                    entrevistado 
+                SET 
+                    nombre=?,
+                    apellido=?,
+                    sexo=?,
+                    fecha_nacimiento=?,
+                    jubilado_legal=?,
+                    caidas=?,
+                    n_caidas=?,
+                    n_convivientes_3_meses=?,
+                    id_investigador=?,
+                    id_ciudad=?,
+                    id_nivel_educacional=?,
+                    id_estado_civil=?,
+                    id_tipo_convivencia=?,
+                    id_profesion=? 
+                WHERE
+                    id=?"
+            );
 
             $stmt->execute(
                 array(

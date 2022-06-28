@@ -405,19 +405,19 @@ $app->get('/entrevistados/{id}', function ($request, $response, $args) {
 //Editar un entrevistados
 $app->put('/entrevistados/{id}', function ($request, $response, $args) {
 
-    $id_entrevistado = $args['id'];
+    $idEntrevistado = $args['id'];
 
     //Seccion link self
     $payload = array(
         'links' => array(
-            'self' => "/entrevistados/" . $id_entrevistado
+            'self' => "/entrevistados/" . $idEntrevistado
         )
     );
 
     //Obtener parametros put
     $data = $request->getBody()->getContents();
-    $putdata = array();
-    parse_str($data, $putdata);
+    $putData = array();
+    parse_str($data, $putData);
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -426,104 +426,104 @@ $app->put('/entrevistados/{id}', function ($request, $response, $args) {
     /**
      * VALIDACION PARAMETROS
      */
-    if (!is_numeric($id_entrevistado)) {
+    if (!is_numeric($idEntrevistado)) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
     }
 
     //CAMPOS OPCIONALES
-    if (!isset($putdata['n_caidas']) || empty($putdata['n_caidas'])) {
-
-        $putdata['n_caidas'] = NULL;
-    }
-    if (!isset($putdata['id_nivel_educacional']) || empty($putdata['id_nivel_educacional'])) {
-
-        $putdata['id_nivel_educacional'] = NULL;
-    }
-    if (!isset($putdata['id_tipo_convivencia']) || empty($putdata['id_tipo_convivencia'])) {
-
-        $putdata['id_tipo_convivencia'] = NULL;
-    }
-    if (!isset($putdata['nombre_profesion']) || empty($putdata['nombre_profesion'])) {
-
-        $putdata['nombre_profesion'] = NULL;
+    $nCaidas = $putData['n_caidas'] ?? null;
+    $nivelEducacional = $putData['id_nivel_educacional'] ?? null;
+    $tipoConvivencia = $putData['id_tipo_convivencia'] ?? null;
+    if (array_key_exists('nombre_profesion', $putData)) {
+        $nombreProfesion = htmlspecialchars(ucfirst($putData['nombre_profesion']));
+    } else {
+        $nombreProfesion = null;
     }
 
     //Campos obligatorios
-    if (!isset($putdata['nombre']) || empty($putdata['nombre'])) {
+    if (!array_key_exists('nombre', $putData) || $putData['nombre'] === "") {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($putdata['apellido']) || empty($putdata['apellido'])) {
+    } else if (!array_key_exists('apellido', $putData) || $putData['apellido'] === "") {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Apellido is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($putdata['sexo']) || empty($putdata['sexo'])) {
+    } else if (!array_key_exists('sexo', $putData) || $putData['sexo'] === "") {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Sexo is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($putdata['fecha_nacimiento']) || empty($putdata['fecha_nacimiento'])) {
+    } else if (!array_key_exists('fecha_nacimiento', $putData) || $putData['fecha_nacimiento'] === "") {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Fecha_nac is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($putdata['nombre_ciudad']) || empty($putdata['nombre_ciudad'])) {
 
-        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre ciudad is empty');
+    } else if (!array_key_exists('nombre_ciudad', $putData) || $putData['nombre_ciudad'] === "") {
+
+        $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Nombre_ciudad is empty');
         $response = $response->withStatus(400);
-    } else if (!isset($putdata['jubilado_legal'])) {
+
+    } else if (!array_key_exists('jubilado_legal', $putData) || $putData['jubilado_legal'] === "") {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Jubilado legal is empty');
         $response = $response->withStatus(400);
-    } else if (!is_numeric($putdata['jubilado_legal'])) {
+
+    } else if (!is_numeric($putData['jubilado_legal'])) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Jubilado_legal must be integer');
         $response = $response->withStatus(400);
-    } else if (!isset($putdata['caidas'])) {
+
+    } else if (!array_key_exists('caidas', $putData) || $putData['caidas'] === "") {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Caidas is empty');
         $response = $response->withStatus(400);
-    } else if (!is_numeric($putdata['caidas'])) {
+
+    } else if (!is_numeric($putData['caidas'])) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Caidas must be integer');
         $response = $response->withStatus(400);
-    } else if (!isset($putdata['id_estado_civil']) || empty($putdata['id_estado_civil'])) {
+
+    } else if (!array_key_exists('id_estado_civil', $putData) || $putData['id_estado_civil'] === "") {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_estado_civil is empty');
         $response = $response->withStatus(400);
-    } else if (!is_numeric($putdata['id_estado_civil'])) {
+
+    } else if (!is_numeric($putData['id_estado_civil'])) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_estado_civil must be integer');
         $response = $response->withStatus(400);
-    } else if (!isset($putdata['id_investigador']) || empty($putdata['id_investigador'])) {
+
+    } else if (!array_key_exists('id_investigador', $putData) || $putData['id_investigador'] === "") {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_investigador is empty');
         $response = $response->withStatus(400);
-    } else if (!is_numeric($putdata['id_investigador'])) {
+    } else if (!is_numeric($putData['id_investigador'])) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id_investigador must be integer');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
 
         //Actualizar Entrevistado
         $object = new Entrevistado();
-        $object->setId(htmlspecialchars($id_entrevistado));
-        $object->setNombre(htmlspecialchars($putdata['nombre']));
-        $object->setApellido(htmlspecialchars($putdata['apellido']));
-        $object->setSexo(htmlspecialchars($putdata['sexo']));
-        $object->setFechaNac($putdata['fecha_nacimiento']);
-        $object->setNombreCiudad(htmlspecialchars(ucwords($putdata['nombre_ciudad'])));
-        $object->setJubiladoLegal(htmlspecialchars($putdata['jubilado_legal']));
-        $object->setCaidas(htmlspecialchars($putdata['caidas']));
-        $object->setNConvivientes(htmlspecialchars($putdata['n_convivientes_3_meses']));
-        $object->setIdInvestigador(htmlspecialchars($putdata['id_investigador']));
-        $object->setIdEstadoCivil(htmlspecialchars($putdata['id_estado_civil']));
+        $object->setId(htmlspecialchars($idEntrevistado));
+        $object->setNombre(htmlspecialchars($putData['nombre']));
+        $object->setApellido(htmlspecialchars($putData['apellido']));
+        $object->setSexo(htmlspecialchars($putData['sexo']));
+        $object->setFechaNac($putData['fecha_nacimiento']);
+        $object->setNombreCiudad(htmlspecialchars(ucwords($putData['nombre_ciudad'])));
+        $object->setJubiladoLegal(htmlspecialchars($putData['jubilado_legal']));
+        $object->setCaidas(htmlspecialchars($putData['caidas']));
+        $object->setNConvivientes(htmlspecialchars($putData['n_convivientes_3_meses']));
+        $object->setIdInvestigador(htmlspecialchars($putData['id_investigador']));
+        $object->setIdEstadoCivil(htmlspecialchars($putData['id_estado_civil']));
 
         //Opcionales
-        $object->setNCaidas($putdata['n_caidas']);
-        $object->setIdNivelEducacional($putdata['id_nivel_educacional']);
-        $object->setIdTipoConvivencia($putdata['id_tipo_convivencia']);
-        $object->setNombreProfesion(htmlspecialchars(ucfirst($putdata['nombre_profesion'])));
+        $object->setNCaidas($nCaidas);
+        $object->setIdNivelEducacional($nivelEducacional);
+        $object->setIdTipoConvivencia($tipoConvivencia);
+        $object->setNombreProfesion($nombreProfesion);
 
         //actualizar entrevistado
         $actualizar = $object->actualizar($conn);
@@ -568,7 +568,7 @@ $app->put('/entrevistados/{id}', function ($request, $response, $args) {
         $response = $response->withStatus(500);
     }
 
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
     //Desconectar mysql
@@ -580,7 +580,7 @@ $app->put('/entrevistados/{id}', function ($request, $response, $args) {
 //Eliminar un usuario
 $app->delete('/entrevistados/{id}', function ($request, $response, $args) {
 
-    $id_entrevistado = $args['id'];
+    $idEntrevistado = $args['id'];
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -588,18 +588,18 @@ $app->delete('/entrevistados/{id}', function ($request, $response, $args) {
 
     $payload = array(
         'links' => array(
-            'self' => "/entrevistados/" . $id_entrevistado
+            'self' => "/entrevistados/" . $idEntrevistado
         )
     );
 
-    if (!isset($id_entrevistado) || !is_numeric($id_entrevistado) || empty($id_entrevistado)) {
+    if (!isset($idEntrevistado) || !is_numeric($idEntrevistado) || empty($idEntrevistado)) {
 
         $payload = ErrorJsonHandler::lanzarError($payload, 400, 'Invalid parameter', 'Id must be integer');
         $response = $response->withStatus(400);
-    } else if ($conn != null) {
+    } else if ($conn !== null) {
 
         $object = new Entrevistado();
-        $object->setId($id_entrevistado);
+        $object->setId($idEntrevistado);
         $eliminar = $object->eliminar($conn);
 
         if ($eliminar) {
@@ -612,7 +612,7 @@ $app->delete('/entrevistados/{id}', function ($request, $response, $args) {
         }
     }
 
-    $payload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     $response->getBody()->write($payload);
 
     //Desconectar mysql
