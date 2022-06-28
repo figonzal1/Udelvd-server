@@ -12,18 +12,20 @@ class Entrevistado
     private string $fechaNac;
     private string $jubiladoLegal;
     private string $caidas;
-    private string $nCaidas;  //Opcional
+    private ?string $nCaidas;  //Opcional
     private string $nConvivientes3meses;
 
     //Foreneas
     private string $idInvestigador;
-    private string $idCiudad;
+
+    private ?string $idCiudad;
     private string $nombreCiudad;
-    private string $idNivelEducacional; //Opcional
+    private ?string $idNivelEducacional; //Opcional
     private string $idEstadoCivil;
-    private string $idTipoConvivencia;    //Opcional
-    private string $idProfesion;     //Opcional
-    private string $nombreProfesion;
+    private ?string $idTipoConvivencia;    //Opcional
+
+    private ?string $idProfesion;
+    private ?string $nombreProfesion;
 
     private int $limite = 10;
 
@@ -32,7 +34,7 @@ class Entrevistado
         try {
 
             //Intentar agregar profesion
-            if ($this->nombreProfesion !== NULL) {
+            if (!empty($this->nombreProfesion)) {
 
                 $profesion = new Profesion();
                 $profesion->setNombre($this->nombreProfesion);
@@ -41,9 +43,8 @@ class Entrevistado
 
                 //Si no existe, agrega nuevo
                 if (!$existente) {
-                    $this->id_profesion = $profesion->agregar($conn);
-                }
-                //Si existe asignar id
+                    $this->idProfesion = $profesion->agregar($conn);
+                } //Si existe asignar id
                 else {
                     $this->idProfesion = $existente['id'];
                 }
@@ -52,18 +53,17 @@ class Entrevistado
             }
 
             //Intentar agregar ciudad
-            if ($this->nombreCiudad !== NULL) {
+            if (!empty($this->nombreCiudad)) {
 
                 $ciudad = new Ciudad();
                 $ciudad->setNombre($this->nombreCiudad);
+
                 $existente = $ciudad->buscarCiudadPorNombre($conn);
 
                 //Si no existe, agrega nuevo
                 if (!$existente) {
-                    $this->id_ciudad = $ciudad->agregar($conn);
-                }
-
-                //Si existe asignar id
+                    $this->idCiudad = $ciudad->agregar($conn);
+                } //Si existe asignar id
                 else {
                     $this->idCiudad = $existente['id'];
                 }
@@ -71,26 +71,26 @@ class Entrevistado
                 $this->idCiudad = NULL;
             }
 
-            $sql = "INSERT 
-            INTO entrevistado 
-            (nombre,
-            apellido,
-            sexo,
-            fecha_nacimiento,
-            jubilado_legal,
-            caidas,
-            n_caidas,
-            n_convivientes_3_meses,
-            id_investigador,
-            id_ciudad,
-            id_nivel_educacional,
-            id_estado_civil,
-            id_tipo_convivencia,
-            id_profesion
-            ) 
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-
-            $stmt = $conn->prepare($sql);
+            $stmt = $conn->prepare(
+                "INSERT 
+                INTO entrevistado 
+                    (nombre,
+                    apellido,
+                    sexo,
+                    fecha_nacimiento,
+                    jubilado_legal,
+                    caidas,
+                    n_caidas,
+                    n_convivientes_3_meses,
+                    id_investigador,
+                    id_ciudad,
+                    id_nivel_educacional,
+                    id_estado_civil,
+                    id_tipo_convivencia,
+                    id_profesion
+                    ) 
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+            );
 
             $stmt->execute(
                 array(
@@ -137,9 +137,8 @@ class Entrevistado
 
                 //Si no existe, agrega nuevo
                 if (!$existente) {
-                    $this->id_profesion = $profesion->agregar($conn);
-                }
-                //Si existe asignar id
+                    $this->idProfesion = $profesion->agregar($conn);
+                } //Si existe asignar id
                 else {
                     $this->idProfesion = $existente['id'];
                 }
@@ -156,10 +155,8 @@ class Entrevistado
 
                 //Si no existe, agrega nuevo
                 if (!$existente) {
-                    $this->id_ciudad = $ciudad->agregar($conn);
-                }
-
-                //Si existe asignar id
+                    $this->idCiudad = $ciudad->agregar($conn);
+                } //Si existe asignar id
                 else {
                     $this->idCiudad = $existente['id'];
                 }
@@ -391,6 +388,48 @@ class Entrevistado
         }
     }
 
+    public function entrevistadosPorGenero($conn, $proyecto)
+    {
+
+        try {
+
+            $sql = "SELECT 
+            DISTINCT(e.nombre),e.sexo,COUNT(ev.id) as n_eventos
+            FROM 
+                investigador i
+            INNER JOIN 
+                entrevistado e 
+            ON i.id = e.id_investigador 
+            INNER JOIN 
+                entrevista n 
+            ON e.id = n.id_entrevistado 
+            INNER JOIN 
+                evento ev 
+            ON n.id = ev.id_entrevista 
+            WHERE e.visible =1 and n.visible =1 and ev.visible =1";
+
+
+            if ($proyecto !== null) {
+                $sql .= " and i.proyecto= ?";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->execute(
+                    array(
+                        $proyecto
+                    )
+                );
+            }
+            $sql .= " GROUP BY e.nombre;";
+
+            $stmt = $conn->prepare($sql);
+
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Fail search entrevistas por genero: " . $e->getMessage());
+            return false;
+        }
+    }
+
     public function eliminar($conn): bool
     {
 
@@ -419,43 +458,53 @@ class Entrevistado
     {
         $this->id = $id;
     }
-    function setNombre($nombre)
+
+    public function setNombre($nombre): void
     {
         $this->nombre = $nombre;
     }
-    function setApellido($apellido)
+
+    public function setApellido($apellido): void
     {
         $this->apellido = $apellido;
     }
-    function setSexo($sexo)
+
+    public function setSexo($sexo): void
     {
         $this->sexo = $sexo;
     }
-    function setFechaNac($fecha_nac)
+
+    public function setFechaNac($fechaNac): void
     {
         $this->fechaNac = $fechaNac;
     }
-    function setNombreCiudad($nombre_ciudad)
+
+    public function setNombreCiudad($nombreCiudad): void
     {
         $this->nombreCiudad = $nombreCiudad;
     }
-    function setJubiladoLegal($jubilado_legal)
+
+    public function setJubiladoLegal($jubiladoLegal): void
     {
         $this->jubiladoLegal = $jubiladoLegal;
     }
-    function setCaidas($caidas)
+
+    public function setCaidas($caidas): void
     {
         $this->caidas = $caidas;
     }
-    function setNCaidas($n_caidas)
+
+    public function setNCaidas($nCaidas): void
     {
         $this->nCaidas = $nCaidas;
     }
-    function setNConvivientes($n_convivientes_3_meses)
+
+    public function setNConvivientes($n_convivientes_3_meses): void
     {
         $this->nConvivientes3meses = $n_convivientes_3_meses;
     }
-    function setIdInvestigador($id_investigador)
+
+    public function setIdInvestigador($idInvestigador): void
     {
         $this->idInvestigador = $idInvestigador;
     }
@@ -465,15 +514,13 @@ class Entrevistado
     {
         $this->idNivelEducacional = $idNivelEducacional;
     }
-    function setIdEstadoCivil($id_estado_civil)
+
+    public function setIdEstadoCivil($idEstadoCivil): void
     {
         $this->idEstadoCivil = $idEstadoCivil;
     }
-    function setIdEnfermedad($id_enfermedad)
-    {
-        $this->id_enfermedad = $id_enfermedad;
-    }
-    function setIdTipoConvivencia($id_tipo_convivencia)
+
+    public function setIdTipoConvivencia($idTipoConvivencia): void
     {
         $this->idTipoConvivencia = $idTipoConvivencia;
     }
