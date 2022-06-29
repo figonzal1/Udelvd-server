@@ -410,16 +410,16 @@ class Entrevistado
                     evento ev
                 ON n.id = ev.id_entrevista
                 WHERE e.visible = 1
-                    and n.visible = 1
-                    and ev.visible = 1";
+                    AND n.visible = 1
+                    AND ev.visible = 1";
 
 
             if ($proyecto !== null) {
-                $sql .= " and i.proyecto= ?";
+                $sql .= " AND i.proyecto= ?";
             }
 
             if ($idEmoticon !== null) {
-                $sql .= " and ev.id_emoticon=?";
+                $sql .= " AND ev.id_emoticon=?";
             }
             $sql .= " GROUP BY e.id,e.nombre ORDER BY e.nombre";
             $stmt = $conn->prepare($sql);

@@ -180,6 +180,62 @@ class Evento
         }
     }
 
+    public function eventosParaEstadisticas($conn, $proyecto, $idEmoticon)
+    {
+        try {
+            $sql = "SELECT
+                e.nombre,
+                e.apellido,
+                ac.nombre_es as nombre_accion,
+                ev.hora_evento,
+                ev.justificacion,
+                em.url
+            FROM
+                investigador i
+            INNER JOIN entrevistado e ON
+                i.id = e.id_investigador
+            INNER JOIN entrevista en ON
+                e.id = en.id_entrevistado
+            INNER JOIN evento ev ON
+                en.id = ev.id_entrevista
+            INNER JOIN emoticon em ON
+                ev.id_emoticon = em.id
+            INNER JOIN accion ac ON
+                ev.id_accion = ac.id
+            WHERE 
+                e.visible = 1 AND 
+                en.visible = 1 AND 
+                ev.visible = 1";
+
+            if ($proyecto !== null) {
+                $sql .= " AND i.proyecto=?";
+            }
+
+            if ($idEmoticon !== null) {
+                $sql .= " AND ev.id_emoticon=?";
+            }
+
+            $sql .= " ORDER BY e.nombre,e.apellido,ev.hora_evento";
+            $stmt = $conn->prepare($sql);
+
+            if ($proyecto !== null && $idEmoticon !== null) {
+                $stmt->execute(array($proyecto, $idEmoticon));
+            } else if ($proyecto !== null) {
+                $stmt->execute(array($proyecto));
+            } else if ($idEmoticon !== null) {
+                $stmt->execute(array($idEmoticon));
+            } else {
+                $stmt->execute();
+            }
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        } catch (PDOException $e) {
+            error_log("Fail search evento para estadisticas: " . $e->getMessage());
+            return false;
+        }
+    }
+
     public function eliminar($conn): bool
     {
 

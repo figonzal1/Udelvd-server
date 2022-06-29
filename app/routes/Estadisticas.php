@@ -78,6 +78,13 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
     $idInvestigador = $idInvestigador ?? null;
     $idEmoticon = $idEmoticon ?? null;
 
+    if ($idInvestigador !== null) {
+        $payload['links']['self'] .= "/investigador/" . $idInvestigador;
+    }
+    if ($idEmoticon !== null) {
+        $payload['links']['self'] .= "/emoticon/" . $idEmoticon;
+    }
+
     if ($conn !== null) {
 
         //ENTREVISTADOS POR GENERO
@@ -137,7 +144,7 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
             }
         }
 
-        $payload['data'][] = array(
+        $payload['data'][0] = array(
             'type' => 'estadisticas',
             'attributes' => array(
                 'general' => array(
@@ -154,32 +161,28 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
                     'tristeza' => $totalTristeza,
                     'miedo' => $totalMiedo,
                     'enojo' => $totalEnojo
-                )
+                ),
 
 
             )
         );
 
-        //Preparar respuesta
-        /*foreach ($listadoPorGenero as $value) {
+        $payload['data'][0]['attributes']['eventos_para_estadisticas'] = array();
 
-            $payload['data'][] = array(
-                'type' => 'estadisticas',
-                'id' => $value['id'],
-                'attributes' => array(
-                    'nombre' => $value['nombre'],
-                    'apellido' => $value['apellido'],
-                    'sexo' => $value['sexo'],
-                    'fecha_nacimiento' => $value['fecha_nacimiento'],
-                    'jubilado_legal' => $value['jubilado_legal'],
-                    'caidas' => $value['caidas'],
-                    'n_caidas' => $value['n_caidas'],
-                    'n_convivientes_3_meses' => $value['n_convivientes_3_meses'],
-                    'id_investigador' => $value['id_investigador'],
-                    'ciudad' => $value['ciudad'],
-                )
+        //EVENTOS PARA ESTADISTICAS
+        $eventosParaEstadisticas = $evento->eventosParaEstadisticas($conn, $proyectoInvestigador, $idEmoticon);
+
+        foreach ($eventosParaEstadisticas as $iValue) {
+
+            $payload['data'][0]['attributes']['eventos_para_estadisticas'][] = array(
+                'nombre' => $iValue['nombre'],
+                'apellido' => $iValue['apellido'],
+                'accion' => $iValue['nombre_accion'],
+                'hora_evento' => $iValue['hora_evento'],
+                'justificacion' => $iValue['justificacion'],
+                'url' => $iValue['url'],
             );
-        }*/
+        }
 
         $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         $response->getBody()->write($payload);
