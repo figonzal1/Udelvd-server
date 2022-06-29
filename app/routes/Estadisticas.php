@@ -111,7 +111,31 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
         }
 
         //EVENTOS POR EMOTICON
+        $evento = new Evento();
+        $listadoPorEmoticon = $evento->eventosPorEmoticon($conn, $proyectoInvestigador, $idEmoticon);
 
+        $totalFelicidad = 0;
+        $totalTristeza = 0;
+        $totalMiedo = 0;
+        $totalEnojo = 0;
+
+        foreach ($listadoPorEmoticon as $value) {
+            if (str_contains($value['descripcion_es'], "felicidad")) {
+                $totalFelicidad = $value['n_emoticones'];
+            }
+
+            if (str_contains($value['descripcion_es'], "tristeza")) {
+                $totalTristeza = $value['n_emoticones'];
+            }
+
+            if (str_contains($value['descripcion_es'], "miedo")) {
+                $totalMiedo = $value['n_emoticones'];
+            }
+
+            if (str_contains($value['descripcion_es'], "enojo")) {
+                $totalEnojo = $value['n_emoticones'];
+            }
+        }
 
         $payload['data'][] = array(
             'type' => 'estadisticas',
@@ -125,7 +149,12 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
                     'total_masculino' => $totalMasculino,
                     'total_otros' => $totalOtro
                 ),
-                'eventos_por_emoticon' => array()
+                'eventos_por_emoticon' => array(
+                    'felicidad' => $totalFelicidad,
+                    'tristeza' => $totalTristeza,
+                    'miedo' => $totalMiedo,
+                    'enojo' => $totalEnojo
+                )
 
 
             )

@@ -128,6 +128,58 @@ class Evento
         }
     }
 
+    public function eventosPorEmoticon($conn, $proyecto, $idEmoticon)
+    {
+        try {
+
+            $sql = "SELECT
+                em.descripcion_es,
+                COUNT(*) AS n_emoticones
+            FROM
+                investigador
+            INNER JOIN entrevistado ON
+                investigador.id = entrevistado.id_investigador
+            INNER JOIN entrevista ON
+                entrevistado.id = entrevista.id_entrevistado
+            INNER JOIN evento ON
+                entrevista.id = evento.id_entrevista
+            INNER JOIN emoticon em ON
+                evento.id_emoticon = em.id
+            WHERE
+                entrevistado.visible = 1 AND 
+                entrevista.visible = 1 AND 
+                evento.visible = 1";
+
+
+            if ($proyecto !== null) {
+                $sql .= " AND investigador.proyecto = ?";
+            }
+
+            if ($idEmoticon !== null) {
+                $sql .= " AND evento.id_emoticon = ?";
+            }
+
+            $sql .= " GROUP BY evento.id_emoticon";
+            $stmt = $conn->prepare($sql);
+
+            if ($proyecto !== null && $idEmoticon !== null) {
+                $stmt->execute(array($proyecto, $idEmoticon));
+            } else if ($proyecto !== null) {
+                $stmt->execute(array($proyecto));
+            } else if ($idEmoticon !== null) {
+                $stmt->execute(array($idEmoticon));
+            } else {
+                $stmt->execute();
+            }
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        } catch (PDOException $e) {
+            error_log("Fail search eventos por emoticon: " . $e->getMessage());
+            return false;
+        }
+    }
+
     public function eliminar($conn): bool
     {
 
