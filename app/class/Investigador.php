@@ -93,6 +93,7 @@ class Investigador
             i.activado,
             i.create_time,
             i.update_time,
+            i.proyecto,
             r.id AS id_rol,
             r.nombre AS nombre_rol
         FROM

@@ -388,42 +388,54 @@ class Entrevistado
         }
     }
 
-    public function entrevistadosPorGenero($conn, $proyecto)
+    public function entrevistadosPorGenero($conn, $proyecto, $idEmoticon)
     {
 
         try {
 
             $sql = "SELECT 
-            DISTINCT(e.nombre),e.sexo,COUNT(ev.id) as n_eventos
-            FROM 
-                investigador i
-            INNER JOIN 
-                entrevistado e 
-            ON i.id = e.id_investigador 
-            INNER JOIN 
-                entrevista n 
-            ON e.id = n.id_entrevistado 
-            INNER JOIN 
-                evento ev 
-            ON n.id = ev.id_entrevista 
-            WHERE e.visible =1 and n.visible =1 and ev.visible =1";
+                DISTINCT(e.id),
+                        e.nombre,
+                        e.apellido,
+                        e.sexo,
+                        COUNT(ev.id) as n_eventos
+                FROM investigador i
+                INNER JOIN
+                    entrevistado e
+                ON i.id = e.id_investigador
+                INNER JOIN
+                    entrevista n
+                ON e.id = n.id_entrevistado
+                INNER JOIN
+                    evento ev
+                ON n.id = ev.id_entrevista
+                WHERE e.visible = 1
+                    and n.visible = 1
+                    and ev.visible = 1";
 
 
             if ($proyecto !== null) {
                 $sql .= " and i.proyecto= ?";
-
-                $stmt = $conn->prepare($sql);
-                $stmt->execute(
-                    array(
-                        $proyecto
-                    )
-                );
             }
-            $sql .= " GROUP BY e.nombre;";
 
+            if ($idEmoticon !== null) {
+                $sql .= " and ev.id_emoticon=?";
+            }
+            $sql .= " GROUP BY e.id,e.nombre ORDER BY e.nombre";
             $stmt = $conn->prepare($sql);
 
-            return $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($proyecto !== null && $idEmoticon !== null) {
+                $stmt->execute(array($proyecto, $idEmoticon));
+            } else if ($proyecto !== null) {
+                $stmt->execute(array($proyecto));
+            } else if ($idEmoticon !== null) {
+                $stmt->execute(array($idEmoticon));
+            } else {
+                $stmt->execute();
+            }
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
         } catch (PDOException $e) {
             error_log("Fail search entrevistas por genero: " . $e->getMessage());
             return false;
