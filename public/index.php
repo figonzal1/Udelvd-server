@@ -76,12 +76,12 @@ $app->addRoutingMiddleware();
 /**
  * DEV MODE
  */
-#$errorMiddleware = $app->addErrorMiddleware(true, true, true);
+$errorMiddleware = $app->addErrorMiddleware(true, true, true);
 
 /**
  * PROD MODE
  */
-$errorMiddleware = $app->addErrorMiddleware(false, true, true);
+#$errorMiddleware = $app->addErrorMiddleware(false, true, true);
 
 /**
  * RUTAS

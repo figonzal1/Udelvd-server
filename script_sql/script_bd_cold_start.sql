@@ -500,15 +500,13 @@ LOCK TABLES `emoticon` WRITE;
 INSERT INTO
   `emoticon`
 VALUES
-  (
-    1,
-    'https://undiaenlavidade.cl/img/smiley.png',
-    'Emoticon que describe felicidad',
-    'Emoticon that describes happiness',
-    '2020-08-27 20:16:14',
-    NULL
-  ),
-  (
+    (1,
+     'https://undiaenlavidade.cl/img/happy.png',
+     'Emoticon que describe felicidad',
+     'Emoticon that describes happiness',
+     '2020-08-27 20:16:14',
+     NULL),
+    (
     2,
     'https://undiaenlavidade.cl/img/sad.png',
     'Emoticon que describe tristeza',
@@ -516,15 +514,13 @@ VALUES
     '2020-08-27 20:17:44',
     NULL
   ),
-  (
-    3,
-    'https://undiaenlavidade.cl/img/afraid.png',
-    'Emoticon que describe miedo',
-    'Emoticon that describes fear',
-    '2020-08-27 20:17:44',
-    NULL
-  ),
-  (
+    (3,
+     'https://undiaenlavidade.cl/img/fear.png',
+     'Emoticon que describe miedo',
+     'Emoticon that describes fear',
+     '2020-08-27 20:17:44',
+     NULL),
+    (
     4,
     'https://undiaenlavidade.cl/img/angry.png',
     'Emoticon que describe enojo',

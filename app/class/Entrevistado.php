@@ -388,7 +388,7 @@ class Entrevistado
         }
     }
 
-    public function entrevistadosPorGenero($conn, $proyecto, $idEmoticon)
+    public function entrevistadosPorGenero($conn, $proyecto, $idEmoticon, $letraGenero)
     {
 
         try {
@@ -415,24 +415,34 @@ class Entrevistado
 
 
             if ($proyecto !== null) {
-                $sql .= " AND i.proyecto= ?";
+                $sql .= " AND i.proyecto= :proyecto";
             }
 
             if ($idEmoticon !== null) {
-                $sql .= " AND ev.id_emoticon=?";
+                $sql .= " AND ev.id_emoticon= :emoticon";
             }
+            if ($letraGenero !== null) {
+                $sql .= " AND e.sexo LIKE :letraGenero";
+                $letraGenero .= "%";
+            }
+
             $sql .= " GROUP BY e.id,e.nombre ORDER BY e.nombre";
             $stmt = $conn->prepare($sql);
 
-            if ($proyecto !== null && $idEmoticon !== null) {
-                $stmt->execute(array($proyecto, $idEmoticon));
-            } else if ($proyecto !== null) {
-                $stmt->execute(array($proyecto));
-            } else if ($idEmoticon !== null) {
-                $stmt->execute(array($idEmoticon));
-            } else {
-                $stmt->execute();
+
+            if ($proyecto !== null) {
+                $stmt->bindParam(':proyecto', $proyecto, PDO::PARAM_STR);
             }
+
+            if ($idEmoticon !== null) {
+                $stmt->bindParam(':emoticon', $idEmoticon, PDO::PARAM_INT);
+            }
+
+            if ($letraGenero !== null) {
+                $stmt->bindParam(':letraGenero', $letraGenero, PDO::PARAM_STR);
+            }
+
+            $stmt->execute();
 
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
 

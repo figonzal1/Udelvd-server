@@ -63,7 +63,7 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
 
     $params = explode('/', $args['params']);
 
-    //investigador/{id_investigador}/emoticon/{id_emoticon}
+    //investigador/{id_investigador}/emoticon/{id_emoticon}/genero/{f|m}
     foreach ($params as $i => $iValue) {
 
         if ($iValue === "investigador") {
@@ -73,16 +73,24 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
         if ($iValue === "emoticon") {
             $idEmoticon = $params[$i + 1];
         }
+
+        if ($iValue === "genero") {
+            $letraGenero = $params[$i + 1];
+        }
     }
 
     $idInvestigador = $idInvestigador ?? null;
     $idEmoticon = $idEmoticon ?? null;
+    $letraGenero = $letraGenero ?? null;
 
     if ($idInvestigador !== null) {
         $payload['links']['self'] .= "/investigador/" . $idInvestigador;
     }
     if ($idEmoticon !== null) {
         $payload['links']['self'] .= "/emoticon/" . $idEmoticon;
+    }
+    if ($letraGenero !== null) {
+        $payload['links']['self'] .= "/genero/" . $letraGenero;
     }
 
     if ($conn !== null) {
@@ -97,7 +105,7 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
         }
 
         $entrevistado = new Entrevistado();
-        $listadoPorGenero = $entrevistado->entrevistadosPorGenero($conn, $proyectoInvestigador, $idEmoticon);
+        $listadoPorGenero = $entrevistado->entrevistadosPorGenero($conn, $proyectoInvestigador, $idEmoticon, $letraGenero);
 
         $nEntrevistados = count($listadoPorGenero);
         $nEventos = 0;
@@ -119,7 +127,7 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
 
         //EVENTOS POR EMOTICON
         $evento = new Evento();
-        $listadoPorEmoticon = $evento->eventosPorEmoticon($conn, $proyectoInvestigador, $idEmoticon);
+        $listadoPorEmoticon = $evento->eventosPorEmoticon($conn, $proyectoInvestigador, $idEmoticon, $letraGenero);
 
         $totalFelicidad = 0;
         $totalTristeza = 0;
@@ -128,19 +136,19 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
 
         foreach ($listadoPorEmoticon as $value) {
             if (str_contains($value['descripcion_es'], "felicidad")) {
-                $totalFelicidad = $value['n_emoticones'];
+                $totalFelicidad = (int)$value['n_emoticones'];
             }
 
             if (str_contains($value['descripcion_es'], "tristeza")) {
-                $totalTristeza = $value['n_emoticones'];
+                $totalTristeza = (int)$value['n_emoticones'];
             }
 
             if (str_contains($value['descripcion_es'], "miedo")) {
-                $totalMiedo = $value['n_emoticones'];
+                $totalMiedo = (int)$value['n_emoticones'];
             }
 
             if (str_contains($value['descripcion_es'], "enojo")) {
-                $totalEnojo = $value['n_emoticones'];
+                $totalEnojo = (int)$value['n_emoticones'];
             }
         }
 
@@ -161,13 +169,11 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
                     'tristeza' => $totalTristeza,
                     'miedo' => $totalMiedo,
                     'enojo' => $totalEnojo
-                ),
-
-
+                )
             )
         );
 
-        $payload['data'][0]['attributes']['eventos_para_estadisticas'] = array();
+        /*$payload['data'][0]['attributes']['eventos_para_estadisticas'] = array();
 
         //EVENTOS PARA ESTADISTICAS
         $eventosParaEstadisticas = $evento->eventosParaEstadisticas($conn, $proyectoInvestigador, $idEmoticon);
@@ -182,7 +188,7 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
                 'justificacion' => $iValue['justificacion'],
                 'url' => $iValue['url'],
             );
-        }
+        }*/
 
         $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         $response->getBody()->write($payload);
