@@ -242,6 +242,8 @@ class Evento
                 $stmt->bindParam(':letraGenero', $letraGenero, PDO::PARAM_STR);
             }
 
+            $stmt->execute();
+
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         } catch (PDOException $e) {
