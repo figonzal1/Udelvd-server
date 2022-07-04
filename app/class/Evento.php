@@ -178,6 +178,7 @@ class Evento
             if ($letraGenero !== null) {
                 $stmt->bindParam(':letraGenero', $letraGenero, PDO::PARAM_STR);
             }
+
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -187,7 +188,7 @@ class Evento
         }
     }
 
-    public function eventosParaEstadisticas($conn, $proyecto, $idEmoticon)
+    public function eventosParaEstadisticas($conn, $proyecto, $idEmoticon, $letraGenero)
     {
         try {
             $sql = "SELECT
@@ -215,24 +216,30 @@ class Evento
                 ev.visible = 1";
 
             if ($proyecto !== null) {
-                $sql .= " AND i.proyecto=?";
+                $sql .= " AND i.proyecto= :proyecto";
             }
 
             if ($idEmoticon !== null) {
-                $sql .= " AND ev.id_emoticon=?";
+                $sql .= " AND ev.id_emoticon= :emoticon";
+            }
+            if ($letraGenero !== null) {
+                $sql .= " AND e.sexo LIKE :letraGenero";
+                $letraGenero .= "%";
             }
 
             $sql .= " ORDER BY e.nombre,e.apellido,ev.hora_evento";
             $stmt = $conn->prepare($sql);
 
-            if ($proyecto !== null && $idEmoticon !== null) {
-                $stmt->execute(array($proyecto, $idEmoticon));
-            } else if ($proyecto !== null) {
-                $stmt->execute(array($proyecto));
-            } else if ($idEmoticon !== null) {
-                $stmt->execute(array($idEmoticon));
-            } else {
-                $stmt->execute();
+            if ($proyecto !== null) {
+                $stmt->bindParam(':proyecto', $proyecto, PDO::PARAM_STR);
+            }
+
+            if ($idEmoticon !== null) {
+                $stmt->bindParam(':emoticon', $idEmoticon, PDO::PARAM_INT);
+            }
+
+            if ($letraGenero !== null) {
+                $stmt->bindParam(':letraGenero', $letraGenero, PDO::PARAM_STR);
             }
 
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
