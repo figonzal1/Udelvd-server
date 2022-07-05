@@ -388,6 +388,35 @@ class Entrevistado
         }
     }
 
+    public function entrevistadosConEventos($conn)
+    {
+
+        try {
+            $sql = "SELECT 
+                DISTINCT (e.id),
+                         e.nombre,
+                         e.apellido,
+                         COUNT(ev.id) AS n_eventos 
+                FROM investigador i 
+                INNER JOIN entrevistado e 
+                    ON i.id = e.id_investigador 
+                INNER JOIN entrevista n 
+                    ON e.id = n.id_entrevistado 
+                INNER JOIN evento ev 
+                    ON n.id = ev.id_entrevista 
+                WHERE e.visible = 1 AND n.visible = 1 AND ev.visible = 1 GROUP BY e.id, e.nombre";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        } catch (PDOException $e) {
+            error_log("Fail search entrevistas con eventos: " . $e->getMessage());
+            return false;
+        }
+    }
+
     public function entrevistadosPorGenero($conn, $proyecto, $idEmoticon, $letraGenero, $ids)
     {
 

@@ -333,6 +333,53 @@ $app->get('/entrevistados/pagina/{n_pag}/investigador/{id_investigador}', functi
     return $response;
 })->add(new JwtMiddleware());
 
+
+//Obtener entrevistados con eventos registrados
+$app->get('/entrevistados/eventos', function ($request, $response, $args) {
+    $payload = array(
+        'links' => array(
+            'self' => '/entrevistados/eventos'
+        )
+    );
+
+    //Conectar BD
+    $mysql_adapter = new MysqlAdapter();
+    $conn = $mysql_adapter->connect();
+
+    if ($conn !== null) {
+        //Buscar entrevistados
+        $object = new Entrevistado();
+
+        $listado = $object->entrevistadosConEventos($conn);
+
+        //Preparar respuesta
+        foreach ($listado as $value) {
+
+            $payload['data'][] = array(
+                'type' => 'entrevistados',
+                'id' => $value['id'],
+                'attributes' => array(
+                    'nombre' => $value['nombre'],
+                    'apellido' => $value['apellido'],
+                    'n_eventos' => $value['n_eventos'],
+                )
+            );
+        }
+        $response = $response->withStatus(200);
+    } else {
+        $payload = ErrorJsonHandler::lanzarError($payload, 500, 'Server connection problem', 'A connection problem ocurred with database');
+        $response = $response->withStatus(500);
+    }
+    //Encodear resultado
+    $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+    $response->getBody()->write($payload);
+
+    //Desconectar mysql
+    $mysql_adapter->disconnect();
+    return $response;
+})->add(new JwtMiddleware());
+
 //Obtener entrevistado segun id
 $app->get('/entrevistados/{id}', function ($request, $response, $args) {
 
