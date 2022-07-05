@@ -388,7 +388,7 @@ class Entrevistado
         }
     }
 
-    public function entrevistadosPorGenero($conn, $proyecto, $idEmoticon, $letraGenero)
+    public function entrevistadosPorGenero($conn, $proyecto, $idEmoticon, $letraGenero, $ids)
     {
 
         try {
@@ -425,6 +425,10 @@ class Entrevistado
                 $sql .= " AND e.sexo LIKE :letraGenero";
                 $letraGenero .= "%";
             }
+            if ($ids !== null) {
+                $questionMarks = implode(",", array_pad(array(), count($ids), "?"));
+                $sql .= " AND e.id in ($questionMarks)";
+            }
 
             $sql .= " GROUP BY e.id,e.nombre ORDER BY e.nombre";
             $stmt = $conn->prepare($sql);
@@ -440,6 +444,10 @@ class Entrevistado
 
             if ($letraGenero !== null) {
                 $stmt->bindParam(':letraGenero', $letraGenero, PDO::PARAM_STR);
+            }
+
+            if ($ids !== null) {
+                $stmt->execute($ids);
             }
 
             $stmt->execute();

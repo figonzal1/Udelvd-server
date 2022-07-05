@@ -128,7 +128,7 @@ class Evento
         }
     }
 
-    public function eventosPorEmoticon($conn, $proyecto, $idEmoticon, $letraGenero)
+    public function eventosPorEmoticon($conn, $proyecto, $idEmoticon, $letraGenero, $ids)
     {
         try {
 
@@ -163,6 +163,10 @@ class Evento
                 $sql .= " AND entrevistado.sexo LIKE :letraGenero";
                 $letraGenero .= "%";
             }
+            if ($ids !== null) {
+                $questionMarks = implode(",", array_pad(array(), count($ids), "?"));
+                $sql .= " AND entrevistado.id in ($questionMarks)";
+            }
 
             $sql .= " GROUP BY evento.id_emoticon";
             $stmt = $conn->prepare($sql);
@@ -178,6 +182,9 @@ class Evento
             if ($letraGenero !== null) {
                 $stmt->bindParam(':letraGenero', $letraGenero, PDO::PARAM_STR);
             }
+            if ($ids !== null) {
+                $stmt->execute($ids);
+            }
 
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -188,7 +195,7 @@ class Evento
         }
     }
 
-    public function eventosParaEstadisticas($conn, $proyecto, $idEmoticon, $letraGenero)
+    public function eventosParaEstadisticas($conn, $proyecto, $idEmoticon, $letraGenero, $ids)
     {
         try {
             $sql = "SELECT
@@ -226,6 +233,10 @@ class Evento
                 $sql .= " AND e.sexo LIKE :letraGenero";
                 $letraGenero .= "%";
             }
+            if ($ids !== null) {
+                $questionMarks = implode(",", array_pad(array(), count($ids), "?"));
+                $sql .= " AND e.id in ($questionMarks)";
+            }
 
             $sql .= " ORDER BY e.nombre,e.apellido,ev.hora_evento";
             $stmt = $conn->prepare($sql);
@@ -240,6 +251,10 @@ class Evento
 
             if ($letraGenero !== null) {
                 $stmt->bindParam(':letraGenero', $letraGenero, PDO::PARAM_STR);
+            }
+
+            if ($ids !== null) {
+                $stmt->execute($ids);
             }
 
             $stmt->execute();

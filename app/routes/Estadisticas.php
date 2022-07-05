@@ -77,11 +77,16 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
         if ($iValue === "genero") {
             $letraGenero = $params[$i + 1];
         }
+
+        if ($iValue === "entrevistados") {
+            $ids = $params[$i + 1];
+        }
     }
 
     $idInvestigador = $idInvestigador ?? null;
     $idEmoticon = $idEmoticon ?? null;
     $letraGenero = $letraGenero ?? null;
+    $ids = $ids ?? null;
 
     if ($idInvestigador !== null) {
         $payload['links']['self'] .= "/investigador/" . $idInvestigador;
@@ -92,6 +97,11 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
     if ($letraGenero !== null) {
         $payload['links']['self'] .= "/genero/" . $letraGenero;
     }
+    if ($ids !== null) {
+        $payload['links']['self'] .= "/entrevistados/" . $ids;
+        $ids = explode(';', $ids);
+    }
+
 
     if ($conn !== null) {
 
@@ -105,7 +115,7 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
         }
 
         $entrevistado = new Entrevistado();
-        $listadoPorGenero = $entrevistado->entrevistadosPorGenero($conn, $proyectoInvestigador, $idEmoticon, $letraGenero);
+        $listadoPorGenero = $entrevistado->entrevistadosPorGenero($conn, $proyectoInvestigador, $idEmoticon, $letraGenero, $ids);
 
         $nEntrevistados = count($listadoPorGenero);
         $nEventos = 0;
@@ -127,7 +137,7 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
 
         //EVENTOS POR EMOTICON
         $evento = new Evento();
-        $listadoPorEmoticon = $evento->eventosPorEmoticon($conn, $proyectoInvestigador, $idEmoticon, $letraGenero);
+        $listadoPorEmoticon = $evento->eventosPorEmoticon($conn, $proyectoInvestigador, $idEmoticon, $letraGenero, $ids);
 
         $totalFelicidad = 0;
         $totalTristeza = 0;
@@ -176,7 +186,7 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
         $payload['data'][0]['attributes']['eventos_para_estadisticas'] = array();
 
         //EVENTOS PARA ESTADISTICAS
-        $eventosParaEstadisticas = $evento->eventosParaEstadisticas($conn, $proyectoInvestigador, $idEmoticon, $letraGenero);
+        $eventosParaEstadisticas = $evento->eventosParaEstadisticas($conn, $proyectoInvestigador, $idEmoticon, $letraGenero, $ids);
 
         foreach ($eventosParaEstadisticas as $iValue) {
 
