@@ -458,7 +458,6 @@ class Entrevistado
                 $stmt->bindParam(1, $idEmoticon, PDO::PARAM_INT);
                 $stmt->bindParam(2, $letraGenero, PDO::PARAM_STR);
 
-                /** @noinspection ForeachInvariantsInspection */
                 for ($i = 0, $iMax = count($ids); $i < $iMax; $i++) {
                     $stmt->bindParam($i + 3, $ids[$i], PDO::PARAM_INT);
                 }
@@ -531,11 +530,6 @@ class Entrevistado
             }
 
             $stmt->execute();
-
-            /*if ($proyecto !== null) {
-                $sql .= " ";
-                $stmt->bindParam(1, $proyecto, PDO::PARAM_STR);
-            }*/
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         } catch (PDOException $e) {

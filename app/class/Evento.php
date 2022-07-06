@@ -272,41 +272,86 @@ class Evento
                 en.visible = 1 AND 
                 ev.visible = 1";
 
-            if ($proyecto !== null) {
-                $sql .= " AND i.proyecto= :proyecto";
-            }
-
-            if ($idEmoticon !== null) {
-                $sql .= " AND ev.id_emoticon= :emoticon";
-            }
-            if ($letraGenero !== null) {
-                $sql .= " AND e.sexo LIKE :letraGenero";
+            if ($idEmoticon !== null && $letraGenero !== null && $ids !== null) {
+                $in = str_repeat('?,', count($ids) - 1) . '?';
                 $letraGenero .= "%";
-            }
-            if ($ids !== null) {
-                $questionMarks = implode(",", array_pad(array(), count($ids), "?"));
-                $sql .= " AND e.id in ($questionMarks)";
-            }
 
-            $sql .= " ORDER BY e.nombre,e.apellido,ev.hora_evento";
-            $stmt = $conn->prepare($sql);
+                $sql .= " AND ev.id_emoticon= ?
+                    AND e.sexo LIKE ?
+                    AND e.id in ($in)
+                    ORDER BY e.nombre,e.apellido,ev.hora_evento";
 
-            if ($proyecto !== null) {
-                $stmt->bindParam(':proyecto', $proyecto, PDO::PARAM_STR);
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $idEmoticon, PDO::PARAM_INT);
+                $stmt->bindParam(2, $letraGenero, PDO::PARAM_STR);
+
+                for ($i = 0, $iMax = count($ids); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 3, $ids[$i], PDO::PARAM_INT);
+                }
+            } else if ($idEmoticon !== null && $letraGenero !== null) {
+                $letraGenero .= "%";
+
+                $sql .= " AND ev.id_emoticon= ?
+                    AND e.sexo LIKE ?
+                    ORDER BY e.nombre,e.apellido,ev.hora_evento";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $idEmoticon, PDO::PARAM_INT);
+                $stmt->bindParam(2, $letraGenero, PDO::PARAM_STR);
+            } else if ($idEmoticon !== null && $ids !== null) {
+                $in = str_repeat('?,', count($ids) - 1) . '?';
+
+                $sql .= " AND ev.id_emoticon= ?
+                    AND e.id in ($in)
+                    ORDER BY e.nombre,e.apellido,ev.hora_evento";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $idEmoticon, PDO::PARAM_INT);
+
+                for ($i = 0, $iMax = count($ids); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 2, $ids[$i], PDO::PARAM_INT);
+                }
+            } else if ($letraGenero !== null && $ids !== null) {
+                $in = str_repeat('?,', count($ids) - 1) . '?';
+                $letraGenero .= "%";
+
+                $sql .= " AND e.sexo LIKE ?
+                    AND e.id in ($in)
+                    ORDER BY e.nombre,e.apellido,ev.hora_evento";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $letraGenero, PDO::PARAM_STR);
+
+                for ($i = 0, $iMax = count($ids); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 2, $ids[$i], PDO::PARAM_INT);
+                }
+            } else if ($idEmoticon !== null) {
+
+                $sql .= " AND ev.id_emoticon= ?
+                    ORDER BY e.nombre,e.apellido,ev.hora_evento";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $idEmoticon, PDO::PARAM_INT);
+            } else if ($letraGenero !== null) {
+                $letraGenero .= "%";
+
+                $sql .= " AND e.sexo LIKE ?
+                    ORDER BY e.nombre,e.apellido,ev.hora_evento";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $letraGenero, PDO::PARAM_STR);
+            } else if ($ids !== null) {
+                $in = str_repeat('?,', count($ids) - 1) . '?';
+
+                $sql .= " AND e.id in ($in)
+                    ORDER BY e.nombre,e.apellido,ev.hora_evento";
+                $stmt = $conn->prepare($sql);
+                for ($i = 0, $iMax = count($ids); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 1, $ids[$i], PDO::PARAM_INT);
+                }
+            } else {
+                $stmt = $conn->prepare($sql);
             }
-
-            if ($idEmoticon !== null) {
-                $stmt->bindParam(':emoticon', $idEmoticon, PDO::PARAM_INT);
-            }
-
-            if ($letraGenero !== null) {
-                $stmt->bindParam(':letraGenero', $letraGenero, PDO::PARAM_STR);
-            }
-
-            if ($ids !== null) {
-                $stmt->execute($ids);
-            }
-
             $stmt->execute();
 
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
