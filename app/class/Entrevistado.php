@@ -404,7 +404,9 @@ class Entrevistado
                     ON e.id = n.id_entrevistado 
                 INNER JOIN evento ev 
                     ON n.id = ev.id_entrevista 
-                WHERE e.visible = 1 AND n.visible = 1 AND ev.visible = 1 GROUP BY e.id, e.nombre";
+                WHERE e.visible = 1 AND n.visible = 1 AND ev.visible = 1 
+                GROUP BY e.id, e.nombre,e.apellido
+                ORDER BY e.nombre,e.apellido";
 
             $stmt = $conn->prepare($sql);
             $stmt->execute();

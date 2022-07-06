@@ -359,6 +359,7 @@ $app->get('/entrevistados/eventos', function ($request, $response, $args) {
                 'type' => 'entrevistados',
                 'id' => $value['id'],
                 'attributes' => array(
+                    'id' => $value['id'],
                     'nombre' => $value['nombre'],
                     'apellido' => $value['apellido'],
                     'n_eventos' => $value['n_eventos'],
