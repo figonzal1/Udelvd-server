@@ -444,45 +444,98 @@ class Entrevistado
                     AND n.visible = 1
                     AND ev.visible = 1";
 
+            if ($idEmoticon !== null && $letraGenero !== null && $ids !== null) {
 
-            if ($proyecto !== null) {
-                $sql .= " AND i.proyecto= :proyecto";
-            }
-
-            if ($idEmoticon !== null) {
-                $sql .= " AND ev.id_emoticon= :emoticon";
-            }
-            if ($letraGenero !== null) {
-                $sql .= " AND e.sexo LIKE :letraGenero";
+                $in = str_repeat('?,', count($ids) - 1) . '?';
                 $letraGenero .= "%";
-            }
-            if ($ids !== null) {
-                $questionMarks = implode(",", array_pad(array(), count($ids), "?"));
-                $sql .= " AND e.id in ($questionMarks)";
-            }
 
-            $sql .= " GROUP BY e.id,e.nombre ORDER BY e.nombre";
-            $stmt = $conn->prepare($sql);
+                $sql .= " AND ev.id_emoticon= ?
+                    AND e.sexo LIKE ?
+                    AND e.id in ($in)
+                    GROUP BY e.id,e.nombre ORDER BY e.nombre";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $idEmoticon, PDO::PARAM_INT);
+                $stmt->bindParam(2, $letraGenero, PDO::PARAM_STR);
+
+                /** @noinspection ForeachInvariantsInspection */
+                for ($i = 0, $iMax = count($ids); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 3, $ids[$i], PDO::PARAM_INT);
+                }
+
+            } else if ($idEmoticon !== null && $letraGenero !== null) {
+                $letraGenero .= "%";
+
+                $sql .= " AND ev.id_emoticon= ?
+                    AND e.sexo LIKE ?
+                    GROUP BY e.id,e.nombre ORDER BY e.nombre";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $idEmoticon, PDO::PARAM_INT);
+                $stmt->bindParam(2, $letraGenero, PDO::PARAM_STR);
 
 
-            if ($proyecto !== null) {
-                $stmt->bindParam(':proyecto', $proyecto, PDO::PARAM_STR);
-            }
+            } else if ($idEmoticon !== null && $ids !== null) {
+                $in = str_repeat('?,', count($ids) - 1) . '?';
 
-            if ($idEmoticon !== null) {
-                $stmt->bindParam(':emoticon', $idEmoticon, PDO::PARAM_INT);
-            }
+                $sql .= " AND ev.id_emoticon= ?
+                    AND e.id in ($in)
+                    GROUP BY e.id,e.nombre ORDER BY e.nombre";
 
-            if ($letraGenero !== null) {
-                $stmt->bindParam(':letraGenero', $letraGenero, PDO::PARAM_STR);
-            }
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $idEmoticon, PDO::PARAM_INT);
+                for ($i = 0, $iMax = count($ids); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 2, $ids[$i], PDO::PARAM_INT);
+                }
+            } else if ($letraGenero !== null && $ids !== null) {
+                $in = str_repeat('?,', count($ids) - 1) . '?';
+                $letraGenero .= "%";
 
-            if ($ids !== null) {
-                $stmt->execute($ids);
+                $sql .= " AND e.sexo LIKE ?
+                    AND e.id in ($in)
+                    GROUP BY e.id,e.nombre ORDER BY e.nombre";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $letraGenero, PDO::PARAM_STR);
+
+                for ($i = 0, $iMax = count($ids); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 2, $ids[$i], PDO::PARAM_INT);
+                }
+            } else if ($idEmoticon !== null) {
+                $sql .= " AND ev.id_emoticon= ?
+                    GROUP BY e.id,e.nombre ORDER BY e.nombre";
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $idEmoticon, PDO::PARAM_INT);
+            } else if ($letraGenero !== null) {
+                $letraGenero .= "%";
+
+                $sql .= " AND e.sexo LIKE ?
+                    GROUP BY e.id,e.nombre ORDER BY e.nombre";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $letraGenero, PDO::PARAM_STR);
+            } else if ($ids !== null) {
+                $in = str_repeat('?,', count($ids) - 1) . '?';
+
+                $sql .= " AND e.id in ($in)
+                    GROUP BY e.id,e.nombre ORDER BY e.nombre";
+
+                $stmt = $conn->prepare($sql);
+                for ($i = 0, $iMax = count($ids); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 1, $ids[$i], PDO::PARAM_INT);
+                }
+
+            } else {
+                $sql .= " GROUP BY e.id,e.nombre ORDER BY e.nombre";
+                $stmt = $conn->prepare($sql);
             }
 
             $stmt->execute();
 
+            /*if ($proyecto !== null) {
+                $sql .= " ";
+                $stmt->bindParam(1, $proyecto, PDO::PARAM_STR);
+            }*/
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         } catch (PDOException $e) {

@@ -137,53 +137,103 @@ class Evento
                 COUNT(*) AS n_emoticones
             FROM
                 investigador
-            INNER JOIN entrevistado ON
-                investigador.id = entrevistado.id_investigador
-            INNER JOIN entrevista ON
-                entrevistado.id = entrevista.id_entrevistado
-            INNER JOIN evento ON
-                entrevista.id = evento.id_entrevista
+            INNER JOIN entrevistado e ON
+                investigador.id = e.id_investigador
+            INNER JOIN entrevista en ON
+                e.id = en.id_entrevistado
+            INNER JOIN evento ev ON
+                en.id = ev.id_entrevista
             INNER JOIN emoticon em ON
-                evento.id_emoticon = em.id
+                ev.id_emoticon = em.id
             WHERE
-                entrevistado.visible = 1 AND 
-                entrevista.visible = 1 AND 
-                evento.visible = 1";
+                e.visible = 1 AND 
+                en.visible = 1 AND 
+                ev.visible = 1";
 
+            if ($idEmoticon !== null && $letraGenero !== null && $ids !== null) {
 
-            if ($proyecto !== null) {
-                $sql .= " AND investigador.proyecto = :proyecto";
-            }
-
-            if ($idEmoticon !== null) {
-                $sql .= " AND evento.id_emoticon = :emoticon";
-            }
-
-            if ($letraGenero !== null) {
-                $sql .= " AND entrevistado.sexo LIKE :letraGenero";
+                $in = str_repeat('?,', count($ids) - 1) . '?';
                 $letraGenero .= "%";
-            }
-            if ($ids !== null) {
-                $questionMarks = implode(",", array_pad(array(), count($ids), "?"));
-                $sql .= " AND entrevistado.id in ($questionMarks)";
-            }
 
-            $sql .= " GROUP BY evento.id_emoticon";
-            $stmt = $conn->prepare($sql);
+                $sql .= " AND ev.id_emoticon = ?
+                    AND e.sexo LIKE ?
+                    AND e.id in ($in)
+                    GROUP BY ev.id_emoticon";
 
-            if ($proyecto !== null) {
-                $stmt->bindParam(':proyecto', $proyecto, PDO::PARAM_STR);
-            }
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $idEmoticon, PDO::PARAM_INT);
+                $stmt->bindParam(2, $letraGenero, PDO::PARAM_STR);
 
-            if ($idEmoticon !== null) {
-                $stmt->bindParam(':emoticon', $idEmoticon, PDO::PARAM_INT);
-            }
+                for ($i = 0, $iMax = count($ids); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 3, $ids[$i], PDO::PARAM_INT);
+                }
+            } else if ($idEmoticon !== null && $letraGenero !== null) {
+                $letraGenero .= "%";
 
-            if ($letraGenero !== null) {
-                $stmt->bindParam(':letraGenero', $letraGenero, PDO::PARAM_STR);
-            }
-            if ($ids !== null) {
-                $stmt->execute($ids);
+                $sql .= " AND ev.id_emoticon = ?
+                    AND e.sexo LIKE ?
+                    GROUP BY ev.id_emoticon";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $idEmoticon, PDO::PARAM_INT);
+                $stmt->bindParam(2, $letraGenero, PDO::PARAM_STR);
+
+
+            } else if ($idEmoticon !== null && $ids !== null) {
+                $in = str_repeat('?,', count($ids) - 1) . '?';
+
+                $sql .= " AND ev.id_emoticon = ?
+                    AND e.id in ($in)
+                    GROUP BY ev.id_emoticon";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $idEmoticon, PDO::PARAM_INT);
+
+                for ($i = 0, $iMax = count($ids); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 2, $ids[$i], PDO::PARAM_INT);
+                }
+            } else if ($letraGenero !== null && $ids !== null) {
+                $in = str_repeat('?,', count($ids) - 1) . '?';
+                $letraGenero .= "%";
+
+                $sql .= " AND e.sexo LIKE ?
+                    AND e.id in ($in)
+                    GROUP BY ev.id_emoticon";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $letraGenero, PDO::PARAM_STR);
+
+                for ($i = 0, $iMax = count($ids); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 2, $ids[$i], PDO::PARAM_INT);
+                }
+            } else if ($idEmoticon !== null) {
+                $sql .= " AND ev.id_emoticon = ?
+                    GROUP BY ev.id_emoticon";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $idEmoticon, PDO::PARAM_INT);
+            } else if ($letraGenero !== null) {
+                $letraGenero .= "%";
+
+                $sql .= " AND e.sexo LIKE ?
+                    GROUP BY ev.id_emoticon";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $letraGenero, PDO::PARAM_STR);
+            } else if ($ids !== null) {
+                $in = str_repeat('?,', count($ids) - 1) . '?';
+
+                $sql .= " AND e.id in ($in)
+                    GROUP BY ev.id_emoticon";
+
+                $stmt = $conn->prepare($sql);
+
+                for ($i = 0, $iMax = count($ids); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 1, $ids[$i], PDO::PARAM_INT);
+                }
+            } else {
+                $sql .= " GROUP BY e.id,e.nombre ORDER BY e.nombre";
+                $stmt = $conn->prepare($sql);
             }
 
             $stmt->execute();
