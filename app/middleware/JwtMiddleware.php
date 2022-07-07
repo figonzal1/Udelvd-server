@@ -42,19 +42,19 @@ class JwtMiddleware
 
         if ($jwt->validarToken($authorization_header)) {
             return $response;
-        } else {
-            $payload = [];
-            $payload = ErrorJsonHandler::lanzarError($payload, 403, 'Auth problem', 'Token invalid');
-
-            try {
-                $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-            } catch (JsonException $e) {
-                error_log("JSON Exception: " . $e->getMessage());
-            }
-
-            $response = new Response();
-            $response->getBody()->write($payload);
-            return $response->withStatus(403);
         }
+
+        $payload = [];
+        $payload = ErrorJsonHandler::lanzarError($payload, 403, 'Auth problem', 'Token invalid');
+
+        try {
+            $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        } catch (JsonException $e) {
+            error_log("JSON Exception: " . $e->getMessage());
+        }
+
+        $response = new Response();
+        $response->getBody()->write($payload);
+        return $response->withStatus(403);
     }
 }

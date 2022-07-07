@@ -145,7 +145,7 @@ $app->post('/acciones', function ($request, $response, $args) {
 
             //Formatear respuesta
             $payload['data'] = array(
-                'type' => 'investigadores',
+                'type' => 'acciones',
                 'id' => $accion['id'],
                 'attributes' => array(
                     'nombre_es' => $accion['nombre_es'],
