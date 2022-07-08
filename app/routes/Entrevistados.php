@@ -335,7 +335,7 @@ $app->get('/entrevistados/pagina/{n_pag}/investigador/{id_investigador}', functi
 
 
 //Obtener entrevistados con eventos registrados
-$app->get('/entrevistados/eventos[/proyecto/{ids}]', function ($request, $response, $args) {
+$app->get('/entrevistados/eventos[/proyectos/{ids}]', function ($request, $response, $args) {
 
     $payload = array(
         'links' => array(

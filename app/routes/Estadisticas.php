@@ -66,10 +66,6 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
     //investigador/{id_investigador}/emoticon/{id_emoticon}/genero/{f|m}
     foreach ($params as $i => $iValue) {
 
-        if ($iValue === "investigador") {
-            $idInvestigador = $params[$i + 1];
-        }
-
         if ($iValue === "emoticon") {
             $idEmoticon = $params[$i + 1];
         }
@@ -79,43 +75,41 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
         }
 
         if ($iValue === "entrevistados") {
-            $ids = $params[$i + 1];
+            $intervieweesIds = $params[$i + 1];
+        }
+
+        if ($iValue === "proyectos") {
+            $projectIds = $params[$i + 1];
         }
     }
 
-    $idInvestigador = $idInvestigador ?? null;
     $idEmoticon = $idEmoticon ?? null;
     $letraGenero = $letraGenero ?? null;
-    $ids = $ids ?? null;
+    $intervieweesIds = $intervieweesIds ?? null;
+    $projectIds = $projectIds ?? null;
 
-    if ($idInvestigador !== null) {
-        $payload['links']['self'] .= "/investigador/" . $idInvestigador;
-    }
     if ($idEmoticon !== null) {
         $payload['links']['self'] .= "/emoticon/" . $idEmoticon;
     }
     if ($letraGenero !== null) {
         $payload['links']['self'] .= "/genero/" . $letraGenero;
     }
-    if ($ids !== null) {
-        $payload['links']['self'] .= "/entrevistados/" . $ids;
-        $ids = explode(';', $ids);
+    if ($intervieweesIds !== null) {
+        $payload['links']['self'] .= "/entrevistados/" . $intervieweesIds;
+        $intervieweesIds = explode(';', $intervieweesIds);
+    }
+    if ($projectIds !== null) {
+        $payload['links']['self'] .= "/proyectos/" . $projectIds;
+        $projectIds = explode(';', $projectIds);
     }
 
 
     if ($conn !== null) {
 
         //ENTREVISTADOS POR GENERO
-        if ($idInvestigador !== null) {
-            $investigador = new Investigador();
-            $investigador->setId($idInvestigador);
-            $proyectoInvestigador = $investigador->buscarInvestigadorPorId($conn)['proyecto'];
-        } else {
-            $proyectoInvestigador = null;
-        }
 
         $entrevistado = new Entrevistado();
-        $listadoPorGenero = $entrevistado->entrevistadosPorGenero($conn, $proyectoInvestigador, $idEmoticon, $letraGenero, $ids);
+        $listadoPorGenero = $entrevistado->entrevistadosPorGenero($conn, $idEmoticon, $letraGenero, $intervieweesIds, $projectIds);
 
         $nEntrevistados = count($listadoPorGenero);
         $nEventos = 0;
@@ -136,8 +130,9 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
         }
 
         //EVENTOS POR EMOTICON
+        /*
         $evento = new Evento();
-        $listadoPorEmoticon = $evento->eventosPorEmoticon($conn, $proyectoInvestigador, $idEmoticon, $letraGenero, $ids);
+        $listadoPorEmoticon = $evento->eventosPorEmoticon($conn, $idEmoticon, $letraGenero, $intervieweesIds, $projectIds);
 
         $totalFelicidad = 0;
         $totalTristeza = 0;
@@ -160,7 +155,7 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
             if (str_contains($value['descripcion_es'], "enojo")) {
                 $totalEnojo = (int)$value['n_emoticones'];
             }
-        }
+        }*/
 
         $payload['data'][0] = array(
             'type' => 'estadisticas',
@@ -169,7 +164,7 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
                     'n_entrevistados' => $nEntrevistados,
                     'n_eventos' => $nEventos,
                 ),
-                'entrevistados_por_genero' => array(
+                /*'entrevistados_por_genero' => array(
                     'total_femenino' => $totalFemenino,
                     'total_masculino' => $totalMasculino,
                     'total_otros' => $totalOtro
@@ -179,14 +174,14 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
                     'tristeza' => $totalTristeza,
                     'miedo' => $totalMiedo,
                     'enojo' => $totalEnojo
-                )
+                )*/
             )
         );
 
-        $payload['data'][0]['attributes']['eventos_para_estadisticas'] = array();
+        /*$payload['data'][0]['attributes']['eventos_para_estadisticas'] = array();
 
         //EVENTOS PARA ESTADISTICAS
-        $eventosParaEstadisticas = $evento->eventosParaEstadisticas($conn, $proyectoInvestigador, $idEmoticon, $letraGenero, $ids);
+        $eventosParaEstadisticas = $evento->eventosParaEstadisticas($conn, $idEmoticon, $letraGenero, $intervieweesIds,$projectIds);
 
         foreach ($eventosParaEstadisticas as $iValue) {
 
@@ -199,7 +194,7 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
                 'url' => $iValue['url'],
             );
         }
-
+*/
         $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         $response->getBody()->write($payload);
 
