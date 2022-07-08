@@ -23,7 +23,7 @@ require_once("../app/config/MysqlAdapter.php");
 /**
  * CLASES
  */
-require_once("../app/class/Acciones.php");
+require_once("../app/class/Accion.php");
 require_once("../app/class/Emoticones.php");
 require_once("../app/class/Entrevista.php");
 require_once("../app/class/Evento.php");

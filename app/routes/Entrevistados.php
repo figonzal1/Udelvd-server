@@ -335,12 +335,20 @@ $app->get('/entrevistados/pagina/{n_pag}/investigador/{id_investigador}', functi
 
 
 //Obtener entrevistados con eventos registrados
-$app->get('/entrevistados/eventos', function ($request, $response, $args) {
+$app->get('/entrevistados/eventos[/proyecto/{ids}]', function ($request, $response, $args) {
+
     $payload = array(
         'links' => array(
             'self' => '/entrevistados/eventos'
         )
     );
+
+    $projectIds = $args['ids'] ?? null;
+
+    if ($projectIds !== null) {
+        $payload['links']['self'] .= "/proyecto/" . $projectIds;
+        $projectIds = explode(';', $projectIds);
+    }
 
     //Conectar BD
     $mysql_adapter = new MysqlAdapter();
@@ -350,7 +358,7 @@ $app->get('/entrevistados/eventos', function ($request, $response, $args) {
         //Buscar entrevistados
         $object = new Entrevistado();
 
-        $listado = $object->entrevistadosConEventos($conn);
+        $listado = $object->entrevistadosConEventos($conn, $projectIds);
 
         //Preparar respuesta
         foreach ($listado as $value) {

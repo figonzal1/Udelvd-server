@@ -388,7 +388,7 @@ class Entrevistado
         }
     }
 
-    public function entrevistadosConEventos($conn)
+    public function entrevistadosConEventos($conn, $projectIds)
     {
 
         try {
@@ -404,13 +404,29 @@ class Entrevistado
                     ON e.id = n.id_entrevistado 
                 INNER JOIN evento ev 
                     ON n.id = ev.id_entrevista 
-                WHERE e.visible = 1 AND n.visible = 1 AND ev.visible = 1 
+                INNER JOIN proyecto p on i.id_proyecto = p.id
+                WHERE e.visible = 1 AND n.visible = 1 AND ev.visible = 1 ";
+
+            if ($projectIds !== null) {
+                $in = str_repeat('?,', count($projectIds) - 1) . '?';
+
+                $sql .= " AND i.id_proyecto IN ($in)
                 GROUP BY e.id, e.nombre,e.apellido
                 ORDER BY e.nombre,e.apellido";
 
-            $stmt = $conn->prepare($sql);
-            $stmt->execute();
+                $stmt = $conn->prepare($sql);
 
+                for ($i = 0, $iMax = count($projectIds); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 1, $projectIds[$i], PDO::PARAM_INT);
+                }
+
+            } else {
+                $sql .= " GROUP BY e.id, e.nombre,e.apellido
+                ORDER BY e.nombre,e.apellido";
+                $stmt = $conn->prepare($sql);
+            }
+
+            $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         } catch (PDOException $e) {

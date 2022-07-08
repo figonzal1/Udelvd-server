@@ -3,7 +3,7 @@
 /**
  * Objeto accion
  */
-class Acciones
+class Accion
 {
 
     private string $id;

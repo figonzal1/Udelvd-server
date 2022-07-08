@@ -19,7 +19,7 @@ $app->get('/acciones/idioma/{idioma}', function ($request, $response, $args) {
     if ($conn !== null) {
 
         //Buscar acciones
-        $object = new Acciones();
+        $object = new Accion();
         $listado = $object->buscarTodosPorIdioma($conn, $idioma);
 
         //Preparar respuesta
@@ -68,7 +68,7 @@ $app->get('/acciones', function ($request, $response, $args) {
     if ($conn !== null) {
 
         //Buscar acciones
-        $object = new Acciones();
+        $object = new Accion();
         $listado = $object->buscarTodos($conn);
 
         //Preparar respuesta
@@ -129,7 +129,7 @@ $app->post('/acciones', function ($request, $response, $args) {
 
         //Agregar accion
 
-        $object = new Acciones();
+        $object = new Accion();
         $object->setNombreEs(htmlspecialchars($data['nombre_es']));
         $object->setNombreEn(htmlspecialchars($data['nombre_en']));
 
@@ -202,7 +202,7 @@ $app->put('/acciones/{id_accion}', function ($request, $response, $args) {
     } else if ($conn !== null) {
 
         //Agregar accion
-        $object = new Acciones();
+        $object = new Accion();
         $object->setId(htmlspecialchars($idAccion));
         $object->setNombreES(htmlspecialchars($putData['nombre_es']));
         $object->setNombreEN(htmlspecialchars($putData['nombre_en']));
@@ -266,7 +266,7 @@ $app->delete('/acciones/{id_accion}', function ($request, $response, $args) {
         $response = $response->withStatus(400);
     } else if ($conn !== null) {
 
-        $object = new Acciones();
+        $object = new Accion();
         $eliminar = $object->eliminar($conn, $idAccion);
 
         if ($eliminar) {
