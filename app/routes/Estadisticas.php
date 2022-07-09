@@ -178,10 +178,10 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
             )
         );
 
-        /*$payload['data'][0]['attributes']['eventos_para_estadisticas'] = array();
+        $payload['data'][0]['attributes']['eventos_para_estadisticas'] = array();
 
         //EVENTOS PARA ESTADISTICAS
-        $eventosParaEstadisticas = $evento->eventosParaEstadisticas($conn, $idEmoticon, $letraGenero, $intervieweesIds,$projectIds);
+        $eventosParaEstadisticas = $evento->eventosParaEstadisticas($conn, $idEmoticon, $letraGenero, $intervieweesIds, $projectIds);
 
         foreach ($eventosParaEstadisticas as $iValue) {
 
@@ -194,7 +194,7 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
                 'url' => $iValue['url'],
             );
         }
-*/
+
         $payload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         $response->getBody()->write($payload);
 

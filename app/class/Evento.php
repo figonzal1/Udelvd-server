@@ -278,7 +278,7 @@ class Evento
                 $stmt->bindParam(1, $idEmoticon, PDO::PARAM_INT);
 
                 for ($i = 0, $iMax = count($projectIds); $i < $iMax; $i++) {
-                    $stmt->bindParam($i + 3, $projectIds[$i], PDO::PARAM_INT);
+                    $stmt->bindParam($i + 2, $projectIds[$i], PDO::PARAM_INT);
                 }
             } /**
              * Filter: genre, projects
@@ -296,7 +296,7 @@ class Evento
                 $stmt->bindParam(1, $letraGenero, PDO::PARAM_STR);
 
                 for ($i = 0, $iMax = count($projectIds); $i < $iMax; $i++) {
-                    $stmt->bindParam($i + 3, $projectIds[$i], PDO::PARAM_INT);
+                    $stmt->bindParam($i + 2, $projectIds[$i], PDO::PARAM_INT);
                 }
             } /**
              * Filter: interviewee, projects
@@ -452,18 +452,50 @@ class Evento
                 ev.id_emoticon = em.id
             INNER JOIN accion ac ON
                 ev.id_accion = ac.id
+            INNER JOIN proyecto p ON
+                i.id_proyecto = p.id
             WHERE 
                 e.visible = 1 AND 
                 en.visible = 1 AND 
                 ev.visible = 1";
 
-            if ($idEmoticon !== null && $letraGenero !== null && $intervieweeIds !== null) {
-                $in = str_repeat('?,', count($intervieweeIds) - 1) . '?';
+            /**
+             * Filter: emoticon, genre, interview, projects
+             */
+            if ($idEmoticon !== null && $letraGenero !== null && $intervieweeIds !== null && $projectIds !== null) {
+                $inIds = str_repeat('?,', count($intervieweeIds) - 1) . '?';
+                $proIds = str_repeat('?,', count($projectIds) - 1) . '?';
+
                 $letraGenero .= "%";
 
                 $sql .= " AND ev.id_emoticon= ?
                     AND e.sexo LIKE ?
-                    AND e.id in ($in)
+                    AND i.id_proyecto IN($proIds)
+                    AND e.id in ($inIds)
+                    ORDER BY e.nombre,e.apellido,ev.hora_evento";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $idEmoticon, PDO::PARAM_INT);
+                $stmt->bindParam(2, $letraGenero, PDO::PARAM_STR);
+
+                for ($i = 0, $iMax = count($projectIds); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 3, $projectIds[$i], PDO::PARAM_INT);
+                }
+
+                for ($i = 0, $iMax = count($intervieweeIds); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 3 + count($projectIds), $intervieweeIds[$i], PDO::PARAM_INT);
+                }
+            } /**
+             * Filter: emoticon, genre, interviewee
+             */
+            else if ($idEmoticon !== null && $letraGenero !== null && $intervieweeIds !== null) {
+                $inIds = str_repeat('?,', count($intervieweeIds) - 1) . '?';
+
+                $letraGenero .= "%";
+
+                $sql .= " AND ev.id_emoticon= ?
+                    AND e.sexo LIKE ?
+                    AND e.id in ($inIds)
                     ORDER BY e.nombre,e.apellido,ev.hora_evento";
 
                 $stmt = $conn->prepare($sql);
@@ -473,7 +505,134 @@ class Evento
                 for ($i = 0, $iMax = count($intervieweeIds); $i < $iMax; $i++) {
                     $stmt->bindParam($i + 3, $intervieweeIds[$i], PDO::PARAM_INT);
                 }
-            } else if ($idEmoticon !== null && $letraGenero !== null) {
+            } /**
+             * Filter: emoticon, genre, projects
+             */
+            else if ($idEmoticon !== null && $letraGenero !== null && $projectIds !== null) {
+
+                $proIds = str_repeat('?,', count($projectIds) - 1) . '?';
+
+                $letraGenero .= "%";
+
+                $sql .= " AND ev.id_emoticon= ?
+                    AND e.sexo LIKE ?
+                    AND i.id_proyecto IN($proIds)
+                    ORDER BY e.nombre,e.apellido,ev.hora_evento";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $idEmoticon, PDO::PARAM_INT);
+                $stmt->bindParam(2, $letraGenero, PDO::PARAM_STR);
+
+                for ($i = 0, $iMax = count($projectIds); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 3, $projectIds[$i], PDO::PARAM_INT);
+                }
+            } /**
+             * Filter: emoticon, interviewee, project
+             */
+            else if ($idEmoticon !== null && $intervieweeIds !== null && $projectIds !== null) {
+                $inIds = str_repeat('?,', count($intervieweeIds) - 1) . '?';
+                $proIds = str_repeat('?,', count($projectIds) - 1) . '?';
+
+                $sql .= " AND ev.id_emoticon= ?
+                    AND i.id_proyecto IN($proIds)
+                    AND e.id in ($inIds)
+                    ORDER BY e.nombre,e.apellido,ev.hora_evento";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $idEmoticon, PDO::PARAM_INT);
+
+                for ($i = 0, $iMax = count($projectIds); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 2, $projectIds[$i], PDO::PARAM_INT);
+                }
+
+                for ($i = 0, $iMax = count($intervieweeIds); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 2 + count($projectIds), $intervieweeIds[$i], PDO::PARAM_INT);
+                }
+            } /**
+             * Filter: genre, interviewee, project
+             */
+            else if ($letraGenero !== null && $intervieweeIds !== null && $projectIds !== null) {
+
+                $inIds = str_repeat('?,', count($intervieweeIds) - 1) . '?';
+                $proIds = str_repeat('?,', count($projectIds) - 1) . '?';
+
+                $letraGenero .= "%";
+
+                $sql .= " AND e.sexo LIKE ?
+                    AND i.id_proyecto IN($proIds)
+                    AND e.id in ($inIds)
+                    ORDER BY e.nombre,e.apellido,ev.hora_evento";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $letraGenero, PDO::PARAM_STR);
+
+                for ($i = 0, $iMax = count($projectIds); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 2, $projectIds[$i], PDO::PARAM_INT);
+                }
+
+                for ($i = 0, $iMax = count($intervieweeIds); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 2 + count($projectIds), $intervieweeIds[$i], PDO::PARAM_INT);
+                }
+            } /**
+             * Filter: emoticon, projects
+             */
+            else if ($idEmoticon !== null && $projectIds !== null) {
+
+                $proIds = str_repeat('?,', count($projectIds) - 1) . '?';
+
+                $sql .= " AND ev.id_emoticon= ?
+                    AND i.id_proyecto IN($proIds)
+                    ORDER BY e.nombre,e.apellido,ev.hora_evento";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $idEmoticon, PDO::PARAM_INT);
+
+                for ($i = 0, $iMax = count($projectIds); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 2, $projectIds[$i], PDO::PARAM_INT);
+                }
+            } /**
+             * Filter: genre, projects
+             */
+            else if ($letraGenero !== null && $projectIds !== null) {
+
+                $proIds = str_repeat('?,', count($projectIds) - 1) . '?';
+
+                $letraGenero .= "%";
+
+                $sql .= " AND e.sexo LIKE ?
+                    AND i.id_proyecto IN($proIds)
+                    ORDER BY e.nombre,e.apellido,ev.hora_evento";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(1, $letraGenero, PDO::PARAM_STR);
+
+                for ($i = 0, $iMax = count($projectIds); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 2, $projectIds[$i], PDO::PARAM_INT);
+                }
+            } /**
+             * Filter: interviewee, projects
+             */
+            else if ($intervieweeIds !== null && $projectIds !== null) {
+                $inIds = str_repeat('?,', count($intervieweeIds) - 1) . '?';
+                $proIds = str_repeat('?,', count($projectIds) - 1) . '?';
+
+                $sql .= " AND i.id_proyecto IN($proIds)
+                    AND e.id in ($inIds)
+                    ORDER BY e.nombre,e.apellido,ev.hora_evento";
+
+                $stmt = $conn->prepare($sql);
+
+                for ($i = 0, $iMax = count($projectIds); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 1, $projectIds[$i], PDO::PARAM_INT);
+                }
+
+                for ($i = 0, $iMax = count($intervieweeIds); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 1 + count($projectIds), $intervieweeIds[$i], PDO::PARAM_INT);
+                }
+            } /**
+             * Filter: emoticon, genre
+             */
+            else if ($idEmoticon !== null && $letraGenero !== null) {
                 $letraGenero .= "%";
 
                 $sql .= " AND ev.id_emoticon= ?
@@ -483,7 +642,10 @@ class Evento
                 $stmt = $conn->prepare($sql);
                 $stmt->bindParam(1, $idEmoticon, PDO::PARAM_INT);
                 $stmt->bindParam(2, $letraGenero, PDO::PARAM_STR);
-            } else if ($idEmoticon !== null && $intervieweeIds !== null) {
+            } /**
+             * Filter: emoticon, interviewees
+             */
+            else if ($idEmoticon !== null && $intervieweeIds !== null) {
                 $in = str_repeat('?,', count($intervieweeIds) - 1) . '?';
 
                 $sql .= " AND ev.id_emoticon= ?
@@ -496,7 +658,10 @@ class Evento
                 for ($i = 0, $iMax = count($intervieweeIds); $i < $iMax; $i++) {
                     $stmt->bindParam($i + 2, $intervieweeIds[$i], PDO::PARAM_INT);
                 }
-            } else if ($letraGenero !== null && $intervieweeIds !== null) {
+            } /**
+             * Filter: genre, interviewees
+             */
+            else if ($letraGenero !== null && $intervieweeIds !== null) {
                 $in = str_repeat('?,', count($intervieweeIds) - 1) . '?';
                 $letraGenero .= "%";
 
@@ -510,14 +675,20 @@ class Evento
                 for ($i = 0, $iMax = count($intervieweeIds); $i < $iMax; $i++) {
                     $stmt->bindParam($i + 2, $intervieweeIds[$i], PDO::PARAM_INT);
                 }
-            } else if ($idEmoticon !== null) {
+            } /**
+             * Filter: emoticons
+             */
+            else if ($idEmoticon !== null) {
 
                 $sql .= " AND ev.id_emoticon= ?
                     ORDER BY e.nombre,e.apellido,ev.hora_evento";
 
                 $stmt = $conn->prepare($sql);
                 $stmt->bindParam(1, $idEmoticon, PDO::PARAM_INT);
-            } else if ($letraGenero !== null) {
+            } /**
+             * Filter: genre
+             */
+            else if ($letraGenero !== null) {
                 $letraGenero .= "%";
 
                 $sql .= " AND e.sexo LIKE ?
@@ -525,16 +696,34 @@ class Evento
 
                 $stmt = $conn->prepare($sql);
                 $stmt->bindParam(1, $letraGenero, PDO::PARAM_STR);
-            } else if ($intervieweeIds !== null) {
+            } /**
+             * Filter: interviewees
+             */
+            else if ($intervieweeIds !== null) {
                 $in = str_repeat('?,', count($intervieweeIds) - 1) . '?';
 
                 $sql .= " AND e.id in ($in)
                     ORDER BY e.nombre,e.apellido,ev.hora_evento";
                 $stmt = $conn->prepare($sql);
+
                 for ($i = 0, $iMax = count($intervieweeIds); $i < $iMax; $i++) {
                     $stmt->bindParam($i + 1, $intervieweeIds[$i], PDO::PARAM_INT);
                 }
+            } /**
+             * Filter: projects
+             */
+            else if ($projectIds !== null) {
+                $proIds = str_repeat('?,', count($projectIds) - 1) . '?';
+
+                $sql .= " AND i.id_proyecto IN($proIds)
+                    ORDER BY e.nombre,e.apellido,ev.hora_evento";
+
+                $stmt = $conn->prepare($sql);
+                for ($i = 0, $iMax = count($projectIds); $i < $iMax; $i++) {
+                    $stmt->bindParam($i + 1, $projectIds[$i], PDO::PARAM_INT);
+                }
             } else {
+                $sql .= " ORDER BY e.nombre,e.apellido,ev.hora_evento";
                 $stmt = $conn->prepare($sql);
             }
             $stmt->execute();

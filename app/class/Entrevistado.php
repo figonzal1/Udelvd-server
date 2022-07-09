@@ -647,7 +647,7 @@ class Entrevistado
 
 
             } /*
-             *  Filter: emoticon, interview
+             *  Filter: emoticon, interviewees
              */
             else if ($idEmoticon !== null && $intervieweeIds !== null) {
                 $in = str_repeat('?,', count($intervieweeIds) - 1) . '?';
@@ -658,6 +658,7 @@ class Entrevistado
 
                 $stmt = $conn->prepare($sql);
                 $stmt->bindParam(1, $idEmoticon, PDO::PARAM_INT);
+
                 for ($i = 0, $iMax = count($intervieweeIds); $i < $iMax; $i++) {
                     $stmt->bindParam($i + 2, $intervieweeIds[$i], PDO::PARAM_INT);
                 }
@@ -719,6 +720,7 @@ class Entrevistado
                 $sql .= " AND i.id_proyecto in ($in)
                     GROUP BY e.id,e.nombre ORDER BY e.nombre";
                 $stmt = $conn->prepare($sql);
+
                 for ($i = 0, $iMax = count($projectIds); $i < $iMax; $i++) {
                     $stmt->bindParam($i + 1, $projectIds[$i], PDO::PARAM_INT);
                 }
