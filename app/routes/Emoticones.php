@@ -34,6 +34,7 @@ $app->get('/emoticones/idioma/{idioma}', function ($request, $response, $args) {
                 'type' => 'emoticones',
                 'id' => $value['id'],
                 'attributes' => array(
+                    'id' => $value['id'],
                     'url' => $value['url'],
                     'descripcion' => $descripcion
                 )
