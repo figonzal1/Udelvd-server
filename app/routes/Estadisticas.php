@@ -130,7 +130,7 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
         }
 
         //EVENTOS POR EMOTICON
-        /*
+
         $evento = new Evento();
         $listadoPorEmoticon = $evento->eventosPorEmoticon($conn, $idEmoticon, $letraGenero, $intervieweesIds, $projectIds);
 
@@ -155,7 +155,7 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
             if (str_contains($value['descripcion_es'], "enojo")) {
                 $totalEnojo = (int)$value['n_emoticones'];
             }
-        }*/
+        }
 
         $payload['data'][0] = array(
             'type' => 'estadisticas',
@@ -164,7 +164,7 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
                     'n_entrevistados' => $nEntrevistados,
                     'n_eventos' => $nEventos,
                 ),
-                /*'entrevistados_por_genero' => array(
+                'entrevistados_por_genero' => array(
                     'total_femenino' => $totalFemenino,
                     'total_masculino' => $totalMasculino,
                     'total_otros' => $totalOtro
@@ -174,7 +174,7 @@ $app->get("/estadisticas[/{params:.*}]", function ($request, $response, $args) {
                     'tristeza' => $totalTristeza,
                     'miedo' => $totalMiedo,
                     'enojo' => $totalEnojo
-                )*/
+                )
             )
         );
 
