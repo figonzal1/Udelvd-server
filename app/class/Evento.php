@@ -417,7 +417,7 @@ class Evento
                     $stmt->bindParam($i + 1, $projectIds[$i], PDO::PARAM_INT);
                 }
             } else {
-                $sql .= " GROUP BY e.id,e.nombre ORDER BY e.nombre";
+                $sql .= " GROUP BY ev.id_emoticon";
                 $stmt = $conn->prepare($sql);
             }
 
