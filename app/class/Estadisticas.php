@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection ForgottenDebugOutputInspection */
 
 class Estadisticas
 {
@@ -49,11 +49,13 @@ class Estadisticas
         $this->nombre_en = $nombre_en;
     }
 
-    public function getPinPass(){
+    public function getPinPass()
+    {
         return $this->pin_pass;
     }
 
-    public function setPinPass($pin_pass){
+    public function setPinPass($pin_pass)
+    {
         $this->pin_pass = $pin_pass;
     }
 
@@ -62,11 +64,9 @@ class Estadisticas
 
         try {
 
-            $stmt = $conn->query(
+            return $conn->query(
                 "SELECT * FROM estadisticas"
-            );
-            $listado = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            return $listado;
+            )->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("Fail search lista estadisticas: " . $e->getMessage(), 0);
             return false;
