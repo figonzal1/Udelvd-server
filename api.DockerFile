@@ -17,8 +17,8 @@ COPY ./public/ /var/www/html/
 #Configuraciones apache
 COPY ./api-files/apache2.conf /etc/apache2/apache2.conf
 COPY ./api-files/000-udelvd.conf /etc/apache2/sites-available/000-udelvd.conf
-COPY ./api-files/server.pem /etc/ssl/certs/server.pem
-COPY ./api-files/server-key.pem /etc/ssl/certs/server-key.pem
+#COPY ./api-files/server.pem /etc/ssl/certs/server.pem
+#COPY ./api-files/server-key.pem /etc/ssl/certs/server-key.pem
 
 RUN a2ensite 000-udelvd.conf \ 
 && a2enmod ssl \ 

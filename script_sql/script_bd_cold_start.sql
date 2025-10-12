@@ -944,8 +944,9 @@ VALUES
   (27, 'Enfermero/a'),
   (28, 'Mechanic'),
   (29, 'Mecánico/a'),
-  (30, 'Feriante')
-  /*!40000 ALTER TABLE `profesion` ENABLE KEYS */
+  (30, 'Feriante');
+
+/*!40000 ALTER TABLE `profesion` ENABLE KEYS */
 ;
 
 UNLOCK TABLES;
